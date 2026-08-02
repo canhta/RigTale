@@ -34,7 +34,16 @@ Verified flags (`optionsprocessor.cpp:152-172`): target, width, height, threads,
 
 **Cross-episode rig reuse — an explicit RigTale requirement — is structurally unsupported.**
 
-The bone registry is a file-static map keyed to the **root** canvas (`valuenode_bone.h:64-65`, `valuenode_bone.cpp:74,276`). `loadcanvas.cpp:3336-3337` errors with "Inline canvas cannot have a `<bones>` section". And **every stored bone identifier is XORed with the runtime root-canvas identifier on both write and read** (`savecanvas.cpp:665,731,755`; `loadcanvas.cpp:2575`), while canvases never persist their own identifier — so a bone reference from one file can never resolve in another.
+The bone registry is a file-static map keyed to the **root** canvas (`valuenode_bone.h:64-65`, `valuenode_bone.cpp:74,276`). And **every stored bone identifier is XORed with the runtime root-canvas identifier on both write and read**, while canvases never persist their own identifier — so a bone reference from one file can never resolve in another.
+
+**Independently verified at the pinned commit:**
+
+| Claim | Verification |
+|---|---|
+| Identifiers XORed with the root canvas GUID on write | Confirmed at five sites: `savecanvas.cpp:665,731,737,755,761` |
+| The same XOR applied on read | Confirmed at `loadcanvas.cpp:2575` |
+| Inline canvases cannot carry bones | Confirmed at `loadcanvas.cpp:3337` — `error(child,_("Inline canvas cannot have a <bones> section"))` |
+| No shipped example exercises the bone system | Confirmed: **zero** `.sif` files in the repository contain a `<bones>` section |
 
 There is no import-skeleton and no bind-foreign-bone mechanism anywhere.
 
