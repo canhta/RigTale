@@ -81,3 +81,61 @@ Every production must remain inspectable, reproducible, versionable, and editabl
 3. **Keep the entire production structured and editable.** Store characters, capabilities, scenes, shots, actions, choreography, camera instructions, timing, dependencies, and validation results in versioned structured formats. A user must be able to modify and re-render one shot without regenerating unaffected shots.
 4. **Meet a defined production-quality threshold.** A release candidate must have zero blocking schema, dependency, missing-asset, unsupported-action, render, or audio-duration errors. Visual quality, educational clarity, pacing, synchronization, and repetition must pass a documented human review rubric with an average score of at least 4 out of 5.
 5. **Demonstrate business value with target users.** Complete at least five problem interviews and two hands-on production evaluations with independent creators or studios of approximately two to five people. RigTale should demonstrate at least a 50% reduction in hands-on layout and animation time for the reference production compared with a documented manual cutout workflow using the same published assets.
+
+## Scope Boundary
+
+### Long-Term Product Scope
+
+RigTale is a production-ready, agent-operated animation system covering the complete workflow from creative intent to publishable delivery:
+
+- Educational or creative brief, script, lyrics, and audio-lock workflows.
+- Storyboard, shot planning, animatic, layout, animation, compositing, review, rendering, QC, and delivery.
+- Reusable fixed casts, backgrounds, props, motions, expressions, interactions, and production templates.
+- Multi-character 2D cutout animation as the primary production model.
+- Biped, quadruped, vehicle, prop, and environment asset archetypes.
+- User-uploaded layered artwork and versioned production asset packs.
+- Assisted layer mapping, pivot detection, rigging, and capability authoring.
+- Future AI-generated characters and assets, provided they compile into the same validated production contracts.
+- Typed, versioned `CharacterPack`, `ScenePack`, `PropPack`, `MotionPack`, `AudioTimeline`, `ShotPlan`, and `Episode` representations.
+- Capability-aware agent planning that cannot silently request unsupported actions.
+- Reusable solo motions, group choreography, role-based interactions, lip sync, expressions, camera direction, parallax, and layered compositing.
+- Structured timeline editing and isolated shot regeneration or re-rendering.
+- Deterministic preview and final-render pipelines.
+- Automated visual, temporal, audio, dependency, licensing, and delivery validation.
+- Human approval gates with versioned review notes and audit history.
+- Local single-operator, collaborative studio, CI, and headless-server deployment profiles.
+- Provider-neutral interfaces for language, speech, music, alignment, and future generative models.
+- Localization, captioning, alternative aspect ratios, compilations, and reusable content packaging.
+- Extensible renderer interfaces, with 2D cutout as the primary renderer and future 2D or 3D adapters permitted without changing the production model.
+- Asset provenance, license metadata, reproducible builds, observability, backup, migration, and archival workflows.
+- Complete operator, asset-authoring, deployment, troubleshooting, API, and contributor documentation.
+
+### Release 1 Production Scope
+
+Release 1 will be a complete production vertical, not a disposable prototype:
+
+- Produce 150–210 second publication-ready 2D cutout music videos.
+- Support multiple shots and at least three simultaneous character instances.
+- Include biped, quadruped, and vehicle animation.
+- Import at least one documented layered-asset format.
+- Provide a license-audited reference asset library.
+- Accept locked audio, lyrics, beat, phoneme/viseme, and timing data.
+- Generate capability-valid shot plans, blocking, choreography, actions, reactions, and camera instructions.
+- Support hierarchical transforms, motion clips, sprite swapping, masks, layer ordering, parallax, camera movement, and basic mesh or bone deformation.
+- Provide group choreography and a bounded set of role-based interactions.
+- Generate animatics, shot previews, final video, captions, manifests, and QC reports.
+- Allow shot-level structured corrections and isolated re-rendering.
+- Provide a usable local studio interface plus CLI/API automation.
+- Include production tests, reproducible installation, failure recovery, and documented upgrade paths.
+- Pass the reference-production quality and business objectives defined in the charter.
+
+### Product Non-Goals
+
+- Replacing the structured animation renderer with black-box text-to-video generation.
+- Becoming a general-purpose professional drawing or frame-by-frame animation application.
+- Reimplementing every capability of Harmony, After Effects, Moho, or Blender.
+- Training proprietary foundation models as a core business requirement.
+- Bundling unlicensed assets or imitating protected characters and visual identities.
+- Silently generating unsupported motions or flattening projects into non-editable media.
+- Making native 3D authoring a dependency of the primary 2D production workflow.
+- Optimizing first for large broadcast-studio procurement, live performance capture, or mobile-only authoring.
