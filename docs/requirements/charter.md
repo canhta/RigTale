@@ -230,3 +230,16 @@ RigTale is successful when:
 | Assets introduce copyright or redistribution problems | Require provenance and license metadata, audit bundled assets, and reject unknown or incompatible licenses. |
 | The system depends too heavily on one AI provider | Keep provider adapters replaceable and ensure approved productions can be edited and rendered without an AI connection. |
 | Technical success does not create sufficient user value | Validate the workflow with independent creators and compare hands-on production time against a documented manual baseline. |
+
+## Go/No-Go Criteria
+
+RigTale proceeds to broader production use only when all of the following are true:
+
+- Two materially different productions can be completed without episode-specific engine changes.
+- Final output meets the defined quality gates without manual frame-by-frame correction.
+- A clean installation can reproduce, edit, resume, and render an existing production.
+- Independent evaluations demonstrate at least a 50% reduction in hands-on layout and animation time.
+- The asset pipeline can operate with legally usable, provenance-tracked resources.
+- The system remains practical for one developer to maintain and one operator to run.
+
+The product direction must be reconsidered if visual quality still requires extensive manual animation, each new production requires engine modification, or measured production cost approaches the equivalent manual workflow.
