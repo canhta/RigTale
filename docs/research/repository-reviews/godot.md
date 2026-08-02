@@ -56,8 +56,7 @@ These are architectural, not configuration issues.
 3. **No time-range or start-frame rendering.** Output is a zero-indexed sequence from process start plus one monolithic WAV (`servers/movie_writer/movie_writer_pngwav.cpp:66-86`); no range argument exists in `main/main.cpp`. Isolated shot rerendering — a charter requirement — must be built outside the engine.
 4. **No pixel-level regression testing.** The 234-file suite under `tests/` runs against the dummy rasterizer (`tests/display_server_mock.cpp:37-39`). There are no golden-image tests. `tests/data/images/*` are decoder fixtures.
 5. **Zero 2D-skeletal test coverage.** No `test_skeleton_2d.cpp` and no `test_polygon_2d.cpp` exist, though `test_skeleton_3d.cpp` does. The subsystem RigTale would depend on most is the one with no upstream tests.
-6. ~~**Weight painting is editor-only.**~~ **Corrected — this claim was wrong.** See the correction below.
-7. Audio/video sync is best-effort and warns when `mix_rate % fps != 0` (`servers/movie_writer/movie_writer.cpp:128-130`).
+6. Audio/video sync is best-effort and warns when `mix_rate % fps != 0` (`servers/movie_writer/movie_writer.cpp:128-130`).
 
 ## Correction: Rig Authoring Is Fully Scriptable
 

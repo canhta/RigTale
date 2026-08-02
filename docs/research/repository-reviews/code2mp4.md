@@ -116,7 +116,6 @@ None are scheduled, because the disposition does not depend on them.
 |---|---|
 | Does `assembleComposition` output actually pass `hyperframes lint/validate/inspect` and render? | Nothing in-repo demonstrates the assembler's own output being rendered |
 | Is HyperFrames rendering bit-reproducible across runs and platforms? | Deferred entirely by the repository |
-| ~~What are the actual licence terms of the `hyperframes` CLI?~~ **Resolved.** `https://github.com/heygen-com/hyperframes` is Apache-2.0 (`https://raw.githubusercontent.com/heygen-com/hyperframes/main/LICENSE`, "Copyright 2026 HeyGen, Inc."), accessed 2026-08-02. HyperFrames is therefore a candidate in its own right and is added to the index; see `docs/research/candidate-screening.md`. | Closed |
 | Terms of `@hyperframes/player` specifically | Open |
 | Does HyperFrames support subrange rendering with frame-accurate stitching? | Would matter only for engine-layer reuse |
 | Is DOM capture viable at 150–210 seconds on macOS? | Committed demos are 25–30 seconds |

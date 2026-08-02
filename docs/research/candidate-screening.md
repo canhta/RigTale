@@ -177,21 +177,15 @@ This collapses the comparative ranking built on it. resvg sits on the **same axi
 
 `RGT-S013` is re-scoped accordingly: the question is no longer only "does determinism hold with unpinned fonts" but **"does resvg reproduce its own Linux goldens on macOS arm64 at all."**
 
-### The superseded claim, retained for the record
+### Verified facts
 
-`https://github.com/linebender/resvg` (Apache-2.0 OR MIT) and `https://github.com/linebender/tiny-skia` (BSD-3-Clause).
-
-**Correction to an earlier assumption:** these are no longer under their original owner. `RazrFalcon/resvg` now redirects to `linebender/resvg`, and they are among the most active projects surveyed — resvg released v0.48.0 **on 2026-08-02**, tiny-skia committed 2026-07-31.
+`https://github.com/linebender/resvg` (Apache-2.0 OR MIT) and `https://github.com/linebender/tiny-skia` (BSD-3-Clause). Both moved owner: `RazrFalcon/resvg` now redirects to `linebender/resvg`. Among the most active projects surveyed — resvg v0.48.0 released 2026-08-02, tiny-skia last committed 2026-07-31.
 
 **CPU-only rasterisation.** tiny-skia is a pure-Rust subset of Skia; resvg renders into its pixel buffer. No GPU, therefore no driver variance. Inherently headless, with a library, a C API, and a CLI.
 
-**The determinism evidence is exact-match golden images.** `crates/resvg/tests/integration/render.rs` contains roughly 1,600 generated tests of the form `assert_eq!(render("tests/filters/feBlend/mode=multiply"), 0);`, where the function returns the **count of differing pixels** against a committed reference PNG. Asserting zero means byte-exact reproduction, enforced in CI across the whole suite.
-
-**The one honest exception** is quarantined in the test generator's ignore list with the comment that one radial-gradient focal-point case "Produces slightly different output on some hardware. Not a bug, just a SIMD rounding difference." One known case out of roughly 1,600, explicitly excluded rather than papered over.
+**Golden-image tests.** `crates/resvg/tests/integration/render.rs` contains roughly 1,600 generated tests of the form `assert_eq!(render("tests/filters/feBlend/mode=multiply"), 0);`, where the function returns the count of pixels differing by more than 1/255 on any channel. One radial-gradient focal-point case is quarantined in the generator's ignore list as a SIMD rounding difference.
 
 **Caveat:** text rendering depends on the resolved font set, so reproducibility requires pinning fonts. The harness does exactly that with a fixed font database. Cross-machine text determinism with unpinned system fonts is unproven.
-
-~~This is the most credible determinism posture in the entire screening round.~~ **Withdrawn — see the correction above. The claim "asserting zero means byte-exact reproduction, enforced in CI across the whole suite" is false on both halves: the assertion tolerates ±1/255 and exempts transparent pixels, and CI runs the suite on Linux only.**
 
 ### Vello — documents non-exact output on Apple platforms
 
