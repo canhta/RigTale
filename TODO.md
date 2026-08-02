@@ -12,8 +12,8 @@ An item may be marked `completed` only when its linked exit criteria are satisfi
 
 | ID | Type | Item | Evidence | Status |
 |---|---|---|---|---|
-| RGT-S009 | Workflow spike | Establish the source-cited small-studio workflow map, gate evidence status, and manual comparison protocol | `docs/spikes/SPIKE-W001-production-workflow-and-business-evidence.md` | active |
-| RGT-S001 | Competitive spike | Discover and screen comparable open-source systems (read-only) | `docs/spikes/SPIKE-C001-competitive-landscape.md` | active |
+| RGT-S009 | Workflow spike | Establish the source-cited small-studio workflow map, gate evidence status, and manual comparison protocol | `docs/research/small-studio-workflow.md`, `docs/research/manual-baseline-protocol.md` | active |
+| RGT-S001 | Competitive spike | Discover and screen comparable open-source systems (read-only) | `docs/research/landscape.md`, `docs/research/candidate-screening.md`, `docs/research/repository-reviews/` | active |
 
 ## Blocked
 
@@ -29,6 +29,8 @@ An item may be marked `completed` only when its linked exit criteria are satisfi
 |---|---|---|---|---|
 | RGT-S003 | Fixture spike | Define the representative multi-character production fixture | RGT-S001, RGT-S009 | `docs/spikes/SPIKE-F001-reference-production-fixture.md` |
 | RGT-S002 | Competitive spikes | Deep-review shortlisted repositories using approved fixture cases | RGT-S001, RGT-S003 | `docs/research/repository-reviews/` |
+| RGT-S012 | Renderer gate | Determine whether `tcomposer` renders headless on macOS with no window server | RGT-S001 | `docs/spikes/SPIKE-R001-renderer-backends.md` |
+| RGT-S013 | Determinism gate | Measure byte-level reproducibility of the shortlisted rasterisers on macOS across runs, thread counts, and architectures | RGT-S001 | `docs/spikes/SPIKE-R001-renderer-backends.md` |
 | RGT-S010 | Asset spike | Validate layered-asset ingestion and rig publication | RGT-S001, RGT-S003 | `docs/spikes/SPIKE-A002-asset-ingestion-and-rig-authoring.md` |
 | RGT-S008 | Orchestration research | Compare and prototype renderer-independent orchestration contracts | RGT-S002, RGT-S003, RGT-S010 | `docs/spikes/SPIKE-A001-animation-orchestration.md` |
 | RGT-S004 | Production-engine spike | Execute shortlisted orchestration and renderer pairings | RGT-S008 | `docs/spikes/SPIKE-R001-renderer-backends.md` |
@@ -58,6 +60,21 @@ An item may be marked `completed` only when its linked exit criteria are satisfi
 | RGT-D008 | Deployment and operations v1 drafted | `docs/operations/deployment-and-operations.md` | `e593958` |
 | RGT-P001 | Evidence-gated implementation plan v1 drafted | `docs/plans/implementation-plan.md` | `e593958` |
 | RGT-D000 | v1 documentation baseline reviewed and evidence work authorized | `docs/README.md`, `docs/plans/implementation-plan.md` | `e82c45b` |
+
+## Screening Shortlist
+
+`RGT-S001` produced these deep-review candidates, covering four candidate groups. Selection remains blocked on `RGT-D010`.
+
+| Candidate | Why shortlisted | Gating question |
+|---|---|---|
+| OpenToonz | Only candidate with both an agent-writable text scene format and a headless frame-range renderer | `RGT-S012` — does `tcomposer` run headless on macOS? |
+| MLT Framework | Only verified timeline-scope frame-exact range render; LGPL-2.1-only build retains 2D compositing | Does a GPL-free build work on Apple Silicon? |
+| resvg + tiny-skia | Only candidate with CI-enforced zero-pixel-difference golden tests; CPU-only | `RGT-S013` — does determinism hold with unpinned fonts? |
+| DragonBones | Only MIT skeletal format recoverable from source; skin overlay matches the fixed-cast premise | Does multi-skin work? No shipped sample exercises it. |
+| Blender Grease Pencil | Only purpose-built 2D cutout layer model with per-layer render-target routing | Does it render headless on macOS given the unconditional GPU dependency? |
+| Lottie specification | Only animation format with a published machine validator | Can a strict RigTale profile close the permissive unknown-type holes? |
+| OpenTimelineIO | Most mature open per-type schema versioning and migration implementation | Design reference only; no gating question |
+| HyperFrames | Only candidate whose determinism claim is backed by byte-equality tests | Do those tests run on macOS, or silently skip? |
 
 ## Tracker Rules
 

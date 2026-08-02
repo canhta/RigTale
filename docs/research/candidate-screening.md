@@ -139,6 +139,98 @@ Recorded because each one would have misled a checklist-based screening.
 4. **Activity signal inverts reputation.** The likely intended "Skia Canvas" candidate has had no commits for roughly ten months, while the ostensibly older `node-canvas` committed in July 2026.
 5. **`3b1b/manim`** commits are current but its last tagged release is twenty months old.
 
+## Determinism: The Renderer Evidence
+
+Determinism is graded on what each project's own test infrastructure asserts, not on what it claims. Ranked by strength of evidence.
+
+### resvg and tiny-skia — the strongest evidence found
+
+`https://github.com/linebender/resvg` (Apache-2.0 OR MIT) and `https://github.com/linebender/tiny-skia` (BSD-3-Clause).
+
+**Correction to an earlier assumption:** these are no longer under their original owner. `RazrFalcon/resvg` now redirects to `linebender/resvg`, and they are among the most active projects surveyed — resvg released v0.48.0 **on 2026-08-02**, tiny-skia committed 2026-07-31.
+
+**CPU-only rasterisation.** tiny-skia is a pure-Rust subset of Skia; resvg renders into its pixel buffer. No GPU, therefore no driver variance. Inherently headless, with a library, a C API, and a CLI.
+
+**The determinism evidence is exact-match golden images.** `crates/resvg/tests/integration/render.rs` contains roughly 1,600 generated tests of the form `assert_eq!(render("tests/filters/feBlend/mode=multiply"), 0);`, where the function returns the **count of differing pixels** against a committed reference PNG. Asserting zero means byte-exact reproduction, enforced in CI across the whole suite.
+
+**The one honest exception** is quarantined in the test generator's ignore list with the comment that one radial-gradient focal-point case "Produces slightly different output on some hardware. Not a bug, just a SIMD rounding difference." One known case out of roughly 1,600, explicitly excluded rather than papered over.
+
+**Caveat:** text rendering depends on the resolved font set, so reproducibility requires pinning fonts. The harness does exactly that with a fixed font database. Cross-machine text determinism with unpinned system fonts is unproven.
+
+This is the most credible determinism posture in the entire screening round.
+
+### Vello — documents non-exact output on Apple platforms
+
+`https://github.com/linebender/vello` (Apache-2.0 OR MIT), v0.9.0 released 2026-05-15, very active. The README self-describes the project as "in an alpha state".
+
+`vello_tests/README.md` states verbatim that snapshot tests "have a non-exact comparison metric, because of small differences between rendering on different platforms. **This includes differences from 'fast math' on Apple platforms.**"
+
+**That is a documented admission that GPU output is not bit-identical across platforms, naming RigTale's primary target explicitly.**
+
+The CPU path is not bit-exact either: the test macros set default tolerances of 2 for the u8 CPU path and 1 for SIMD and hybrid, with only the f32 CPU path at zero.
+
+A new `vello_cpu` crate published 2026-07-29 is the path that avoids GPU-driver variance and is worth re-evaluating when the project exits alpha. **For now, the documented Apple divergence is a known disqualifier for the GPU path and must be recorded as such.**
+
+### ThorVG — ships a non-reproducibility detector
+
+`https://github.com/thorvg/thorvg` (MIT), v1.1.0 released 2026-07-22, committed 2026-08-01. Very active, and its headless and frame-addressable capabilities are real and documented.
+
+But it makes no reproducibility claim, and its regression tooling argues against assuming one. `test/regression/settings_comparison.toml` uses a maximum-difference threshold of 5 — similarity, not exact match — comparing a branch build against a development build rather than against golden references. More tellingly, `test/regression/check_same_image_size.py` renders the same input repeatedly and compares output file sizes, emitting the message "POSSIBLE_PROBLEM - Converting svg to png is not reproducible".
+
+**A project that ships a run-to-run non-reproducibility detector has, by construction, experienced run-to-run non-reproducibility.** Determinism is not verified; RigTale must measure it before trusting it.
+
+### Others
+
+**Cairo** (LGPL-2.1 or MPL-1.1, note MPL **1.1** not 2.0) releases roughly annually, most recently 1.18.4 on 2025-03-08. Its only determinism statement is a marketing line about consistent output. No test-suite evidence located. Not verified.
+
+**Blend2D** (Zlib) is a fast CPU rasteriser, but it is "Powered by a JIT Compiler" — runtime code generation specialised per detected CPU feature set is a structural determinism concern. Flag, do not adopt blind.
+
+**Skia** (BSD-3-Clause) has a CPU backend but is heavyweight to build or vendor for a solo maintainer. tiny-skia is the pragmatic subset.
+
+## Structured Animation State: Theatre.js
+
+`https://github.com/theatre-js/theatre`. **Dual-licensed, and the split matters:** `@theatre/core` is Apache-2.0, `@theatre/studio` is **AGPL-3.0-only**. The README states that a project's final bundle includes only the core, so only Apache applies. That is favourable — RigTale would never ship the editor — but the trap is invisible from the repository's top-level licence badge.
+
+**The state format is genuinely data.** `packages/core/src/types/private/core.ts` defines a persisted tree of projects, sheets, static overrides, and a positional sequence carrying **`length`** — duration is a **stored field, not computed by running the animation**. Keyframes are `{id, value, position, handles, connectedRight, type}`. A real on-disk instance in the playground is plain JSON with a `definitionVersion`.
+
+**This directly contrasts with Motion Canvas and Revideo**, where duration is discoverable only by executing the animation. Theatre.js demonstrates the property RigTale requires is achievable in a JavaScript timeline library.
+
+`sequence.position` is a real getter and setter documented as the current time in seconds — arbitrary-time seek.
+
+**Two limitations:**
+
+1. **There is no public keyframe-authoring API in the Apache-2.0 core.** Keyframe mutation lives in the AGPL studio. RigTale's write path would be to emit the JSON directly, then load it. Issue 506 confirms this and was closed without rebuttal.
+2. **There is no shipped runtime schema validation.** The schema is declarative and typed, but RigTale would supply its own validator.
+
+**Maintenance: dormant.** The core's last release was 0.7.2 on 2024-05-19; the last public commit was 2024-04-11, adding a notice that development moved temporarily to a private repository for a 1.0 rewrite. A community issue asking whether the project continues has been open since 2025-05-14, with a maintainer reply only via a screenshotted chat message. Every repository in the organisation is stale.
+
+**Net: the format is excellent and RigTale can own it independently of upstream. The project is a single-maintainer bet with a two-year-invisible rewrite.** Take the schema shape; do not take the dependency.
+
+## XDTS — The Most On-Thesis Format Discovered
+
+Implemented inside OpenToonz at `toonz/sources/toonz/xdtsio.h` and `.cpp`, read and written through Qt JSON types — **it is JSON**.
+
+The field vocabulary is literally animation direction: cell numbers, a dialogue field documented as "speaker names and line timing", and a camerawork field documented as "camerawork instructions", under a header carrying cut and scene.
+
+This is the Japanese industry's exchange digital time sheet — **structured production direction as data for fixed-cast 2D cel and cutout animation.** It is the closest existing standard to what RigTale proposes to generate, and it was absent from the candidate index entirely.
+
+Routed to `SPIKE-A001` as a contract-design reference.
+
+## Licensing Red Flags From This Round
+
+1. **GSAP is the highest-severity flag.** Its licence changed on 2025-04-30 to a "Standard 'no charge' GSAP License" with **no SPDX identifier** — the npm manifest declares a URL, not a licence id — and it is **not OSI-approved**. It contains **no redistribution or sublicensing grant at all**, which is a gap for a project that must be redistributable. Its field-of-use restriction prohibits use in "tools that allow users to build visual animations without code" that compete with a named vendor's visual animation building. **RigTale is such a tool.** Whether it competes with that vendor is arguable; the clause lands uncomfortably close. GSAP is also imperative code, so it fails RigTale's data standard independently. **Drop.**
+2. **`@theatre/studio` is AGPL-3.0-only** while the core is Apache-2.0.
+3. **`python-lottie` is AGPL-3.0-or-later** — the most convenient Lottie writer is copyleft-viral.
+4. **Several agentic research repositories ship no licence file at all** and are therefore all rights reserved by default. Cite in prose; never vendor.
+5. **Two candidates are PolyForm Noncommercial 1.0.0** — not open source, incompatible with RigTale's redistribution requirement.
+6. **`Samsung/rlottie` reports no assertion**: its manifest says "basically MIT" with per-directory carve-outs including Skia. Requires a per-directory audit.
+
+## anime.js — Rejected on the Same Grounds as Motion Canvas
+
+MIT (`LICENSE.md`), genuinely healthy — v4.5.0 released 2026-06-22, zero runtime dependencies. But definitions are imperative, and `timeline.call(callbackFunction, position)` embeds arbitrary executable callbacks. There is no JSON representation and no documented way to obtain total duration without construction.
+
+**Identical failure mode to Motion Canvas and Revideo. Rejected on the same basis, despite a clean licence and active maintenance.** Recorded to show the criterion is applied consistently rather than selectively.
+
 ## Screening Claims Rejected on Cross-Verification
 
 Documentation-level screening produced three claims that contradict evidence obtained by direct source inspection of the pinned clones. Source inspection wins in each case. Recorded so the rejected claims are not reintroduced.
