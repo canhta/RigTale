@@ -80,7 +80,7 @@ Every production must remain inspectable, reproducible, versionable, and editabl
 2. **Eliminate per-frame manual animation.** After characters and reusable motions have been published, the benchmark video must be generated without manual frame-by-frame drawing or per-frame keyframing. Human approval and structured shot-level edits remain allowed.
 3. **Keep the entire production structured and editable.** Store characters, capabilities, scenes, shots, actions, choreography, camera instructions, timing, dependencies, and validation results in versioned structured formats. A user must be able to modify and re-render one shot without regenerating unaffected shots.
 4. **Meet a defined production-quality threshold.** A release candidate must have zero blocking schema, dependency, missing-asset, unsupported-action, render, or audio-duration errors. Visual quality, educational clarity, pacing, synchronization, and repetition must pass a documented human review rubric with an average score of at least 4 out of 5.
-5. **Demonstrate business value with target users.** Complete at least five problem interviews and two hands-on production evaluations with independent creators or studios of approximately two to five people. RigTale should demonstrate at least a 50% reduction in hands-on layout and animation time for the reference production compared with a documented manual cutout workflow using the same published assets.
+5. **Demonstrate business value through owner-operated production evidence.** `[REVISED 2026-08-02 — see Charter Revisions]` Complete two hands-on production evaluations, both operated by the Project Owner, using the reference production and one materially different second production. RigTale should demonstrate at least a 50% reduction in hands-on layout and animation time for the reference production compared with an owner-produced manual cutout baseline using the same published assets, measured under `docs/research/manual-baseline-protocol.md`. **The baseline is self-produced; the resulting circularity is a recorded and permanent limitation of this metric, not a resolved measurement.** No external interview or evaluation participant is required.
 
 ## Scope Boundary
 
@@ -216,8 +216,28 @@ RigTale is successful when:
 - A production can be installed, opened, edited, resumed, and rendered on a clean supported machine using documented steps.
 - A single shot can be changed and re-rendered without rebuilding unaffected shots.
 - Final output passes deterministic validation, Red-Team review, and the defined human quality threshold.
-- The workflow reduces hands-on layout and animation time by at least 50% against the documented manual baseline.
+- The workflow reduces hands-on layout and animation time by at least 50% against the owner-produced manual baseline, with the self-comparison limitation recorded alongside the result.
 - Every distributed or imported asset has traceable provenance and license metadata.
+
+## Charter Revisions
+
+The charter follows an owner-governed lifecycle. Changing approved business scope requires an explicit revision recorded here, never an evidence-state transition in a spike or in `TODO.md`.
+
+### Revision 1 — 2026-08-02: Objective 5 no longer requires external participants
+
+**Decided by:** Project Owner. **Recorded by:** Development Agent.
+
+**Owner statement.** The Project Owner is the sole decision-maker and implementer. No interviews or evaluations with external participants will be conducted. Marketing and build-in-public activity is planned but sits outside this repository and is not evidence.
+
+**What changed.** The five problem interviews are removed. The two hands-on production evaluations become owner-operated. The 50% metric is retained, measured against an owner-produced baseline.
+
+**Consequences.** These follow from the revision and are not objections to it.
+
+1. **`RGT-S009B` is rejected, not completed.** Its exit criteria are not met and never will be. Every user-behaviour statement produced by `RGT-S009` Part A remains permanently `[HYPOTHESIS]` or `[UNKNOWN]`; none can be promoted to `[FACT]` by any work remaining in this project.
+2. **`PR-F002` (approval-gate model) is permanently unvalidated.** `RGT-S009` established zero primary evidence in either direction, and the only route to evidence was Part B. The requirement stands on product reasoning alone and must be labelled as such wherever it is relied on.
+3. **The 50% metric loses its last external anchor.** `RGT-S009` established that no published time or cost baseline exists for small-team 2D cutout production. With no interviews, the baseline can only be self-produced. The project therefore measures itself against its own manual attempt, and a favourable result is evidence about this operator rather than about the segment. This resolves open contradiction 2 in `TODO.md` by selecting the self-produced branch with the circularity accepted.
+4. **`RGT-O002` is resolved by recorded deviation.** Blind quality scoring required a reviewer who does not know which workflow produced an output. A solo project with no external participants cannot supply one. The blind-review requirement is waived; quality scoring is owner-performed and non-blind, and the rubric result in Objective 4 carries that limitation.
+5. **The dominant open risk is unchanged and unaddressed by this revision: output quality.** `TODO.md` records that the assumption an agent can write structured direction yielding publishable animation has no evidence of any kind. Removing external validation removes the cheapest early test of it. The first real test is now the owner-operated reference production itself.
 
 ## Key Risks
 

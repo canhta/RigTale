@@ -54,7 +54,7 @@ The product should preserve explicit artifacts and approval gates for creative i
 
 **Evidence status after `RGT-S009` Part A: unchanged, and the gap is now measured.** Desk research found two gates documented in published cutout workflow material — storyboard locked before animatic, and animation approved before compositing — plus formal approval models in three production-tracking tools. **But every one of those sources describes a supervisor role distinct from the artist, and no primary source or first-hand account was found documenting the gate model of a two-to-five-person team.** The best-documented published pipeline states it targets ten to twenty people.
 
-This requirement therefore stays `hypothesis` and cannot be promoted by desk research. It is the largest single evidence gap in the spike and it sits directly on a core design decision: where the human approves. See `docs/research/small-studio-workflow.md` section 4. Resolution requires `RGT-S009B`.
+Desk research cannot promote this requirement, and `RGT-S009B`, the only route that could, was rejected by owner decision on 2026-08-02 (`docs/requirements/charter.md`, Charter Revision 1). **`PR-F002` is therefore permanently `hypothesis`** and will be implemented on product reasoning alone. It sits directly on a core design decision — where the human approves — so any design, contract, or gate relying on it must say so at the point of reliance. See `docs/research/small-studio-workflow.md` section 4.
 
 ### PR-F003 — Audio is conditional production data (`charter-backed`)
 
@@ -293,7 +293,7 @@ The matrix is updated whenever an artifact, phase, evidence owner, or accepted d
 
 | Charter item | State |
 |---|---|
-| Objective 5 — five problem interviews, two hands-on evaluations, and at least a 50% reduction in hands-on time | **No requirement exists.** The charter's only business-value objective is untraceable, and `RGT-S009` established that the 50% claim is currently unfalsifiable for want of any documented baseline. |
+| Objective 5 — two owner-operated hands-on evaluations and at least a 50% reduction in hands-on time | **No requirement exists.** The charter's only business-value objective is untraceable. Since Charter Revision 1 the 50% claim is measured against an owner-produced baseline, so it is falsifiable but self-referential. |
 | Constraint — agent work must run within bounded context, retries, time, and cost | **No requirement exists.** Budgets are specified in `docs/architecture/agent-system.md`, which is architecture, not a requirement, so they carry no gate, phase, or evidence owner. |
 
 Section 13 states that "every charter objective and release-scope item maps to at least one requirement." That criterion is **not currently met**, and this table records the exceptions rather than concealing them.

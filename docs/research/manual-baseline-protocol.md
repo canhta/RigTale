@@ -2,7 +2,7 @@
 
 **Evidence owner:** `SPIKE-W001` Part A (`RGT-S009`).
 
-**Status:** Draft protocol. Approved for use only after `RGT-S009B` interview evidence confirms the tool class, cast size, and revision behaviour assumed below.
+**Status:** Approved for use by owner decision, 2026-08-02, **with two requirements waived rather than satisfied** (`docs/requirements/charter.md`, Charter Revision 1). The tool class, cast size, and revision behaviour assumed below are owner-selected rather than evidence-confirmed, and scoring is non-blind. Both limitations must appear in any reported result.
 
 **Purpose:** Define, before RigTale exists, how the charter's "at least 50% reduction in hands-on layout and animation time" will be measured. Defining it afterwards would let the threshold be fitted to whatever RigTale happens to achieve.
 
@@ -40,7 +40,7 @@ The following is performed once and charged to neither run:
 
 Rationale: RigTale's hypothesis is explicitly about the production phase *after* assets are published. Charging asset preparation to the manual side would manufacture a saving RigTale does not create.
 
-**Red-team note:** this exclusion is also the protocol's largest threat to validity. If `RGT-S009B` finds that asset and rig preparation dominates real small-team cost, then a 50% saving in the measured phase may be a small saving in total production cost. The protocol therefore also records total elapsed preparation time as context, even though it is excluded from the headline metric.
+**Red-team note:** this exclusion is also the protocol's largest threat to validity. If asset and rig preparation dominates real small-team cost, then a 50% saving in the measured phase may be a small saving in total production cost — and nothing in this project will establish whether it does. The protocol therefore also records total elapsed preparation time as context, even though it is excluded from the headline metric.
 
 ## Baseline Fairness Rules
 
@@ -116,9 +116,11 @@ A run is complete only when its output:
 - runs 150–210 seconds and covers the whole brief;
 - contains every required shot, cast member, and interaction in the fixture;
 - passes the same acceptance rubric used for the other run; and
-- is judged by a reviewer who does not know which workflow produced it.
+- is scored by the Project Owner against the written rubric, non-blind.
 
-Blind review is required. A reviewer who knows the output is RigTale's will not score it the same way.
+**Blind review is waived, and the reason it existed has not gone away:** a reviewer who knows the output is RigTale's will not score it the same way. `RGT-O002` is closed by recorded deviation — a solo project with no external participants cannot supply an unaware reviewer.
+
+The protocol's largest bias is therefore uncontrolled. Any reported quality parity between the two runs is an owner self-assessment, and the 50% time result rests on that parity holding. Two mitigations cost nothing and are required: score both runs in randomised order after a delay, and record raw per-criterion scores rather than only the average, so a later reader can re-judge.
 
 If one run fails the quality bar, its time is not comparable and the result is reported as "did not reach comparable quality", never as a time saving.
 
@@ -140,12 +142,13 @@ The charter threshold is a pass/fail gate, not a headline. A 50% figure derived 
 - Stop if the baseline tool cannot use the same published assets, since the comparison would then measure asset conversion rather than production effort.
 - Stop and revise if the measured categories cannot be separated cleanly in practice.
 
-## Open Questions Routed to `RGT-S009B`
+## Unverified Assumptions This Protocol Rests On
 
-1. Which tool would a real target studio use for this production, and at which version?
-2. How many review and correction rounds does a real production of this length take?
-3. What share of total production cost is asset and rig preparation versus layout and animation?
-4. Which activities do practitioners themselves consider "animation time"?
-5. Is hands-on time the cost that actually blocks these teams, or is it elapsed schedule, review latency, or revision risk?
+`RGT-S009B` was to settle these. It was rejected, so they are owner-selected and stay unverified for the life of the project:
 
-Question 5 is the protocol's core risk: it measures the quantity the charter names, which may not be the quantity users care about.
+- which tool and version a real target studio would use for this production;
+- how many review and correction rounds a real production of this length takes;
+- what share of total cost is asset and rig preparation versus layout and animation;
+- which activities practitioners themselves count as "animation time".
+
+**The core risk is a fifth assumption:** that hands-on time is the cost that actually blocks these teams, rather than elapsed schedule, review latency, or revision risk. The protocol measures the quantity the charter names, which may not be the quantity users care about.

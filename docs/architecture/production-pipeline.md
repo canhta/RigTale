@@ -55,7 +55,7 @@ The earliest required input is a creative prompt or brief. Script, lyrics, audio
 
 `[INFERENCE]` The three production-tracking systems examined all presuppose a supervisor role distinct from the artist, and all are multi-user server products. The same vendor material states that in a small team the animators do their own compositing. **Whether a separate approval role exists at all at RigTale's target scale is unknown**, and the best-documented published pipeline states it targets ten to twenty people.
 
-This table must be revised by `RGT-S009B`, not by further desk research. Evidence: `docs/research/small-studio-workflow.md` section 4.
+`RGT-S009B` was to revise this table and was rejected by owner decision on 2026-08-02 (`docs/requirements/charter.md`, Charter Revision 1). **The table therefore stands on desk research and owner judgement and will not be validated against real small-team practice.** Evidence: `docs/research/small-studio-workflow.md` section 4.
 
 ## Entry Modes
 

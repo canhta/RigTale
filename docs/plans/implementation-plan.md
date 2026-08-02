@@ -75,13 +75,12 @@ The names below define ownership boundaries, not selected languages or build too
 
 ## Phase 1 — Workflow, Business, and Competitive Screening
 
-**Tracker:** `RGT-S009`, `RGT-S009B`, and `RGT-S001`.
+**Tracker:** `RGT-S009` and `RGT-S001`.
 
 **Actions:**
 
-1. Establish the source-cited workflow map, gate evidence status, interview instrument, and ranked problem hypotheses under `RGT-S009`.
-2. Conduct at least five problem interviews with target creators or small studios under `RGT-S009B`, and validate real artifact handoffs, approval gates, rework loops, asset publication, review, rendering, and recovery.
-3. Define the comparable manual cutout workflow and hands-on time-capture protocol before product evaluation.
+1. Establish the source-cited workflow map, gate evidence status, and ranked problem hypotheses under `RGT-S009`.
+2. Define the comparable manual cutout workflow and hands-on time-capture protocol before product evaluation.
 4. Verify canonical repositories, licenses, releases, and exact inspected commits.
 5. Perform read-only source screening for production models, rig systems, timelines, render boundaries, tests, packaging, and agent workflows.
 6. Route executable claims to later fixture-based reviews or technical spikes.
@@ -89,11 +88,11 @@ The names below define ownership boundaries, not selected languages or build too
 
 **Tests of completion, Part A (`RGT-S009`, `RGT-S001`) — met:** workflow claims distinguish facts from hypotheses; every pipeline gate carries an explicit evidence status; the manual baseline protocol is drafted and its bias controls are recorded; every competitive claim cites primary evidence and exact source revisions; no candidate code was executed during screening.
 
-**Tests of completion, Part B (`RGT-S009B`) — not met:** five qualifying interviews and a privacy-safe synthesis exist; the manual baseline protocol is *approved* rather than drafted, which the protocol itself conditions on interview evidence confirming tool class, cast size, and revision behaviour.
+**Part B (`RGT-S009B`) was rejected by Project Owner decision on 2026-08-02** (`docs/requirements/charter.md`, Charter Revision 1). No user-value evidence will be collected. The manual baseline protocol is approved with its tool-class, cast-size, and revision-behaviour assumptions owner-selected rather than evidence-confirmed, and with blind review waived.
 
-**Phase 1 is therefore not complete.** Phase 2 may open under the exit gate below; that is a deliberate partial pass, not a completed phase.
+**Phase 1 is complete on Part A alone.** `RGT-D010` and `RGT-D012` now select a production architecture without user-value evidence and must state that limitation in their decision records.
 
-**Exit gate:** Workflow/business and competitive reports are approved. Phase 2 evidence work may begin once `RGT-S009` and `RGT-S001` are approved, but `RGT-D010` and `RGT-D012` must not select a production architecture until `RGT-S009B` user-value evidence and the manual baseline are accepted. No technology is selected solely by this phase.
+**Exit gate:** Workflow/business and competitive reports are approved. No technology is selected solely by this phase.
 
 ## Phase 2 — Fixture, Repository Deep Reviews, and Asset Evidence
 
@@ -296,11 +295,10 @@ This track may run alongside Phases 7–10. Failure or delay does not block cont
 **Actions:**
 
 1. Instantiate the manual comparison protocol approved in Phase 1 with the exact published assets and reference-production brief.
-2. Complete at least two hands-on evaluations with target creators or small studios using the manual protocol approved in Phase 1.
-3. Conduct focused follow-up interviews only where evaluation exposes new workflow uncertainty.
-4. Measure hands-on layout and animation time, correction effort, failure recovery, learning cost, and visible quality.
-5. Resolve blocking findings and add regression fixtures for every product defect.
-6. Re-run clean installation, full production, second production, archive restore, and isolated rerender qualification.
+2. Complete two owner-operated hands-on evaluations using the manual protocol approved in Phase 1.
+3. Measure hands-on layout and animation time, correction effort, failure recovery, learning cost, and visible quality.
+4. Resolve blocking findings and add regression fixtures for every product defect.
+5. Re-run clean installation, full production, second production, archive restore, and isolated rerender qualification.
 
 **Exit gate:** Charter success and go/no-go criteria pass with recorded evidence. Failure triggers product-scope reconsideration rather than metric redefinition.
 

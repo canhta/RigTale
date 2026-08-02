@@ -14,7 +14,7 @@ Every statement carries one label. An unlabelled statement is a defect.
 | `[HYPOTHESIS]` | Plausible but unevidenced |
 | `[UNKNOWN]` | An open question with no source found |
 
-Desk research establishes what published sources document about tool-supported workflows. **It cannot establish what any specific two-to-five-person team actually does, what it spends time on, or what it would change.** Every claim about user behaviour here is a hypothesis until `RGT-S009B` tests it.
+Desk research establishes what published sources document about tool-supported workflows. **It cannot establish what any specific two-to-five-person team actually does, what it spends time on, or what it would change.** Every claim about user behaviour here is a hypothesis, and stays one permanently: `RGT-S009B`, the only route to testing them, was rejected by owner decision on 2026-08-02.
 
 ## Headline Findings
 
@@ -126,7 +126,7 @@ All from the Toon Boom LEARN cut-out workflow page unless noted.
 
 `[UNKNOWN]` **No primary source and no first-hand account was found documenting the approval-gate model actually used by a two-to-five-person 2D cutout team.** Targeted searches returned only vendor marketing and content-farm output.
 
-**This is the largest single evidence gap in the spike, and it sits directly on a core RigTale design decision: where the human approves.** `PR-F002` in the product requirements is classified `hypothesis` for exactly this reason, and it must stay that way until `RGT-S009B`.
+**This is the largest single evidence gap in the spike, and it sits directly on a core RigTale design decision: where the human approves.** `PR-F002` in the product requirements is classified `hypothesis` for exactly this reason, and now stays that way permanently.
 
 ## 5. Rig Reuse and Versioning — A Documented Unsolved Failure Mode
 
@@ -374,21 +374,13 @@ Each carries the evidence that would confirm or refute it. None is established.
 | 7 | Approval and review in a two-to-five-person team is informal and unmodelled | `[HYPOTHESIS]` | — zero primary evidence in either direction | — |
 | 8 | Style drift across episodes is a real recurring-cast problem | `[HYPOTHESIS]` | — zero documentation found in any vendor or distributor source | — |
 
-## 11. What Only Interviews Can Establish
+## 11. What This Document Cannot Establish
 
-Desk research produced no measured time data, no small-team gate model, no cutout-specific stage ranking, and no localisation workflow. These questions are routed to `RGT-S009B`. Target respondents: two-to-five-person teams shipping recurring-cast children's or educational cutout animation at 150–210 seconds.
+Desk research produced no measured time data, no small-team gate model, no cutout-specific stage ranking, and no localisation workflow. These were routed to `RGT-S009B`, which was **rejected by Project Owner decision on 2026-08-02** (`docs/requirements/charter.md`, Charter Revision 1).
 
-1. For your last piece of this length, how many hours went into each of rig preparation, scene setup, body animation, lip sync, compositing, render, and review or revision?
-2. How many finished seconds does one person produce per week on an established series versus on episode 1 — and how many episodes before rig-preparation cost stops mattering? **This is the go/revise/stop question.**
-3. How many characters are in your recurring cast, how long did each rig take initially, and how many times have you revised a rig after shots shipped?
-4. When you revise a rig, what happens to finished episodes — re-do, leave inconsistent, or freeze the rig? How many shots were affected last time?
-5. Who approves what, at which points? Is approval ever asynchronous or self-approved? Does a storyboard lock actually hold?
-6. What fraction of revisions originate from client or self notes versus rig and asset defects, and at which stage are rig defects usually discovered?
-7. After running automatic lip sync, how much manual correction per minute of dialogue — and do you use the automation at all?
-8. Do you reuse motion libraries across episodes? What fraction of a shot's animation comes from library actions versus new keys?
-9. Do you produce localised versions or compilations? What must be re-opened and re-rendered, and what do you wish you had separated at build time?
-10. What did you stop doing because it was too slow — which shots or ideas get cut for time rather than story?
-11. If a tool generated layout and a first animation pass from a script and board, what would you still insist on doing by hand, and why?
+**Every `[UNKNOWN]` and `[HYPOTHESIS]` label in sections 9 and 10 is therefore final.** No later work in this project promotes them.
+
+The one question that carried the project's go/revise/stop test — how many finished seconds one person produces per week on an established series versus on episode 1, and after how many episodes rig-preparation cost stops mattering — is now answered by the owner-operated reference production instead, after implementation rather than before it.
 
 ## 12. Follow-Up Retrieval Tasks — Closed
 
