@@ -139,3 +139,41 @@ Release 1 will be a complete production vertical, not a disposable prototype:
 - Silently generating unsupported motions or flattening projects into non-editable media.
 - Making native 3D authoring a dependency of the primary 2D production workflow.
 - Optimizing first for large broadcast-studio procurement, live performance capture, or mobile-only authoring.
+
+## Solo Studio Operating Model
+
+RigTale uses two agents supported by deterministic production tools.
+
+### Studio Agent
+
+The Studio Agent owns the complete creative workflow:
+
+- Researches the subject when necessary.
+- Writes the script, lyrics, and scene plan.
+- Analyzes audio and timing.
+- Selects available characters, sets, props, and motions.
+- Produces structured shot, choreography, and animation instructions.
+- Revises the production based on validation results.
+
+The Studio Agent operates through specialized tools and structured production contracts rather than generating final video pixels.
+
+### Red-Team Agent
+
+The Red-Team Agent independently reviews the production plan and rendered output for:
+
+- Factual or audience-safety problems.
+- Unsupported assets or character actions.
+- Timing, continuity, framing, and occlusion defects.
+- Weak storytelling or mismatch with the production brief.
+
+It returns structured findings to the Studio Agent for revision.
+
+### Production Engine
+
+All predictable operations remain deterministic software:
+
+- Asset and rig validation.
+- Timeline and scene compilation.
+- Animation runtime.
+- Rendering and compositing.
+- Media encoding, caching, and versioning.
