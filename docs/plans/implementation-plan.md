@@ -129,7 +129,7 @@ The names below define ownership boundaries, not selected languages or build too
 
 ## Phase 4 — Joint Production-Engine and Preview Spikes
 
-**Tracker:** `RGT-S004` and `RGT-S005`; renderer specification: `SPIKE-R001`.
+**Tracker:** `RGT-S004`, `RGT-D001`, and `RGT-S005`; renderer specification: `SPIKE-R001`.
 
 **Actions:**
 
@@ -159,10 +159,10 @@ Compare supervised process, local service, and native library integration where 
 
 **Actions:**
 
-1. Replace all demonstrated hypotheses in product requirements with measurable requirements.
-2. Finalize contract schemas, time representation, compatibility, migrations, error codes, job states, and adapter capability negotiation.
-3. Select the monorepo layout, implementation languages, build orchestration, schema tooling, local metadata strategy, media dependencies, and test runners.
-4. Approve representative application-tool schemas plus the polling, cancellation, finding, approval, artifact-reference, and long-running-job contracts under `RGT-D013`.
+1. Select the evidenced monorepo layout, implementation languages, build orchestration, schema tooling, local metadata strategy, media dependencies, and test runners under `RGT-D012`.
+2. Reconcile demonstrated core/local hypotheses and quantitative requirements under `RGT-D009`.
+3. Finalize contract schemas, time representation, compatibility, migrations, error codes, job states, and adapter capability negotiation.
+4. Approve representative application-tool schemas plus authorization, idempotency, structured errors, progress, polling, cancellation, findings, approvals, artifact references, resume behavior, and contract tests under `RGT-D013`.
 5. Update system topology, security boundaries, deployment profiles, and resource floors.
 6. Split Phases 7–13 into executable subsystem plans with exact files, APIs, tests, commands, and commit checkpoints.
 

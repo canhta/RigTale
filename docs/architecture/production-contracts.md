@@ -172,7 +172,7 @@ The concrete track representation is not accepted until `SPIKE-A001` demonstrate
 
 Requests rendering of an episode, shot, or frame range against an exact compiled artifact, backend profile, quality profile, output specification, and resource limits. It owns status, attempts, progress, diagnostics, logs, and produced artifacts.
 
-The stable application-tool schemas for submitting, polling, cancelling, resuming, and inspecting long-running jobs are approved under `RGT-D013` after the contract and local-storage baseline is selected.
+The stable application-tool schemas for submitting, polling, cancelling, resuming, and inspecting long-running jobs are approved under `RGT-D013` after `RGT-D009` reconciles core/local requirements and the contract/local-storage baseline is selected.
 
 ### `RenderManifest`
 

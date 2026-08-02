@@ -42,6 +42,21 @@ Every mutating tool validates its input, records actor and source references, is
 
 `RGT-D013` must approve representative tool schemas and long-running-job behavior before executable MCP or embedded-agent validation begins.
 
+### `RGT-D013` Acceptance Checklist
+
+`RGT-D013` consumes the core and local requirements reconciled by `RGT-D009`. It may be approved only when:
+
+- representative read, create-revision, validate, compile, submit-job, inspect-job, cancel-job, record-finding, and request-approval schemas are versioned;
+- every mutating operation declares authorization scope, validation, idempotency, audit event, and affected artifact lifecycle;
+- request, success, structured-error, retryability, and compatibility behavior are specified;
+- long-running operations define submission, progress, polling or notification, cancellation, lease, retry, resume, and terminal states;
+- artifact and media references remain bounded, versioned, and independent of unstable machine-local paths;
+- user approval, waiver, destructive-action, and Red-Team separation behavior are explicit;
+- representative contract tests cover valid calls, invalid schemas, duplicate calls, stale artifacts, authorization failure, cancellation, process loss, and resume; and
+- the approved schemas can serve macOS, CLI/API, MCP, and embedded agents without exposing renderer internals.
+
+If later evidence changes a reconciled core requirement, the affected tool contract returns to review before dependent MCP or embedded execution continues.
+
 ## Production Loop
 
 ```text

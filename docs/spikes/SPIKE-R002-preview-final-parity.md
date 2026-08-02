@@ -17,6 +17,7 @@ Preview and final output may use different quality profiles, runtimes, or render
 - `SPIKE-F001` has published the approved fixture and visual assertions.
 - `SPIKE-A001` has established a candidate authoritative compiled representation.
 - `SPIKE-R001` has produced at least one qualified final-render path and identified viable preview paths.
+- `RGT-D001` has recorded which orchestration/backend pairings qualify for parity and platform testing.
 - Exact engine, adapter, asset-conversion, and environment versions are pinned.
 
 ## Approaches to Compare

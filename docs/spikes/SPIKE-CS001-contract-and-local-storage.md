@@ -6,7 +6,7 @@
 
 ## Question
 
-Which schema, serialization, content-identity, migration, and local-storage approach can preserve RigTale's versioned production artifacts safely while remaining practical across Swift, the selected core languages, CLI automation, and future cloud adapters?
+Which schema, serialization, content-identity, migration, and local-storage approach can preserve RigTale's versioned production artifacts safely across Swift, shortlisted core-language boundaries, CLI automation, and future cloud adapters?
 
 ## Why This Requires Evidence
 
@@ -31,7 +31,7 @@ The spike compares compatible combinations rather than isolated popularity:
 - filesystem object layout and atomic publication;
 - embedded metadata index, index rebuild, and dependency queries;
 - backup, archive export, restore, corruption detection, and garbage collection; and
-- Swift, selected core-language, CLI, and future service interoperability.
+- Swift, each shortlisted core-language boundary, CLI, and future service interoperability.
 
 Cloud databases and distributed queues are not selected here. The local interfaces and evidence must remain portable to later adapters.
 
@@ -57,7 +57,7 @@ Cloud databases and distributed queues are not selected here. The local interfac
 - index rebuild time and dependency-query correctness;
 - archive size, export and restore time, and checksum coverage;
 - schema evolution and generated-code churn;
-- Swift and core-language integration complexity;
+- Swift and shortlisted core-language integration complexity;
 - license, packaging, and long-term maintenance risk; and
 - clear separation between canonical artifacts and disposable indexes or caches.
 
@@ -73,8 +73,9 @@ Cloud databases and distributed queues are not selected here. The local interfac
 
 - At least two viable contract/storage combinations are evaluated unless primary evidence proves only one satisfies a mandatory constraint.
 - Every approved contract, migration, corruption, dependency, invalidation, and archive fixture has a reproducible result.
-- Canonical digests and exact time behave consistently across the required language boundary.
+- Canonical digests and exact time behave consistently across every evaluated language boundary.
 - A corrupt or missing local index can be rebuilt without losing canonical production state.
 - Interrupted publication or migration cannot present partial data as approved.
 - Export and clean restore reproduce all required artifact identities and dependency relationships.
 - D012 receives enough evidence to accept, reject, or defer each material choice independently.
+- D012 may select only a language/tooling/storage combination exercised by this spike; a materially different combination requires a confirmatory rerun of the affected fixtures.
