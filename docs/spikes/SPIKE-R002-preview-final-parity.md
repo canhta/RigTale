@@ -75,7 +75,7 @@ Numerical pass thresholds are calibrated from the fixture and human approval stu
 - Proposed preview approval policy and parity thresholds.
 - Recommendation for one-backend, dual-backend, converted-preview, or deferred architecture.
 - Updates to product requirements, system design, quality system, operations, and implementation plan.
-- Decision record for any accepted preview architecture.
+- Decision inputs for `RGT-D010`; this spike recommends or rejects preview paths but does not select the final architecture.
 
 ## Exit Criteria
 
@@ -84,7 +84,7 @@ Numerical pass thresholds are calibrated from the fixture and human approval stu
 - Preview approval does not hide any unresolved blocking final-output defect in the evaluation set.
 - Full-duration timing and continuity behavior are measured.
 - Operational cost and maintenance burden are recorded.
-- The accepted path has automated regression assertions and an explicit fallback when preview is unavailable or untrustworthy.
+- Every recommended path has automated regression assertions and an explicit fallback when preview is unavailable or untrustworthy.
 
 ## Rejection Conditions
 

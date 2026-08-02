@@ -8,6 +8,7 @@ This map defines the minimum non-overlapping documentation set required before r
 
 - `v1 draft` means the document is coherent enough to expose assumptions, dependencies, and evidence gaps before research begins.
 - `validated` means the relevant research and spike evidence has been incorporated and accepted choices are recorded in decision records.
+- The project charter follows a separate owner-governed lifecycle: `draft` -> `approved`. Changing approved business scope requires an explicit charter revision rather than an evidence-state transition.
 - `charter-backed`, `hypothesis`, and `decision-pending` classify individual requirements inside a document; they are not document lifecycle states.
 
 ## Documentation Order

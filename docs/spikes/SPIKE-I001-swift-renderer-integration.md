@@ -10,7 +10,7 @@ Which integration boundary lets a native Swift macOS studio control compilation,
 
 ## Why This Requires a Spike
 
-Direct native binding can reduce latency but couples Swift to renderer ABI and process failures. A child process or local service improves isolation but introduces packaging, IPC, lifecycle, and data-transfer costs. The correct choice depends on the selected backend and measured workload.
+Direct native binding can reduce latency but couples Swift to renderer ABI and process failures. A child process or local service improves isolation but introduces packaging, IPC, lifecycle, and data-transfer costs. The correct choice must be compared across every qualified backend and measured workload before `RGT-D010` selects the final pairing.
 
 ## Preconditions
 
@@ -26,7 +26,7 @@ Direct native binding can reduce latency but couples Swift to renderer ABI and p
 3. **Local service:** Swift connects to a separately managed localhost or socket service using the application API.
 4. **Hybrid:** lightweight preview is embedded while final rendering uses an isolated worker, only if parity evidence supports it.
 
-Unsupported approaches may be removed only with source-level evidence. New approaches may be added when the selected renderer requires them.
+Unsupported approaches may be removed only with source-level evidence. New approaches may be added when a qualified renderer requires them.
 
 ## Required Behaviors
 
@@ -43,8 +43,8 @@ Unsupported approaches may be removed only with source-level evidence. New appro
 
 ## Method
 
-1. Inspect the selected backend's official embedding, headless, extension, and redistribution interfaces.
-2. Implement the smallest equivalent control surface for each viable approach.
+1. Inspect every qualified backend's official embedding, headless, extension, and redistribution interfaces.
+2. Implement the smallest equivalent control surface for each viable backend/integration approach.
 3. Drive the same diagnostic and full-production jobs from a minimal native Swift harness.
 4. Measure startup, command latency, progress delivery, frame transport, CPU, GPU, memory, and shutdown.
 5. Inject renderer crash, process kill, hang, malformed message, incompatible version, cancellation, disk exhaustion, and application restart.
@@ -82,7 +82,7 @@ Unsupported approaches may be removed only with source-level evidence. New appro
 - Proposed application API, job, health, version, and diagnostic contract revisions.
 - macOS packaging, signing, upgrade, and renderer-dependency policy.
 - Updates to system design, operations, quality system, and implementation plan.
-- Decision record for accepted integration and implementation-language constraints.
+- Decision inputs for `RGT-D010`, including qualified and rejected backend/integration combinations plus any binding implementation-language constraints.
 
 ## Exit Criteria
 
@@ -91,4 +91,4 @@ Unsupported approaches may be removed only with source-level evidence. New appro
 - A renderer crash cannot corrupt the project or terminate the studio application under the accepted boundary.
 - Clean installation and packaged execution succeed on the supported test environment.
 - CLI and future headless implications are documented.
-- The selected approach is justified by measurements and maintenance cost, not preference.
+- Every recommended approach is justified by measurements and maintenance cost; final selection remains with `RGT-D010`.
