@@ -2,7 +2,43 @@
 
 **Tracker:** `RGT-S001`
 
-**Status:** Active. Screening is read-only; candidate execution is deferred to approved fixture-based reviews and technical spikes.
+**Status:** Screening complete. Candidate execution remains deferred to approved fixture-based reviews and technical spikes.
+
+## Result
+
+Evidence locations: `docs/research/landscape.md` (index and dispositions), `docs/research/candidate-screening.md` (documentation-verified candidates), `docs/research/repository-reviews/` (15 dedicated records).
+
+### Exit criteria
+
+| Criterion | Required | Result |
+|---|---|---|
+| Candidates screened | ≥ 12 | 19 source-inspected at pinned commits, plus 29 documentation-verified |
+| Dedicated deep-review records | ≥ 6 | 15 |
+| Candidate groups covered | ≥ 3 | 4 |
+| Material conclusions cite primary evidence at an exact revision | yes | yes, with rejected claims recorded where source contradicted documentation |
+| No candidate dependency, setup script, example, or renderer executed | yes | confirmed; read-only throughout |
+| Renderer candidates handed to `SPIKE-R001` | yes | recorded in the routing column of the index |
+| `TODO.md` and the landscape index reflect results | yes | yes, including the shortlist with a gating question per candidate |
+
+### The organising finding
+
+**A permissively licensed runtime does not imply an open authoring path, and the second property is what determines fit.** An agent cannot produce content for a format it cannot write.
+
+This distinction was not in the original screening criteria and is now recorded as an explicit criterion in `PR-A003`: a program must be able to produce valid content without a graphical interface and without a proprietary tool.
+
+### Findings that changed downstream documents
+
+- No candidate supplies **both** a reusable rig system and a deterministic frame-addressable renderer. Recorded against `PR-R005`.
+- Lottie, the only animation format with a published machine validator, **cannot express a bone hierarchy**. Recorded against `PR-R005`.
+- Rig-change propagation is unsolved or lossy in every system examined. Recorded against `PR-O03`.
+
+### Self-corrections during screening
+
+Three documentation-level claims were rejected because source inspection contradicted them, and one error in this spike's own output was corrected against source: the claim that Godot rig weight painting is editor-only was wrong, and Godot's disposition rose from `reference` to `adapt` as a result. All four are recorded in `docs/research/candidate-screening.md` and the affected review records.
+
+### What screening deliberately did not do
+
+No technology was selected. Every disposition is a screening outcome routed to a later spike or to `RGT-D010`.
 
 ## Question
 

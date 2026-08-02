@@ -12,8 +12,7 @@ An item may be marked `completed` only when its linked exit criteria are satisfi
 
 | ID | Type | Item | Evidence | Status |
 |---|---|---|---|---|
-| RGT-S009 | Workflow spike | Establish the source-cited small-studio workflow map, gate evidence status, and manual comparison protocol | `docs/research/small-studio-workflow.md`, `docs/research/manual-baseline-protocol.md` | active |
-| RGT-S001 | Competitive spike | Discover and screen comparable open-source systems (read-only) | `docs/research/landscape.md`, `docs/research/candidate-screening.md`, `docs/research/repository-reviews/` | active |
+_No item is active. `RGT-S003` is the next eligible item; see the note below the queue._
 
 ## Blocked
 
@@ -60,6 +59,16 @@ An item may be marked `completed` only when its linked exit criteria are satisfi
 | RGT-D008 | Deployment and operations v1 drafted | `docs/operations/deployment-and-operations.md` | `e593958` |
 | RGT-P001 | Evidence-gated implementation plan v1 drafted | `docs/plans/implementation-plan.md` | `e593958` |
 | RGT-D000 | v1 documentation baseline reviewed and evidence work authorized | `docs/README.md`, `docs/plans/implementation-plan.md` | `e82c45b` |
+| RGT-S001 | Competitive screening complete: 19 candidates source-inspected at pinned commits plus 29 documentation-verified, 15 review records, four groups, no candidate code executed | `docs/spikes/SPIKE-C001-competitive-landscape.md`, `docs/research/landscape.md`, `docs/research/repository-reviews/` | `96c5489` |
+| RGT-S009 | Workflow Part A complete: labelled workflow map, gate evidence status, manual baseline protocol, interview instrument | `docs/spikes/SPIKE-W001-production-workflow-and-business-evidence.md`, `docs/research/small-studio-workflow.md`, `docs/research/manual-baseline-protocol.md` | `3c1ff4c` |
+
+## Next Eligible Item
+
+`RGT-S003` (`SPIKE-F001`, the reference fixture) is unblocked: its dependencies `RGT-S001` and `RGT-S009` are complete, and `SPIKE-F001` names competitive research and workflow evidence as preconditions.
+
+**It cannot be completed without an owner decision on assets.** The fixture requires original or compatibly licensed characters, backgrounds, props, and music, and `SPIKE-F001` stop-conditions require halting if assets lack provable redistribution rights. The brief, cast, diagnostic shots, risk matrix, and acceptance criteria can be specified without them; **nothing can be measured without them.**
+
+`RGT-S012` and `RGT-S013` must not run before the fixture is approved. `SPIKE-F001` states the reason: a convenient demo scene can make a weak architecture look successful.
 
 ## Screening Shortlist
 

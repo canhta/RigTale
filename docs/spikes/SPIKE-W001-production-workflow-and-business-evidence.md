@@ -2,7 +2,37 @@
 
 **Tracker:** `RGT-S009` (Part A, desk research) and `RGT-S009B` (Part B, interviews)
 
-**Status:** Part A active. Part B blocked pending Project Owner authorization to contact participants.
+**Status:** Part A complete. Part B blocked pending Project Owner authorization to contact participants.
+
+## Part A Result
+
+Evidence locations: `docs/research/small-studio-workflow.md` (workflow map, gate evidence status, ranked problems, interview questions) and `docs/research/manual-baseline-protocol.md` (comparison protocol and time-capture template).
+
+### Exit criteria
+
+| Criterion | Result |
+|---|---|
+| Every claim distinguishes documented fact, practitioner report, inference, and hypothesis | Met — every statement carries an explicit label |
+| Each pipeline gate carries an explicit evidence status | Met |
+| Manual comparison protocol is reproducible and does not advantage RigTale | Met, with bias controls that allow the baseline every labour-saving feature its tools already provide |
+| Problems only interviews can settle are named and routed to Part B | Met — eleven questions |
+| No user-behaviour claim presented as established | Met |
+
+### Three results that change the product's evidence position
+
+1. **No published time or cost baseline exists for small-team 2D cutout production.** Both candidate external sources were retrieved and both fail to supply one: the academic paper is an uncontrolled single case in a different technique, and the union agreement prices labour without rating output — since January 2025 it contains no footage-per-day standard at all. **The charter's 50% reduction claim is therefore currently unfalsifiable.** This is a business risk independent of whether the claim is true, and it is the reason the baseline protocol must run before the claim is used.
+
+2. **The unautomated residue is smaller than assumed.** Cutout as a technique already claims the time saving; in-betweening, motion reuse, and lip sync are commodity features; and one vendor already auto-exports storyboard scenes into the animation tool with panels, soundtrack, and camera moves. The addressable segment may be users of tools that lack that integration.
+
+3. **No source documents the approval-gate model of a two-to-five-person team.** `PR-F002` therefore stays `hypothesis` and cannot be promoted by desk research. This is the largest single gap and it sits on a core design decision.
+
+### Constraints added to downstream design
+
+Recorded in `docs/research/small-studio-workflow.md` section 13. The technical ones affect `PR-O03`, `PR-Q004`, `PR-F003`, `SPIKE-A001`, `SPIKE-A002`, and `SPIKE-CS001`. Two business constraints — narrative differentiation requirements and made-for-kids monetisation limits on the dominant platform — are raised for the Project Owner. **No charter revision is proposed.**
+
+### What Part A could not establish
+
+Measured time data, a small-team gate model, a cutout-specific stage ranking, and any localisation workflow. All are routed to Part B.
 
 ## Execution Split
 

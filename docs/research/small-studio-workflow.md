@@ -24,21 +24,21 @@ Three results matter more than the rest, and two of them are adverse to RigTale.
 2. **The scene-assembly work RigTale proposes to automate is already largely automated for Toon Boom users**, and cutout as a technique already claims the time-saving RigTale claims. RigTale's 50% must be measured against an already-optimised baseline.
 3. **Rig-change propagation is a documented, unsolved failure mode in the dominant cutout tool**, and automating shot production would amplify it. This is a design requirement for RigTale, not an optional feature.
 
-## Source Provenance and Withdrawn Citations
+## Source Provenance
 
-An earlier draft of this research cited sources that were never retrieved. They are withdrawn rather than repeated, and are recorded here as open tasks:
+An earlier draft cited seven sources that were never retrieved; they were withdrawn and recorded as open tasks. **Five have since been retrieved directly and are now incorporated:**
 
-- The Animation Guild / IATSE 839 Master CBA 2024–2027, including a claimed null result on footage quotas and specific wage rates;
-- PBS Distribution Global Technical Specifications, September 2024;
-- Discovery Textless Delivery Quick Guide, 2021;
-- Blender Studio "Asset Pipeline 2022 Update";
-- Blender Manual "Library Overrides";
-- AMWA AS-11 UK DPP;
-- internal methodology and findings of the ADADA journal paper below.
+| Source | Status |
+|---|---|
+| Blender Manual, Library Overrides and Link/Append | **Retrieved.** Section 5. |
+| Blender Studio pipeline and asset-versioning docs | **Retrieved.** The pipeline path redirects rather than being empty; successor pages read. Section 5. |
+| Animation Guild / IATSE 839 Master CBA 2024–2027 and wage schedule | **Retrieved**, 215 pages, full-text searched. Section 6. |
+| ADADA journal paper | **Retrieved.** The earlier parse failure was a tooling issue. Section 6. |
+| YouTube monetization and made-for-kids policy | **Retrieved by direct fetch**, replacing search-index extraction. Section 8. |
+| Netflix textless and M&E guidelines | **Retrieved by direct fetch.** Section 8. |
+| PBS Distribution technical specifications; Discovery textless guide; AMWA AS-11 UK DPP | **Still not retrieved. Nothing rests on them.** The Netflix material now covers the same architectural question. |
 
-**Nothing in this document rests on those.** Retrieving the Blender live-link material is the highest-value follow-up, because it is the best available prior art for the rig-propagation problem in section 5.
-
-Two further access limitations: `helpx.adobe.com` timed out on all six fetch attempts, so Adobe statements come from search-index extraction; the same applies to the Netflix and YouTube policy statements in section 7. Those are weighted medium and **must be re-verified by direct retrieval before informing any requirement or decision record.**
+**Remaining limitation:** `helpx.adobe.com` timed out on all fetch attempts, so the Adobe Character Animator and Adobe Animate statements in section 7 come from search-index extraction and are weighted medium. They must be re-verified by direct retrieval before informing any requirement or decision record. No conclusion in this document depends on them alone.
 
 ## 1. Source Inventory
 
@@ -148,6 +148,50 @@ All from the Toon Boom LEARN cut-out workflow page unless noted.
 
 `[UNKNOWN]` **Style drift across episodes:** no vendor documentation treats model sheets or style guides as an enforceable cross-episode consistency control. Toon Boom documents the Art Director as the human who "ensures the consistency of that look" — a person, not a mechanism.
 
+### The opposite architecture, and what it costs — now retrieved
+
+Blender's linked-library system is the live-link counterpart to Harmony's copy model, and Blender Studio runs a real production on it. Retrieved directly on 2026-08-02.
+
+`[FACT]` Link "creates a reference to data in a source file such that changes made there will be reflected in the current file the next time it is reloaded." Append "copies data-blocks into your blend-file without keeping any reference to the original ones… changes in the external source file will not be reflected."
+
+`[INFERENCE]` Blender's Append is functionally the same architecture as Harmony templates. Link is the opposite.
+
+`[FACT]` Library Overrides is "designed to allow editing linked data, while keeping it in sync with the original library data… **When the library data changes, unmodified properties of the overridden one will be updated accordingly.**"
+
+`[INFERENCE]` **That is the operative rule: unmodified properties keep tracking the library; modified ones stop tracking.** It is the mechanism RigTale needs for per-shot deviation without mutating a published rig.
+
+`[FACT]` Blender Studio's stated design principle is explicit: "When working on Blender-centric pipeline, we rely on Blender's linking system, limit the usage of caching as much as possible." Its animation guide treats rig churn as normal — "Assets are continuously updated during production so it is important to keep rigs and props up to date" — and names "Asset updates" as a budgeted stage between blocking and polishing.
+
+#### The failure mode this trades into
+
+`[FACT]` **The central documented risk**, verbatim: "While resyncing a library override it is possible that **edited overrides get deleted** if they are changed in the original library. If this is the case, a warning message will be displayed stating how many overrides were deleted, if the deletion is undesirable **the resync can be undone before saving** the blend-file."
+
+`[FACT]` Resync "are automatically resynced if needed on blend-files opening."
+
+`[INFERENCE]` **Live-link does not remove the rig-propagation problem; it converts a *staleness* failure into a *reconciliation* failure.** Harmony fails silently by leaving shots stale. Blender fails by deleting a shot's hand-made overrides when the library changes the same data.
+
+`[INFERENCE]` **This is the sharpest risk for an agent-operated studio specifically.** The documented recovery is undo-before-save, and resync runs automatically on file open. **A pipeline that opens, processes, and saves a shot non-interactively consumes that recovery window without any human seeing the warning.** RigTale must therefore treat resync as an explicit, inspected step with a machine-readable diff, never as an implicit side effect of loading.
+
+`[FACT]` A harsher variant exists for hierarchy-mismatched files: Resync Enforce "is more forceful, aggressive, at the cost of a potential loss of some overrides on ID pointers properties."
+
+`[FACT]` Overrides also constrain *where* deviation may live: "most notably Edit Mode is not allowed for overrides"; overridden actions "only support a very limited amount of editing… an existing F-Curve can be muted, but its keyframes cannot be edited, and no new F-Curve can be added"; and replacing an action "will completely replace the keyframed animation from the linked data… not override it in any way."
+
+`[INFERENCE]` Any shot-level change that is topological, or that edits keyframes on animation authored in the library, cannot be expressed as an override. It forces either a library change affecting all shots, or Make Local — which drops straight back to the copy architecture.
+
+#### Two mitigations, both documented rather than invented
+
+`[FACT]` **Keep authored animation out of the library rig.** "In general, an override can do much more with its animation data if no animation data exists in its linked reference data-block."
+
+`[FACT]` **Pin shots to versions.** Blender Studio's Active publish class allows "multiple version can be published if some shots require an older version of the current asset."
+
+`[INFERENCE]` **Version pinning is the escape valve that makes live-link survivable — shots are not forced onto the latest rig.** This directly corroborates the `PR-O03` requirement change recorded in the product requirements: pinning plus dependency invalidation is not a convenience, it is what makes either architecture workable.
+
+`[FACT]` Hierarchy stability is a hard constraint, not a style preference: "For library overrides to work well, it is much better if all the collections needed by the character are children of the root… Otherwise, some data may not be properly automatically overridden."
+
+`[INFERENCE]` A fixed-cast rig standard would need hierarchy stability enforced as a validation gate.
+
+`[UNKNOWN]` No retrieved page quantifies how often resync deletes overrides in practice, or gives a measured cost for asset-update stages per shot.
+
 ## 6. Time and Cost Data — A Null Result
 
 Stated plainly: **there is essentially no citable published data on production time or cost per finished minute for short 2D cutout work at small-team scale.** This is recorded as a finding.
@@ -156,7 +200,19 @@ Stated plainly: **there is essentially no citable published data on production t
 
 `[INFERENCE]` That is roughly 58 finished minutes per month sustained over 19 months. **Team size is stated nowhere.** Without a headcount it cannot be converted to minutes per person-week, which is precisely the metric RigTale needs. As a baseline it is unusable in its current form.
 
-`[FACT]` The one academic candidate could not be read: the PDF returned as unparseable binary. Zero verified content.
+`[FACT]` **The one academic candidate has now been retrieved and read.** Purwaningsih, "Optimizing 2D Animation Production Time in Creating Traditional Watercolor Looks by Integrating Traditional and Digital Media", ADADA Vol.21 No.1, pages 57–62.
+
+`[FACT]` Methodology is a single practice-based case study, **n = 1**, produced by one person: one animated short combining hand-painted watercolour backgrounds with digital frame-by-frame character animation. Evaluation was a screening with qualitative feedback on pacing and look.
+
+`[FACT]` Reported figures: runtime "3 minutes and 9 seconds"; production "done individually and completed in around 3 months of work"; "12 different backgrounds"; "The process to finalize all of the backgrounds and foregrounds took 3 weeks to complete."
+
+`[FACT]` **There is no baseline, no control condition, no comparison against an all-digital pipeline, no time logs, and no per-shot timing data.** The conclusion is asserted, not measured: "it is safe to assume that this strategy has optimized the production time".
+
+`[FACT]` The published PDF's first page contains unedited journal-template placeholder material, including a lorem ipsum abstract and a placeholder author affiliation.
+
+`[INFERENCE]` The only derivable ratio is roughly **one finished minute per person-month**, from a single uncontrolled observation. It is also poor transfer to RigTale: hand-drawn frame-by-frame animation with hand-painted backgrounds for a one-off short — **not cutout rigging, not a recurring cast, not multi-episode reuse, not team production.** Citing it as evidence for RigTale's throughput claims would not be defensible, and the leftover template text indicates weak editorial control at the venue.
+
+**The null result therefore stands, now on a retrieved rather than an unavailable source.**
 
 `[FACT]` Every general search for cutout production time or per-minute cost returned animation-studio marketing pages quoting their own numbers.
 
@@ -166,7 +222,23 @@ Stated plainly: **there is essentially no citable published data on production t
 
 `[UNKNOWN]` **Minutes of finished 2D cutout animation per person-week at two-to-five-person scale: no citable source exists.**
 
-**Consequence.** RigTale's 50% reduction claim has no published baseline. It must be generated in-house, which is exactly what `docs/research/manual-baseline-protocol.md` specifies. Until that protocol runs, the claim is unfalsifiable — a business risk regardless of its truth, and a reason the protocol's bias controls matter.
+### The union agreement: a price of labour, but no sanctioned rate of output
+
+Retrieved directly on 2026-08-02: the Animation Guild / IATSE Local 839 Master CBA for 2024–2027, 215 pages, and the master wage schedule.
+
+`[FACT]` The agreement is in force, and the wage period beginning 2026-08-02 is current. Rates are published per classification. For the current period, hourly and weekly journey rates include Animator at $64.94 / $2,597.60; Digital Animator I at the same; Digital Animator II and Animation Checker at $55.58 / $2,223.20; Animation Timer at $61.01 / $2,440.40; Breakdown at $48.80; Inbetweener at $47.01; Painter at $46.18. Daily employees receive 118.583% inclusive of vacation and holiday pay, and pension contributions assume a 60-hour on-call week.
+
+`[FACT]` **A full-text search of the 215-page agreement and the wage schedule found: quota 0 hits, footage 0, productivity 0, piece rate 0, piecework 0, workload 0, incentive 0.** The four "output" hits are all in the article on AI systems and refer to AI output, not worker output. Extraction covered 214 of 215 pages; the one image-only page was inspected visually and is the signature page.
+
+`[FACT]` One genuine footage-based norm does exist, for freelance timing: "$4.63/foot… 8 hours/70 feet". `[INFERENCE]` At 16 frames per foot and 24 frames per second that is roughly 46.7 seconds of timed footage per eight-hour day. But it is a **benefits-accrual conversion**, not a required minimum output, and it is explicitly sunset — "not applicable on or after January 1, 2025."
+
+`[FACT]` The one true minimum-staffing article is a **headcount** minimum for writers, not an output minimum.
+
+`[INFERENCE]` **The CBA gives a defensible price of labour and no sanctioned rate of output.** Since January 2025 the agreement contains no footage-per-day standard at all. Any minutes-per-artist-week denominator RigTale uses must be sourced elsewhere and **cannot be attributed to the CBA**.
+
+`[UNKNOWN]` The union site also lists roughly forty employer-specific memoranda and legacy agreements that were not opened. A footage quota in a studio-specific sideletter would not be covered by this null result.
+
+**Consequence.** RigTale's 50% reduction claim has no published baseline. Both candidate external sources have now been retrieved and both fail to supply one: the academic paper is an uncontrolled single case in a different technique, and the union agreement prices labour without rating output. The baseline must be generated in-house, which is exactly what `docs/research/manual-baseline-protocol.md` specifies. Until that protocol runs, the claim is unfalsifiable — a business risk regardless of its truth, and the reason the protocol's bias controls matter.
 
 ## 7. Lip Sync and Audio Synchronisation
 
@@ -202,13 +274,61 @@ Stated plainly: **there is essentially no citable published data on production t
 
 `[FACT]` Harmony documents the audio hygiene that makes localisation possible: "keep your soundtrack separated in tracks for music, sound effects and characters."
 
-## 8. Localisation and Reuse
+## 8. Platform Policy and Localisation — Now Directly Retrieved
 
-`[FACT, low-confidence retrieval]` Netflix maintains distinct requirements for textless elements and forced-narrative subtitles, including that picture which would otherwise carry subtitles "is required to be delivered as a non-subtitled file, or textless." Search-index extraction only; verify before use.
+All pages in this section were retrieved by direct fetch on 2026-08-02, replacing the earlier search-index extraction.
 
-`[FACT, low-confidence retrieval]` YouTube monetization policy treats reused content as repurposing "without adding significant original commentary, substantive modifications, or educational or entertainment value", and disallows "similar or repetitive content with low educational value… where characters are put in the same situation over and over again with the same outcome using highly similar storyline templates across multiple videos."
+### YouTube: the repetitive-content claim is CONFIRMED — and narrower than first framed
 
-`[INFERENCE]` If that language is accurate, it is **directly adverse to a generate-many-similar-episodes-from-templates strategy** and must be verified against the primary policy page before RigTale's positioning is fixed. RigTale's charter emphasises reusable production templates and a recurring cast; this is a concrete platform-policy constraint on how far that can be pushed.
+`[FACT]` The section "Generic or repetitive content" on `support.google.com/youtube/answer/1311392` lists these violations verbatim:
+
+1. "Similar or repetitive content with low educational value, commentary, narratives, or minimal variation across videos"
+2. "Videos where characters are put in the same situation over and over again with the same outcome (i.e., using a highly similar storyline template across multiple videos)"
+3. "Image slideshows, templated storylines, or scrolling text with minimal or no narrative, commentary, or educational value"
+4. "AI-generated content made with generic or unoriginal templates giving the impression of mass production without adding the creator's original, authentic insights or perspective"
+
+The earlier unverified extraction merged bullets 1 and 2 into one quote. That was the only inaccuracy; the language exists.
+
+`[FACT]` **The "What is allowed" bullets in the same section were missing from the earlier extraction and change the reading materially:**
+
+- "The same intro and outro for your videos, but the bulk of your content is different"
+- "Similar content, like a series following a set of characters across episodes or a channel that does product reviews, but in which each video has a distinct storyline, focus or concept"
+
+`[INFERENCE]` **The policy does not prohibit a recurring cast, an episodic series, or reusable production templates.** A series following a set of characters across episodes is expressly named as allowed, and reusable *production* templates — rigs, layouts, pipelines — are nowhere addressed; the policy governs the viewer-visible artifact, not the toolchain.
+
+The prohibition is scoped to **narrative** sameness: same situation, same outcome, same storyline template, minimal variation. The test the page applies is whether "each video has a distinct storyline, focus or concept".
+
+`[INFERENCE]` **The adverse part is real but narrower than first stated, and it is quotable by an adjudicator.** It constrains the narrative axis specifically, and it bites hardest on exactly the genre RigTale targets, because children's music formats are conventionally repetitive by design — same song structure, same lesson shape, same resolution. Bullet 1's "low educational value" qualifier cuts the other way for genuinely educational content, but that is a judgement call at review time, not a bright line.
+
+`[INFERENCE]` **Bullet 4 compounds it.** An agent-operated studio sits squarely in the category YouTube singled out, so RigTale's output plausibly attracts scrutiny that a human studio producing identical episodes would not.
+
+**Correction to the earlier framing in this document:** the claim was not "directly adverse to a generate-many-similar-episodes-from-templates strategy" without qualification. Templates and recurring casts are fine; **narratively interchangeable episodes are not.**
+
+### YouTube: made-for-kids is a structural revenue constraint
+
+`[FACT]` Designation is mandatory and legally consequential: "Failure to set your content appropriately may result in consequences on YouTube or have legal consequences under COPPA and other laws."
+
+`[FACT]` Content is made for kids where children are the primary audience, or where it has "actors, characters, activities, games, songs, stories, or other subject matter that reflect an intent to target children". Stated factors include child-oriented activities "including games, songs, early education".
+
+`[FACT]` Features unavailable on made-for-kids content include personalised advertising, comments, the notification bell, cards and end screens, channel memberships, Super Chat, merchandise and ticketing, the donate button, live chat, save-to-playlist, and autoplay on home.
+
+`[INFERENCE]` For RigTale's target segment this status is **unavoidable** — children's music and educational animation with songs and characters is squarely inside the definition. It removes personalised advertising and every direct-monetisation and audience-retention surface except ads and off-platform channels. **This is a structural constraint on the positioning, independent of the templating question**, and it was not previously recorded anywhere in RigTale's documentation.
+
+### Netflix: split stems are a hard architectural constraint
+
+`[FACT]` Music and effects delivery is required: "Please deliver a fully-filled Music & Effects Package as long-play, discrete channels". Required assets include an M&E track, optional tracks, a dialogue guide, and a print master. "Do not modify Music levels at all".
+
+`[FACT]` **Directly on point for a music show, sung vocals do not stay in the M&E.** Optional tracks must carry "Vocals from a character singing on-screen" and "Vocals from performances original to or produced for show", while the M&E body carries "Background music exactly as it is represented in the original language mix".
+
+`[FACT]` Textless picture is required for IMF and servicing packages, covering "any graphic and/or animated text that occurs over picture" — with carve-outs for text over pure black or white frames, text that was part of visual-effects composites, and in-story brands.
+
+`[INFERENCE]` **This is the sharpest architectural constraint found in the entire spike.** For a children's music show the instrumental bed belongs in the M&E, but **every sung vocal — including character songs, which are the core of the format — must be deliverable as a separate optional track and again as a dialogue stem.** That is achievable only if songs are produced with vocals and instrumental permanently split from the session onward; **it cannot be reconstructed from a stereo song bounce.**
+
+The same applies to picture: on-screen lyric text and animated word overlays need removable layers. The visual-effects-composite carve-out is a plausible route for stylised in-world text.
+
+`[INFERENCE]` **Retrofitting either is impractical, so both must be designed into RigTale's audio and text contracts now, not deferred.** This affects `PR-F003` and the `AudioTimeline` contract directly.
+
+`[UNKNOWN]` How YouTube actually enforces the narrative-sameness bullet against educational children's series — enforcement rates, appeal outcomes, or whether "distinct storyline" is read generously for preschool formats — is not addressed by any retrieved page.
 
 `[UNKNOWN]` **No animation tool vendor documents a multi-language project-versioning workflow.** Not Toon Boom, not Moho, not Reallusion, not Adobe.
 
@@ -270,11 +390,23 @@ Desk research produced no measured time data, no small-team gate model, no cutou
 10. What did you stop doing because it was too slow — which shots or ideas get cut for time rather than story?
 11. If a tool generated layout and a first animation pass from a script and board, what would you still insist on doing by hand, and why?
 
-## 12. Follow-Up Retrieval Tasks
+## 12. Follow-Up Retrieval Tasks — Closed
 
-Not findings. Open tasks that must be completed before this spike closes.
+All four tasks recorded when this document was first written have been completed. Their results are incorporated in sections 5, 6, and 8, and the provenance table above records what was and was not retrieved.
 
-1. Blender Manual "Library Overrides" and Blender Studio's asset-pipeline versioning posts — the live-link architecture is the best available prior art for problem 2 and is currently unverified.
-2. The Animation Guild / IATSE 839 Master CBA — for a defensible cost denominator.
-3. The ADADA paper, by proper PDF extraction.
-4. Netflix textless and split-track pages, and the YouTube monetization policy, by direct fetch rather than search index. The YouTube repetitious-content language in section 8 is potentially adverse to RigTale's positioning and must not be relied on until directly retrieved.
+One task remains open and is **not** blocking: direct retrieval of the Adobe Character Animator and Adobe Animate documentation, currently held at search-index confidence.
+
+## 13. Constraints This Spike Adds to Downstream Design
+
+Recorded here because they are findings, not recommendations, and they change work that has not started yet.
+
+| Constraint | Source | Affects |
+|---|---|---|
+| Shots must pin explicit asset versions, and a dependency graph must identify what a rig change invalidates | Harmony templates are copies; OpenToonz and Synfig reproduce the limitation; Blender's live-link alternative trades it for override deletion | `PR-O03`, `PR-Q004`, `SPIKE-CS001` |
+| Any resync or reconciliation step must be explicit and inspected, never an implicit side effect of loading | Blender resync runs automatically on open, and its documented recovery is undo-before-save — a window an automated pipeline consumes silently | `SPIKE-A001`, agent-system design |
+| Rig hierarchy stability must be a validation gate | Overrides bind to hierarchy; mismatch degrades to a lossy enforced resync | `SPIKE-A002` |
+| Song vocals and instrumental must be split from the session onward, and on-screen lyric text must live on removable layers | Netflix M&E requires sung vocals as separate optional tracks; textless picture is required for animated text over picture | `PR-F003`, `AudioTimeline` contract |
+| Episodes must differ on the narrative axis, not merely in assets | YouTube prohibits "a highly similar storyline template across multiple videos" while expressly allowing a recurring cast across episodes | Charter positioning, `SPIKE-F001` brief design |
+| Made-for-kids status removes personalised advertising and every direct-monetisation surface | YouTube made-for-kids feature restrictions | Charter business case |
+
+The last two are business constraints rather than technical ones and are raised for the Project Owner. They do not change the approved charter and no charter revision is proposed here.

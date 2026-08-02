@@ -45,6 +45,18 @@ The earliest required input is a creative prompt or brief. Script, lyrics, audio
 
 `SPIKE-W001` validates exact gate names, mandatory versus optional handoffs, and which steps are practical to automate. Every bypass must be explicit, versioned, and visible downstream.
 
+### Gate evidence status after `RGT-S009` Part A
+
+| Gate | Evidence status |
+|---|---|
+| Visual-direction approval — storyboard locked before animatic | **Documented** in published cutout workflow material, for studio-scale teams |
+| Review and correction — animation approved before compositing | **Documented**, same source and same scale caveat |
+| All other gates | **Provisional.** No primary source or first-hand account documents the gate model of a two-to-five-person team. |
+
+`[INFERENCE]` The three production-tracking systems examined all presuppose a supervisor role distinct from the artist, and all are multi-user server products. The same vendor material states that in a small team the animators do their own compositing. **Whether a separate approval role exists at all at RigTale's target scale is unknown**, and the best-documented published pipeline states it targets ten to twenty people.
+
+This table must be revised by `RGT-S009B`, not by further desk research. Evidence: `docs/research/small-studio-workflow.md` section 4.
+
 ## Entry Modes
 
 ### Idea-led production
