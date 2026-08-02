@@ -23,7 +23,7 @@ General-purpose text-to-video systems are a poor default for this workflow becau
 
 RigTale will be an open-source animation production system in which designers provide structured puppets, backgrounds, props, and approved motion assets while an AI agent writes the production program that directs them. A deterministic animation engine compiles that program into editable previews and final video.
 
-The MVP will not depend on generative image or video models. It will test whether an agent can direct a fixed cast and reusable asset library to produce a multi-character, approximately three-minute 2D cutout music video with layered compositing, predictable rendering, and production-quality review gates.
+The production system will not depend on generative image or video models for its core rendering path. It will enable an agent to direct a fixed cast and reusable asset library to produce multi-character, approximately three-minute 2D cutout music videos with layered compositing, predictable rendering, and production-quality review gates.
 
 ### Initial Users
 
@@ -32,7 +32,7 @@ The MVP will not depend on generative image or video models. It will test whethe
 - Educational-content teams that reuse a recurring cast across a video library.
 - Developers integrating structured animation generation into another product.
 
-Large broadcast studios are explicitly not the primary MVP customer.
+Large broadcast studios are explicitly not the initial target customer.
 
 ### Core Value
 
@@ -76,8 +76,8 @@ Every production must remain inspectable, reproducible, versionable, and editabl
 
 ## Objectives
 
-1. **Produce the reference MVP video.** Produce at least one publication-ready 2D cutout music video between 150 and 210 seconds from locked audio, timed lyrics, and versioned asset packs. The benchmark must include multiple shots, at least three simultaneous character instances, a reusable background system, one vehicle, and one quadruped character.
+1. **Produce the reference production.** Produce at least one publication-ready 2D cutout music video between 150 and 210 seconds from locked audio, timed lyrics, and versioned asset packs. The benchmark must include multiple shots, at least three simultaneous character instances, a reusable background system, one vehicle, and one quadruped character.
 2. **Eliminate per-frame manual animation.** After characters and reusable motions have been published, the benchmark video must be generated without manual frame-by-frame drawing or per-frame keyframing. Human approval and structured shot-level edits remain allowed.
 3. **Keep the entire production structured and editable.** Store characters, capabilities, scenes, shots, actions, choreography, camera instructions, timing, dependencies, and validation results in versioned structured formats. A user must be able to modify and re-render one shot without regenerating unaffected shots.
 4. **Meet a defined production-quality threshold.** A release candidate must have zero blocking schema, dependency, missing-asset, unsupported-action, render, or audio-duration errors. Visual quality, educational clarity, pacing, synchronization, and repetition must pass a documented human review rubric with an average score of at least 4 out of 5.
-5. **Demonstrate business value with target users.** Complete at least five problem interviews and two hands-on pilot evaluations with independent creators or studios of approximately two to five people. The MVP should demonstrate at least a 50% reduction in hands-on layout and animation time for the reference production compared with a documented manual cutout workflow using the same published assets.
+5. **Demonstrate business value with target users.** Complete at least five problem interviews and two hands-on production evaluations with independent creators or studios of approximately two to five people. RigTale should demonstrate at least a 50% reduction in hands-on layout and animation time for the reference production compared with a documented manual cutout workflow using the same published assets.
