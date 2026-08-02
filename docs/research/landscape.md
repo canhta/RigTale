@@ -43,7 +43,7 @@ Each has a review record under `docs/research/repository-reviews/`.
 | OpenMontage | `c36e4122` | **AGPL-3.0** | `reference`, code reuse blocked |
 | ViMax | `05a48943` | MIT | `reject` architecture, `reference` two mechanisms |
 | Code2MP4 | `91d7ba45` | Apache-2.0 | `reference` |
-| Synfig | `eedebcfc` | GPL-3.0 | screening in progress |
+| Synfig | `eedebcfc` | GPL-3.0 files, **GPL-2.0-or-later headers** | `defer`, leaning `reference` |
 
 ## Documentation-Verified Candidates
 
@@ -89,7 +89,21 @@ Evidence in `docs/research/candidate-screening.md`.
 4. Manim was retained despite an architectural mismatch that no renderer-level work could resolve.
 5. XDTS, Tahoma2D, MLT, Glaxnimate, resvg, tiny-skia, ThorVG, Theatre.js, Inochi2D, DragonBones, OpenTimelineIO, and HyperFrames were absent entirely.
 
-## Open Screening Items
+## Screening Exit Criteria
 
-- Synfig source screening is in progress.
-- Star and fork counts are not recorded as evidence anywhere in this screening; several were unobtainable, several conflicted between sources, and none bears on whether a candidate meets a requirement.
+`SPIKE-C001` required at least twelve candidates screened and at least six dedicated deep-review records across at least three candidate groups.
+
+| Criterion | Result |
+|---|---|
+| Candidates screened | 19 by source inspection at pinned commits, plus 29 by primary documentation |
+| Dedicated review records | 14, under `docs/research/repository-reviews/` |
+| Candidate groups covered | Four: DCC and animation applications, skeletal and vector runtimes, code-driven video frameworks, agentic production systems |
+| Every material conclusion cites primary evidence | Yes, with rejected claims recorded where source contradicted documentation |
+| No candidate code executed | Confirmed; screening was read-only throughout |
+| Renderer candidates handed to `SPIKE-R001` | Yes, listed in the routing column above |
+
+## Notes on Method
+
+- **Star and fork counts are not recorded as evidence anywhere in this screening.** Several were unobtainable, several conflicted between sources, and none bears on whether a candidate meets a requirement.
+- Clones added during screening use full commit history rather than shallow, because shallow clones repeatedly prevented any maintenance-health assessment.
+- Where a documentation-level claim conflicted with source inspection, source inspection wins and the rejected claim is recorded in `docs/research/candidate-screening.md`.
