@@ -93,7 +93,7 @@ The names below define ownership boundaries, not selected languages or build too
 
 ## Phase 2 — Fixture, Repository Deep Reviews, and Asset Evidence
 
-**Tracker:** `RGT-S003`, followed by `RGT-S002` and `RGT-S010`.
+**Tracker:** `RGT-S003`, followed by `RGT-S002`, `RGT-S010`, and `RGT-S011`.
 
 **Actions:**
 
@@ -105,10 +105,11 @@ The names below define ownership boundaries, not selected languages or build too
 6. Deep-review shortlisted repositories and execute code only through bounded fixture-based scopes.
 7. Compare layered-asset ingestion, source-of-truth, rig preparation, capability authoring, derived conversion, and immutable publication workflows.
 8. Measure preparation effort and failure behavior across biped, quadruped, vehicle, prop, and scene assets.
+9. Compare schema, serialization, exact-time, content-identity, migration, local object storage, metadata indexing, corruption recovery, and archive restoration approaches against the fixture corpus.
 
-**Tests of completion:** Candidate implementations receive identical inputs and objective assertions; the fixture contains no protected imitation or unknown-license asset; short tests and the full production share contracts; repository executions cite exact revisions; required asset archetypes complete a measured publish flow or have reproduced blockers.
+**Tests of completion:** Candidate implementations receive identical inputs and objective assertions; the fixture contains no protected imitation or unknown-license asset; short tests and the full production share contracts; repository executions cite exact revisions; required asset archetypes complete a measured publish flow or have reproduced blockers; contract/storage combinations pass or reproducibly fail migration, corruption, dependency, index-rebuild, and archive cases.
 
-**Exit gate:** The Project Owner approves the fixture, visual references, repository shortlist, and provisional asset-publication inputs before orchestration or renderer adapter experiments begin.
+**Exit gate:** The Project Owner approves the fixture, visual references, repository shortlist, provisional asset-publication inputs, and evidence package for later contract/storage selection before orchestration or renderer adapter experiments begin.
 
 ## Phase 3 — Orchestration Model Research
 
@@ -140,37 +141,40 @@ The names below define ownership boundaries, not selected languages or build too
 
 **Tests of completion:** Every candidate either produces complete artifacts with manifests or has a documented reproducible blocking failure; visual comparisons use approved references; measurements identify hardware and versions.
 
-**Exit gate:** `RGT-D001` records the accepted orchestration model, primary renderer, optional adapter policy, and rejected alternatives. `SPIKE-R002` then records parity evidence needed by the macOS integration decision.
+**Exit gate:** `RGT-D001` records which orchestration/backend pairings qualify for downstream parity and platform testing. It does not select the primary renderer. `SPIKE-R002` then records parity evidence needed by Swift integration and final selection.
 
-## Phase 5 — Platform Integration and Independent Agent-Host Evidence
+## Phase 5 — Platform Integration and Final Production-Engine Selection
 
-**Tracker:** `RGT-S006` and `RGT-S007`.
+**Tracker:** `RGT-S006`, followed by `RGT-D010`.
 
 ### macOS integration
 
 Compare supervised process, local service, and native library integration where relevant. Measure packaging, signing, startup, cancellation, crash isolation, progress transport, media preview, and upgrade impact.
 
-### MCP and provider execution — non-blocking for core animation
-
-Validate host-operated MCP behavior, approval boundaries, long-running jobs, media references, subscription constraints, and resume behavior. Separately validate embedded execution requirements and provider credential handling.
-
-**Core exit gate:** `RGT-D010` selects the local process, application transport, and preview integration boundaries required by Phases 6–10.
-
-**Independent agent-host gate:** `RGT-D011` selects the MCP surface and embedded-provider strategy before the MCP and embedded portions of Phase 11. Failure or delay of `SPIKE-M001` does not block contracts, assets, animation compilation, rendering, CLI, or the local macOS studio.
+**Exit gate:** After `SPIKE-R001`, `SPIKE-R002`, and `SPIKE-I001`, `RGT-D010` selects the primary production-engine pairing, preview path, local process, application transport, and Swift integration boundaries required by Phases 6–10.
 
 ## Phase 6 — Architecture Consolidation
 
-**Tracker:** `RGT-D009`, `RGT-D001`, `RGT-D010`, and `RGT-D012`. `RGT-D011` is required only for its Phase 11 scope.
+**Tracker:** `RGT-D009`, `RGT-D001`, `RGT-D010`, `RGT-D012`, and `RGT-D013`. `RGT-D011` is required only for its Phase 11 scope.
 
 **Actions:**
 
 1. Replace all demonstrated hypotheses in product requirements with measurable requirements.
 2. Finalize contract schemas, time representation, compatibility, migrations, error codes, job states, and adapter capability negotiation.
 3. Select the monorepo layout, implementation languages, build orchestration, schema tooling, local metadata strategy, media dependencies, and test runners.
-4. Update system topology, security boundaries, deployment profiles, and resource floors.
-5. Split Phases 7–13 into executable subsystem plans with exact files, APIs, tests, commands, and commit checkpoints.
+4. Approve representative application-tool schemas plus the polling, cancellation, finding, approval, artifact-reference, and long-running-job contracts under `RGT-D013`.
+5. Update system topology, security boundaries, deployment profiles, and resource floors.
+6. Split Phases 7–13 into executable subsystem plans with exact files, APIs, tests, commands, and commit checkpoints.
 
 **Exit gate:** No build task depends on an unrecorded material choice. Contract fixtures and decision records are approved.
+
+## Parallel Evidence Track — MCP and Embedded Agent Execution
+
+**Tracker:** `RGT-S007`, `RGT-D011`, and `RGT-D014`.
+
+After `RGT-D013` approves stable application-tool and job contracts, validate MCP host-operated behavior, approval boundaries, long-running jobs, media references, subscription constraints, session resume, and embedded-provider credential handling. Reconcile the affected `PR-P002` and `PR-P003` requirements through `RGT-D014`.
+
+This track may run alongside Phases 7–10. Failure or delay does not block contracts, assets, animation compilation, rendering, CLI, or the local macOS studio, but `RGT-D011` is required before implementing the MCP and embedded portions of Phase 11.
 
 ## Phase 7 — Contract and Artifact Foundation
 

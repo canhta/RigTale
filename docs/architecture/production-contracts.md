@@ -55,7 +55,7 @@ Every versioned artifact must expose the logical equivalent of:
 | `provenance` | Origin, license, attribution, and transformation history where applicable. |
 | `extensions` | Namespaced optional data that cannot redefine core semantics. |
 
-The storage encoding, ID format, schema language, and digest algorithm are decision-pending under `RGT-D012`, using contract fixtures plus the accepted language, migration, and storage evidence.
+The storage encoding, ID format, schema language, and digest algorithm are decision-pending under `SPIKE-CS001` and `RGT-D012`, using contract, migration, corruption, dependency, and archive fixtures.
 
 ## Lifecycle
 
@@ -172,6 +172,8 @@ The concrete track representation is not accepted until `SPIKE-A001` demonstrate
 
 Requests rendering of an episode, shot, or frame range against an exact compiled artifact, backend profile, quality profile, output specification, and resource limits. It owns status, attempts, progress, diagnostics, logs, and produced artifacts.
 
+The stable application-tool schemas for submitting, polling, cancelling, resuming, and inspecting long-running jobs are approved under `RGT-D013` after the contract and local-storage baseline is selected.
+
 ### `RenderManifest`
 
 Records engine and adapter versions, dependency digests, configuration, seeds, frame range, output checksums, timing, resource measurements, warnings, and environment identity needed to reproduce the result.
@@ -217,6 +219,7 @@ Errors are either validation failures, incompatibilities, resource failures, tra
 - `SPIKE-C001`: established patterns and failure modes from comparable systems.
 - `SPIKE-W001`: real workflow gates, artifact handoffs, and manual baseline.
 - `SPIKE-F001`: contract, failure, quality, recovery, and invalidation fixtures.
+- `SPIKE-CS001`: schema tooling, canonical serialization, exact time, content identity, migrations, local storage, and archive restoration.
 - `SPIKE-A002`: source assets, layered ingestion, rig publication, capability, and versioning.
 - `SPIKE-A001`: provisional action, motion composition, interaction, compiled timeline, and invalidation models.
 - `SPIKE-R001`: visible execution, renderer boundary, supported features, headless operation, recovery, and reproducibility.

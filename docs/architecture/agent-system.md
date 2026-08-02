@@ -40,6 +40,8 @@ Agents operate only through typed tools backed by production services. Candidate
 
 Every mutating tool validates its input, records actor and source references, is idempotent or has an idempotency key, and returns a structured artifact or error. Raw filesystem and unrestricted shell access are development conveniences, not production-agent interfaces.
 
+`RGT-D013` must approve representative tool schemas and long-running-job behavior before executable MCP or embedded-agent validation begins.
+
 ## Production Loop
 
 ```text

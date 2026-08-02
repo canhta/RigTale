@@ -52,4 +52,4 @@ Every deep review must include:
 - Research findings do not modify the approved charter.
 - A candidate remains unselected until its required spike passes.
 - Missing evidence is written as a tracked spike, not filled with an assumption.
-- The work tracker records status; research and spike files hold evidence; decision records hold accepted choices; the system design describes only accepted architecture.
+- The work tracker records status; research and spike files hold evidence; decision records hold accepted choices. The system design distinguishes approved product constraints, provisional integration boundaries, deferred decisions, and ADR-backed selected architecture.

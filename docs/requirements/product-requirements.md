@@ -178,6 +178,7 @@ Quantitative visual-quality, performance, parity, recovery, and interaction thre
 | Small-studio workflow, artifact gates, user problems, and manual baseline | `SPIKE-W001` |
 | Comparable production and open-source patterns | `SPIKE-C001` and fixture-based repository reviews |
 | Reference workload, quality assertions, recovery cases, and rubric-calibration plan | `SPIKE-F001` |
+| Schema tooling, serialization, exact time, content identity, migration, local storage, and archive restoration | `SPIKE-CS001` |
 | Layered-asset ingestion, rig preparation, authoring effort, and publication | `SPIKE-A002` |
 | Orchestration contracts, motion composition, choreography, interaction, and invalidation hypotheses | `SPIKE-A001` |
 | Visible orchestration quality, renderer quality, deterministic execution, cache behavior, recovery, packaging, and headless execution | `SPIKE-R001` |
@@ -194,12 +195,12 @@ Every completed research or spike item must identify affected requirement IDs an
 |---|---|---|---|---|
 | `PR-O01` | `CreativeBrief`, `Episode`, `ShotPlan`, asset packs | Intent, asset, shot-plan gates | 8, 9, 11 | `W001`, `A001`, `R001` |
 | `PR-O02` | `MotionPack`, `CapabilityManifest`, `CompiledShot` | Asset, compilation, preview gates | 8, 9, 14 | `A002`, `A001`, `R001` |
-| `PR-O03` | `Production`, `AssetLock`, `CompiledShot`, manifests | Dependency, correction, archive gates | 7, 9, 10 | `F001`, `A001`, `R001` |
+| `PR-O03` | `Production`, `AssetLock`, `CompiledShot`, manifests | Dependency, correction, archive gates | 7, 9, 10 | `F001`, `CS001`, `A001`, `R001` |
 | `PR-O04` | `ValidationReport`, `ReviewReport`, `DeliveryManifest` | Preview, final, delivery gates | 10, 13, 14 | `W001`, `F001`, `R001` |
 | `PR-F001` | `CreativeBrief`, `Script`, `Episode` | Intent and creative approval | 11, 12 | `W001` |
 | `PR-F002` | All authoring artifacts and lifecycle states | All artifact handoff gates | 1, 11, 12 | `W001` |
 | `PR-F003` | `AudioTimeline`, `ShotPlan` | Media lock when applicable | 10, 11 | `W001`, provider evidence during Phase 11 |
-| `PR-A001` | Asset packs, `AssetLock`, common envelope | Asset publication | 7, 8 | `A002` |
+| `PR-A001` | Asset packs, `AssetLock`, common envelope | Asset publication | 7, 8 | `A002`, `CS001` |
 | `PR-A002` | `CapabilityManifest`, `MotionPack` | Capability and compile validation | 8, 9 | `A002`, `A001` |
 | `PR-A003` | `CharacterPack`, `ScenePack`, `PropPack` | Asset ingestion and publication | 8 | `A002` |
 | `PR-A004` | All asset-pack archetypes | Asset and fixture approval | 8 | `F001`, `A002` |
@@ -221,9 +222,11 @@ Every completed research or spike item must identify affected requirement IDs an
 | `PR-P001` | Application operations, jobs, artifact repository | Local operational qualification | 12, 13 | `I001` |
 | `PR-P002` | Application API, CLI operations, MCP adapter | Automation and integration qualification | 11, 12, 15 | `I001`, `M001` |
 | `PR-P003` | Provider adapters, provenance, run records | Agent and offline-render gates | 11 | `M001`, provider evaluation in Phase 11 |
-| `PR-P004` | Jobs, manifests, migrations, archives | Recovery and operational qualification | 10, 13 | `F001`, `R001`, `I001` |
+| `PR-P004` | Jobs, manifests, migrations, archives | Recovery and operational qualification | 10, 13 | `F001`, `CS001`, `R001`, `I001` |
 
 The matrix is updated whenever an artifact, phase, evidence owner, or accepted decision changes. A requirement with no contract, gate, phase, or evidence owner blocks baseline validation.
+
+`RGT-D009` reconciles the core and local subset after its technical evidence. MCP and embedded-agent requirements remain explicitly evidence-pending until `RGT-D011` and are reconciled by `RGT-D014`. Full business validation still requires the Phase 14 hands-on evaluations.
 
 ## 13. Baseline Review Criteria
 

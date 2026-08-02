@@ -27,8 +27,9 @@ Both modes must use the same application operations, production contracts, valid
 ## Preconditions
 
 - The v1 production contracts and agent-system boundaries are reviewed.
-- Representative tools exist as stable specifications or executable operations.
-- Job polling, cancellation, artifact references, findings, and approvals have defined behavior.
+- `RGT-D013` has approved representative application-tool schemas and the long-running-job contract.
+- Representative tools exist as stable executable operations or bounded test doubles conforming to those approved schemas.
+- Job polling, cancellation, artifact references, findings, and approvals have defined and testable behavior.
 - Test projects contain no private credentials or restricted assets.
 
 ## Questions to Resolve

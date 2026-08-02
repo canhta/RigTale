@@ -25,14 +25,17 @@ An item may be marked `completed` only when its linked exit criteria are satisfi
 | RGT-S010 | Asset spike | Validate layered-asset ingestion and rig publication | RGT-S001, RGT-S003 | `docs/spikes/SPIKE-A002-asset-ingestion-and-rig-authoring.md` |
 | RGT-S008 | Orchestration research | Compare and prototype renderer-independent orchestration contracts | RGT-S002, RGT-S003, RGT-S010 | `docs/spikes/SPIKE-A001-animation-orchestration.md` |
 | RGT-S004 | Production-engine spike | Execute shortlisted orchestration and renderer pairings | RGT-S008 | `docs/spikes/SPIKE-R001-renderer-backends.md` |
+| RGT-D001 | Qualification | Qualify orchestration and renderer pairings for parity and platform tests | RGT-S004 | Planned qualification record |
 | RGT-S005 | Preview spike | Measure preview and final-render parity | RGT-S004 | `docs/spikes/SPIKE-R002-preview-final-parity.md` |
 | RGT-S006 | Integration spike | Compare Swift-to-renderer integration boundaries | RGT-S004, RGT-S005 | `docs/spikes/SPIKE-I001-swift-renderer-integration.md` |
-| RGT-S007 | Agent spike | Validate MCP host-operated and embedded-agent execution | RGT-D000 | `docs/spikes/SPIKE-M001-mcp-and-embedded-agent-execution.md` |
-| RGT-D001 | Decision | Select the orchestration model and primary renderer | RGT-S004 | Planned architecture decision records |
-| RGT-D010 | Decision | Select preview and Swift-renderer integration boundaries | RGT-S005, RGT-S006 | Planned architecture decision records |
+| RGT-D010 | Decision | Select the primary production engine, preview, and Swift integration boundaries | RGT-D001, RGT-S005, RGT-S006 | Planned architecture decision records |
+| RGT-S011 | Foundation spike | Validate contract tooling, migration, content identity, and local storage | RGT-S001, RGT-S003 | `docs/spikes/SPIKE-CS001-contract-and-local-storage.md` |
+| RGT-D012 | Decision | Select core languages, contract tooling, and local storage baseline | RGT-S011, RGT-D010 | Planned architecture decision records |
+| RGT-D013 | Design | Approve application-tool and long-running-job contracts | RGT-D001, RGT-D012 | `docs/architecture/agent-system.md`, `docs/architecture/production-contracts.md` |
+| RGT-S007 | Agent spike | Validate MCP host-operated and embedded-agent execution | RGT-D013 | `docs/spikes/SPIKE-M001-mcp-and-embedded-agent-execution.md` |
 | RGT-D011 | Decision | Select MCP and embedded-agent execution strategy | RGT-S007 | Planned architecture decision records |
-| RGT-D012 | Decision | Select core languages, contract tooling, and local storage baseline | RGT-S001, RGT-D001, RGT-D010 | Planned architecture decision records |
-| RGT-D009 | Requirements | Incorporate accepted evidence into validated product requirements | RGT-S009, RGT-S010, RGT-D001, RGT-D010, RGT-D012 | `docs/requirements/product-requirements.md` |
+| RGT-D009 | Requirements | Reconcile core and local product requirements from accepted evidence | RGT-S009, RGT-S010, RGT-D010, RGT-D012 | `docs/requirements/product-requirements.md` |
+| RGT-D014 | Requirements | Reconcile MCP and embedded-agent requirements from accepted evidence | RGT-D011 | `docs/requirements/product-requirements.md` |
 
 ## Completed
 

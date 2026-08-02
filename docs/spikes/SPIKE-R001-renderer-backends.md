@@ -68,10 +68,10 @@ Preview/final parity and Swift process integration receive dedicated follow-up s
 - Exact source revisions, adapter code, commands, environments, manifests, and rendered artifacts.
 - Structural, visual, failure, performance, recovery, licensing, and maintenance comparison.
 - Catalogue of unsupported features and reproducible blockers.
-- Recommended production-engine architecture or a documented reason to defer.
+- Qualified production-engine pairings for parity and Swift integration, or a documented reason that none qualifies.
 - Proposed final contracts, adapter boundary, quality thresholds, and platform constraints.
 - Updates to requirements, architecture, quality, operations, implementation plan, and tracker.
-- Decision records for accepted orchestration model, primary renderer, and any binding implementation-language constraint.
+- A qualification record that preserves all surviving pairings and rejected alternatives without selecting the final primary renderer.
 
 ## Exit Criteria
 
@@ -80,7 +80,7 @@ Preview/final parity and Swift process integration receive dedicated follow-up s
 - The structured correction and isolated rerender behave as declared.
 - Repeatability, failure recovery, headless behavior, packaging implications, and maintenance cost are recorded.
 - Every material conclusion cites artifacts, commands, exact versions, and environment details.
-- No selection is accepted until the corresponding decision records are approved.
+- `RGT-D001` may qualify pairings for downstream tests but must not select the final primary renderer. Final selection waits for `SPIKE-R002`, `SPIKE-I001`, and `RGT-D010`.
 
 ## Rejection Conditions
 

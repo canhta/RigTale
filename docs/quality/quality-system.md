@@ -124,7 +124,7 @@ A candidate build qualifies only when:
 
 Numerical thresholds must come from `SPIKE-W001`, `SPIKE-F001`, `SPIKE-A002`, `SPIKE-R001`, `SPIKE-R002`, `SPIKE-I001`, and full-production evaluation. This draft must not invent them.
 
-`SPIKE-W001` owns early human-workflow and manual-baseline evidence. `SPIKE-F001` owns the fixture assertions and calibration plan. `SPIKE-A002`, `SPIKE-R001`, `SPIKE-R002`, and `SPIKE-I001` provide the asset, visible-quality, parity, performance, and recovery measurements from which thresholds may be proposed.
+`SPIKE-W001` owns early human-workflow and manual-baseline evidence. `SPIKE-F001` owns the fixture assertions and calibration plan. `SPIKE-CS001`, `SPIKE-A002`, `SPIKE-R001`, `SPIKE-R002`, and `SPIKE-I001` provide storage/recovery, asset, visible-quality, parity, performance, and platform measurements from which thresholds may be proposed.
 
 ## Regression Policy
 

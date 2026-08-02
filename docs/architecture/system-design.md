@@ -184,12 +184,12 @@ Telemetry is local-first and inspectable. Remote telemetry is opt-in unless requ
 |---|---|
 | Source asset, layered ingestion, rig publication, and derived conversion | `SPIKE-A002` |
 | Orchestration, motion, interaction, and compiled timeline model | `SPIKE-A001` and joint execution in `SPIKE-R001` |
-| Primary renderer and adapter boundary | `SPIKE-R001` and `SPIKE-R002` |
-| Server and core implementation languages, schema tooling, and local storage baseline | `RGT-D012`, informed by repository reviews, `SPIKE-R001`, and `SPIKE-I001` |
+| Primary renderer and adapter boundary | Qualification from `SPIKE-R001`, parity from `SPIKE-R002`, Swift integration from `SPIKE-I001`, then final `RGT-D010` |
+| Server and core implementation languages, schema tooling, and local storage baseline | `SPIKE-CS001` and `RGT-D012`, informed by repository reviews, `SPIKE-R001`, and `SPIKE-I001` |
 | macOS process and engine integration | `SPIKE-I001` |
 | Preview implementation | `SPIKE-R002` |
-| Serialization, schema, and migration technology | Contract fixture and language decision |
-| Local metadata store and cloud database | query, migration, backup, and scale evidence |
+| Serialization, schema, migration, and local metadata store | `SPIKE-CS001` and `RGT-D012` |
+| Cloud database | Later query, migration, backup, tenancy, and scale evidence before hosted implementation |
 | MCP host behavior and embedded agent framework | `SPIKE-M001`; it does not block the core local animation path |
 | Queue, object storage, and cloud deployment providers | operational workload evidence |
 

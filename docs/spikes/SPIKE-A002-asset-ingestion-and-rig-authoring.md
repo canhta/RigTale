@@ -67,7 +67,7 @@ Prepared reference packs may bootstrap experiments, but the spike must measure t
 - Minimum required manual authoring versus safe assisted proposals.
 - Import, publication, compatibility, security, and migration failure catalogue.
 - Updates to product requirements, contracts, pipeline, quality, operations, fixture, and implementation plan.
-- Decision records for accepted source format, rig representation, or authoring integration.
+- Decision records may accept a source artwork format and publication workflow. Runtime rig representations and backend-derived formats remain provisional until joint `SPIKE-R001` execution and final `RGT-D010` review.
 
 ## Exit Criteria
 
