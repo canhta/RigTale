@@ -96,6 +96,23 @@ These are recorded rather than silently resolved. Each is a real conflict betwee
 | 2 | Charter Objective 5 requires "at least a 50% reduction in hands-on layout and animation time … compared with a documented manual cutout workflow." `RGT-S009` established that **no such documented baseline exists**, making the claim currently unfalsifiable. The remedy — producing the baseline in-house, with one operator — measures the project against its own manual attempt. | The charter text is unchanged and no revision is proposed. The owner should decide whether to qualify the objective or accept a self-produced baseline with the circularity recorded. |
 | 3 | Charter constraint "Source code and bundled reference assets must permit legal open-source redistribution" (`charter.md`) has **no product requirement**, therefore no traceability row, no gate, and no phase — while screening produced the project's largest body of licensing evidence. | Add a dependency-licensing requirement, or record why the constraint is unenforced. |
 
+## Owner-Stated Commercial Scale
+
+`[OWNER-STATED]` The project's commercial target is approximately **one million USD**, not venture scale. Recorded here because it changes how business evidence is weighed, and because an independent review reached the opposite conclusion by assuming a scale the charter never states.
+
+**What this settles.** A red-team review argued the commercial case was already dead: the nearest comparable vendor's entire business is roughly USD 9M per year and shrinking, the commissioning market it depends on is contracting, and competing tools are free or near-free. At venture scale that is a ceiling problem. **At the stated target it is the opposite** — it is evidence that the segment exists, pays, and is served by products whose vendors have stopped investing in them. Screening already established the standing-still part from primary sources: one vendor states publicly it will not build AI features, another dropped its cutout product from its roadmap, and a third is in maintenance mode.
+
+The finding is therefore **recorded and not actioned**. It must not be reintroduced as a stop signal without first stating which revenue scale it assumes.
+
+**What this does not settle.** Two risks are independent of revenue ambition and remain fully open:
+
+- **Output quality.** A smaller target does not make weak output acceptable. The assumption that an agent can write structured direction that yields publishable animation still has **no evidence of any kind**, and is currently first tested in implementation Phase 11 — after the contracts, the assets, the compiler, the renderer, and `RGT-D010`.
+- **Solo feasibility.** A smaller target does not shrink the scope already committed: roughly thirteen throwaway implementations across the executable spikes, nine executable repository reviews, and three complete hand-made productions that no tracker item creates.
+
+**Strategic consequence: prefer proven prior art over original construction.** The working hypothesis that RigTale must own its rig representation was reached **by elimination** — the weakest available basis for the largest engineering commitment in the project — and the elimination ran before several production-proven permissive schemas were on the candidate list. `RGT-S014` and the second screening pass must test adoption before construction.
+
+**Scope of "clone", stated precisely so it is not mistaken later.** Product model, workflow shape, feature decomposition, pricing, and onboarding may be studied and reproduced freely; that is ordinary competitive design work. Published permissively licensed **formats** may be adopted directly. Proprietary competitors publish no source, so there is nothing there to copy. Copyleft source may be read but not incorporated, because `PR-P005` and the charter's redistribution constraint bind the dependency stack. Adopting a format is not the same act as vendoring a codebase, and only the first is on the table by default.
+
 ## Open Evidence Gaps from Independent Review
 
 Found by red-team review of the closed spikes. Each is verified; none is closed.
