@@ -12,28 +12,20 @@ An item may be marked `completed` only when its linked exit criteria are satisfi
 
 | ID | Type | Item | Evidence | Status |
 |---|---|---|---|---|
-| RGT-D000 | Documentation | Complete and approve the production documentation baseline | `docs/README.md` | active |
-| RGT-D003 | Requirements | Draft product workflows, capabilities, evidence gaps, and acceptance criteria | `docs/requirements/product-requirements.md` | active |
+| RGT-D000 | Documentation | Review the v1 documentation baseline and authorize evidence work | `docs/README.md` | active |
 
 ## Queue
 
 | ID | Type | Item | Depends on | Evidence |
 |---|---|---|---|---|
-| RGT-D004 | Contracts | Define the canonical production model and versioned contracts | RGT-D003 | `docs/architecture/production-contracts.md` |
-| RGT-D005 | Pipeline design | Define asset ingestion, rigging, animation, audio, and rendering flow | RGT-D004 | `docs/architecture/production-pipeline.md` |
-| RGT-D006 | Agent design | Define Development, Studio, and Red-Team agents plus MCP boundaries | RGT-D004 | `docs/architecture/agent-system.md` |
-| RGT-D002 | System design | Define stable architecture, integration seams, and deferred decisions | RGT-D004, RGT-D005, RGT-D006 | `docs/architecture/system-design.md` |
-| RGT-D007 | Quality design | Define validation, review, quality gates, and production acceptance | RGT-D002 | `docs/quality/quality-system.md` |
-| RGT-D008 | Operations | Define local operation, cloud evolution, security, recovery, and observability | RGT-D002 | `docs/operations/deployment-and-operations.md` |
-| RGT-P001 | Plan | Produce the implementation plan with explicit research gates | RGT-D007, RGT-D008 | `docs/plans/implementation-plan.md` |
-| RGT-S001 | Competitive spike | Discover and screen comparable open-source systems | RGT-P001 | `docs/spikes/SPIKE-C001-competitive-landscape.md` |
+| RGT-S001 | Competitive spike | Discover and screen comparable open-source systems | RGT-D000 | `docs/spikes/SPIKE-C001-competitive-landscape.md` |
 | RGT-S002 | Competitive spikes | Deep-review shortlisted repositories; create one spike result per repository | RGT-S001 | `docs/research/repository-reviews/` |
-| RGT-S003 | Spike | Define the representative multi-character animation fixture | RGT-P001 | Planned spike document |
+| RGT-S003 | Spike | Define the representative multi-character animation fixture | RGT-D000 | Planned spike document |
 | RGT-S008 | Animation spike | Validate production-grade fixed-cast character orchestration and deterministic frame compilation | RGT-S001, RGT-S003 | `docs/spikes/SPIKE-A001-animation-orchestration.md` |
 | RGT-S004 | Renderer spike | Compare qualified production backends with the same fixture | RGT-S008 | `docs/spikes/SPIKE-R001-renderer-backends.md` |
 | RGT-S005 | Spike | Measure web-preview and final-render parity | RGT-S004 | Planned spike document |
 | RGT-S006 | Spike | Compare Swift-to-engine process and native-library integration | RGT-S004 | Planned spike document |
-| RGT-S007 | Agent spike | Validate subscription-hosted operation through MCP | RGT-P001 | Planned spike document |
+| RGT-S007 | Agent spike | Validate subscription-hosted operation through MCP | RGT-D000 | Planned spike document |
 | RGT-D001 | Decision | Select the primary renderer and integration language | RGT-S004, RGT-S005, RGT-S006 | Planned architecture decision record |
 | RGT-D009 | Requirements | Incorporate animation and renderer evidence into validated product requirements | RGT-S008, RGT-D001 | `docs/requirements/product-requirements.md` |
 
@@ -42,6 +34,14 @@ An item may be marked `completed` only when its linked exit criteria are satisfi
 | ID | Result | Evidence | Commit |
 |---|---|---|---|
 | RGT-C001 | Project charter approved | `docs/requirements/charter.md` | `1ca3e47` |
+| RGT-D003 | Product requirements v1 drafted | `docs/requirements/product-requirements.md` | `e593958` |
+| RGT-D004 | Production contracts v1 drafted | `docs/architecture/production-contracts.md` | `e593958` |
+| RGT-D005 | Production pipeline v1 drafted | `docs/architecture/production-pipeline.md` | `e593958` |
+| RGT-D006 | Agent system v1 drafted | `docs/architecture/agent-system.md` | `e593958` |
+| RGT-D002 | System design v1 drafted | `docs/architecture/system-design.md` | `e593958` |
+| RGT-D007 | Quality system v1 drafted | `docs/quality/quality-system.md` | `e593958` |
+| RGT-D008 | Deployment and operations v1 drafted | `docs/operations/deployment-and-operations.md` | `e593958` |
+| RGT-P001 | Evidence-gated implementation plan v1 drafted | `docs/plans/implementation-plan.md` | `e593958` |
 
 ## Tracker Rules
 
