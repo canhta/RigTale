@@ -142,7 +142,21 @@ Release 1 will be a complete production vertical, not a disposable prototype:
 
 ## Solo Studio Operating Model
 
-RigTale uses two agents supported by deterministic production tools.
+RigTale uses one development agent and two production agents supported by deterministic production tools.
+
+### Development Agent
+
+The Development Agent supports the Project Owner throughout the construction of RigTale:
+
+- Researches business and technical questions using verifiable sources.
+- Challenges assumptions and records unresolved questions as spike items.
+- Maintains product requirements, architecture, implementation plans, and decisions.
+- Implements, tests, reviews, and documents the repository.
+- Protects product scope and validates each increment against the reference production.
+
+The Development Agent is not part of the video production runtime.
+
+Initially, its workflow is defined at repository level. Repeated and stable workflows will later be extracted into focused RigTale skills instead of creating one large skill.
 
 ### Studio Agent
 
