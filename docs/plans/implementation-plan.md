@@ -71,16 +71,16 @@ The names below define ownership boundaries, not selected languages or build too
 - research plan, candidate index, bounded evidence specifications, and canonical tracker; and
 - traceable links from every material unknown to evidence work.
 
-**Exit gate:** Project Owner accepts the v1 set as a research baseline. Acceptance authorizes evidence collection, not product implementation.
+**Exit gate:** Project Owner accepts the v1 set as a research baseline. Acceptance authorizes evidence collection, not product implementation. Accepted under `RGT-D000` at commit `e82c45b`.
 
 ## Phase 1 — Workflow, Business, and Competitive Screening
 
-**Tracker:** `RGT-S009` and `RGT-S001`.
+**Tracker:** `RGT-S009`, `RGT-S009B`, and `RGT-S001`.
 
 **Actions:**
 
-1. Conduct at least five problem interviews with target creators or small studios.
-2. Validate real artifact handoffs, approval gates, rework loops, asset publication, review, rendering, and recovery.
+1. Establish the source-cited workflow map, gate evidence status, interview instrument, and ranked problem hypotheses under `RGT-S009`.
+2. Conduct at least five problem interviews with target creators or small studios under `RGT-S009B`, and validate real artifact handoffs, approval gates, rework loops, asset publication, review, rendering, and recovery.
 3. Define the comparable manual cutout workflow and hands-on time-capture protocol before product evaluation.
 4. Verify canonical repositories, licenses, releases, and exact inspected commits.
 5. Perform read-only source screening for production models, rig systems, timelines, render boundaries, tests, packaging, and agent workflows.
@@ -89,7 +89,7 @@ The names below define ownership boundaries, not selected languages or build too
 
 **Tests of completion:** Five qualifying interviews and a privacy-safe synthesis exist; workflow claims distinguish facts from hypotheses; the manual baseline protocol is approved; every competitive claim cites primary evidence and exact source revisions; no candidate code was executed during screening.
 
-**Exit gate:** Workflow/business and competitive reports are approved. User-value evidence and the manual baseline exist before major technical selection. No technology is selected solely by this phase.
+**Exit gate:** Workflow/business and competitive reports are approved. Phase 2 evidence work may begin once `RGT-S009` and `RGT-S001` are approved, but `RGT-D010` and `RGT-D012` must not select a production architecture until `RGT-S009B` user-value evidence and the manual baseline are accepted. No technology is selected solely by this phase.
 
 ## Phase 2 — Fixture, Repository Deep Reviews, and Asset Evidence
 

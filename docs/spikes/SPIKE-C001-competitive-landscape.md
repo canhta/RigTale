@@ -2,7 +2,7 @@
 
 **Tracker:** `RGT-S001`
 
-**Status:** Queued. Screening is read-only; candidate execution is deferred to approved fixture-based reviews and technical spikes.
+**Status:** Active. Screening is read-only; candidate execution is deferred to approved fixture-based reviews and technical spikes.
 
 ## Question
 

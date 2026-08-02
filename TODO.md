@@ -12,14 +12,21 @@ An item may be marked `completed` only when its linked exit criteria are satisfi
 
 | ID | Type | Item | Evidence | Status |
 |---|---|---|---|---|
-| RGT-D000 | Documentation | Review the v1 documentation baseline and authorize evidence work | `docs/README.md` | active |
+| RGT-S009 | Workflow spike | Establish the source-cited small-studio workflow map, gate evidence status, and manual comparison protocol | `docs/spikes/SPIKE-W001-production-workflow-and-business-evidence.md` | active |
+| RGT-S001 | Competitive spike | Discover and screen comparable open-source systems (read-only) | `docs/spikes/SPIKE-C001-competitive-landscape.md` | active |
+
+## Blocked
+
+| ID | Type | Item | Blocked by | Evidence |
+|---|---|---|---|---|
+| RGT-S009B | Workflow spike | Conduct and synthesize five target-user problem interviews | Project Owner authorization to contact participants | `docs/spikes/SPIKE-W001-production-workflow-and-business-evidence.md` |
+
+`RGT-S009B` carries the charter Objective 5 interview requirement. It cannot be satisfied by desk research. Technical evidence work may proceed while it is blocked, but `RGT-D010` and `RGT-D012` must not select a production architecture before it is accepted.
 
 ## Queue
 
 | ID | Type | Item | Depends on | Evidence |
 |---|---|---|---|---|
-| RGT-S009 | Workflow spike | Validate small-studio workflow, user problems, and manual business baseline | RGT-D000 | `docs/spikes/SPIKE-W001-production-workflow-and-business-evidence.md` |
-| RGT-S001 | Competitive spike | Discover and screen comparable open-source systems | RGT-D000 | `docs/spikes/SPIKE-C001-competitive-landscape.md` |
 | RGT-S003 | Fixture spike | Define the representative multi-character production fixture | RGT-S001, RGT-S009 | `docs/spikes/SPIKE-F001-reference-production-fixture.md` |
 | RGT-S002 | Competitive spikes | Deep-review shortlisted repositories using approved fixture cases | RGT-S001, RGT-S003 | `docs/research/repository-reviews/` |
 | RGT-S010 | Asset spike | Validate layered-asset ingestion and rig publication | RGT-S001, RGT-S003 | `docs/spikes/SPIKE-A002-asset-ingestion-and-rig-authoring.md` |
@@ -28,13 +35,13 @@ An item may be marked `completed` only when its linked exit criteria are satisfi
 | RGT-D001 | Qualification | Qualify orchestration and renderer pairings for parity and platform tests | RGT-S004 | Planned qualification record |
 | RGT-S005 | Preview spike | Measure preview and final-render parity | RGT-S004, RGT-D001 | `docs/spikes/SPIKE-R002-preview-final-parity.md` |
 | RGT-S006 | Integration spike | Compare Swift-to-renderer integration boundaries | RGT-S004, RGT-S005 | `docs/spikes/SPIKE-I001-swift-renderer-integration.md` |
-| RGT-D010 | Decision | Select the primary production engine, preview, and Swift integration boundaries | RGT-D001, RGT-S005, RGT-S006 | Planned architecture decision records |
+| RGT-D010 | Decision | Select the primary production engine, preview, and Swift integration boundaries | RGT-D001, RGT-S005, RGT-S006, RGT-S009B | Planned architecture decision records |
 | RGT-S011 | Foundation spike | Validate contract tooling, migration, content identity, and local storage | RGT-S001, RGT-S003 | `docs/spikes/SPIKE-CS001-contract-and-local-storage.md` |
-| RGT-D012 | Decision | Select core languages, contract tooling, and local storage baseline | RGT-S011, RGT-D010 | Planned architecture decision records |
+| RGT-D012 | Decision | Select core languages, contract tooling, and local storage baseline | RGT-S011, RGT-D010, RGT-S009B | Planned architecture decision records |
 | RGT-D013 | Design | Approve application-tool and long-running-job contracts | RGT-D009 | `docs/architecture/agent-system.md`, `docs/architecture/production-contracts.md` |
 | RGT-S007 | Agent spike | Validate MCP host-operated and embedded-agent execution | RGT-D013 | `docs/spikes/SPIKE-M001-mcp-and-embedded-agent-execution.md` |
 | RGT-D011 | Decision | Select MCP and embedded-agent execution strategy | RGT-S007 | Planned architecture decision records |
-| RGT-D009 | Requirements | Reconcile core and local product requirements from accepted evidence | RGT-S009, RGT-S010, RGT-D010, RGT-D012 | `docs/requirements/product-requirements.md` |
+| RGT-D009 | Requirements | Reconcile core and local product requirements from accepted evidence | RGT-S009, RGT-S009B, RGT-S010, RGT-D010, RGT-D012 | `docs/requirements/product-requirements.md` |
 | RGT-D014 | Requirements | Reconcile MCP and embedded-agent requirements from accepted evidence | RGT-D011 | `docs/requirements/product-requirements.md` |
 
 ## Completed
@@ -50,6 +57,7 @@ An item may be marked `completed` only when its linked exit criteria are satisfi
 | RGT-D007 | Quality system v1 drafted | `docs/quality/quality-system.md` | `e593958` |
 | RGT-D008 | Deployment and operations v1 drafted | `docs/operations/deployment-and-operations.md` | `e593958` |
 | RGT-P001 | Evidence-gated implementation plan v1 drafted | `docs/plans/implementation-plan.md` | `e593958` |
+| RGT-D000 | v1 documentation baseline reviewed and evidence work authorized | `docs/README.md`, `docs/plans/implementation-plan.md` | `e82c45b` |
 
 ## Tracker Rules
 
