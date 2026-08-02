@@ -191,3 +191,18 @@ All predictable operations remain deterministic software:
 - Animation runtime.
 - Rendering and compositing.
 - Media encoding, caching, and versioning.
+
+## Constraints
+
+- RigTale must remain practical for one developer to build, operate, and maintain.
+- The primary renderer must use structured 2D assets, rigs, motions, and scene data rather than direct AI video generation.
+- The production runtime requires only the Studio Agent and Red-Team Agent. The Development Agent supports repository construction and does not run during video production.
+- Predictable work must remain deterministic software.
+- Existing productions must remain editable and renderable without calling an AI provider.
+- Agent execution must use bounded context, retries, time, and cost.
+- Rendering must be reproducible from versioned assets, production data, engine configuration, and random seeds.
+- Unsupported character actions must produce explicit validation errors rather than silent visual degradation.
+- Core production formats must be versioned and support documented migrations.
+- The system must run locally on a standard creator workstation. Cloud AI and hardware acceleration may be optional extensions.
+- Source code and bundled reference assets must permit legal open-source redistribution. Imported assets must retain license and provenance metadata.
+- RigTale may study comparable production techniques but must not copy protected characters, artwork, music, or brand identity.
