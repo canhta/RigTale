@@ -20,12 +20,12 @@ An item may be marked `completed` only when its linked exit criteria are satisfi
 |---|---|---|---|---|
 | RGT-S001 | Competitive spike | Discover and screen comparable open-source systems | RGT-D000 | `docs/spikes/SPIKE-C001-competitive-landscape.md` |
 | RGT-S002 | Competitive spikes | Deep-review shortlisted repositories; create one spike result per repository | RGT-S001 | `docs/research/repository-reviews/` |
-| RGT-S003 | Spike | Define the representative multi-character animation fixture | RGT-D000 | Planned spike document |
+| RGT-S003 | Fixture spike | Define the representative multi-character production fixture | RGT-S001 | `docs/spikes/SPIKE-F001-reference-production-fixture.md` |
 | RGT-S008 | Animation spike | Validate production-grade fixed-cast character orchestration and deterministic frame compilation | RGT-S001, RGT-S003 | `docs/spikes/SPIKE-A001-animation-orchestration.md` |
 | RGT-S004 | Renderer spike | Compare qualified production backends with the same fixture | RGT-S008 | `docs/spikes/SPIKE-R001-renderer-backends.md` |
-| RGT-S005 | Spike | Measure web-preview and final-render parity | RGT-S004 | Planned spike document |
-| RGT-S006 | Spike | Compare Swift-to-engine process and native-library integration | RGT-S004 | Planned spike document |
-| RGT-S007 | Agent spike | Validate subscription-hosted operation through MCP | RGT-D000 | Planned spike document |
+| RGT-S005 | Preview spike | Measure preview and final-render parity | RGT-S004 | `docs/spikes/SPIKE-R002-preview-final-parity.md` |
+| RGT-S006 | Integration spike | Compare Swift-to-renderer integration boundaries | RGT-S004, RGT-S005 | `docs/spikes/SPIKE-I001-swift-renderer-integration.md` |
+| RGT-S007 | Agent spike | Validate MCP host-operated and embedded-agent execution | RGT-D000 | `docs/spikes/SPIKE-M001-mcp-and-embedded-agent-execution.md` |
 | RGT-D001 | Decision | Select the primary renderer and integration language | RGT-S004, RGT-S005, RGT-S006 | Planned architecture decision record |
 | RGT-D009 | Requirements | Incorporate animation and renderer evidence into validated product requirements | RGT-S008, RGT-D001 | `docs/requirements/product-requirements.md` |
 
