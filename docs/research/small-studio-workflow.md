@@ -380,6 +380,8 @@ Desk research produced no measured time data, no small-team gate model, no cutou
 
 **Every `[UNKNOWN]` and `[HYPOTHESIS]` label in sections 9 and 10 is therefore final.** No later work in this project promotes them.
 
+**One question is answered by substitution rather than left open.** This document covers the segment's *animation* tools and says nothing about its *painting* tools, and `RGT-S014` needed that fact to choose an ingestion format. It could not be measured, so the ingestion decision was rested on **format reach across ingesting tools** instead: PSD is accepted by every ingesting tool verified, so choosing it does not require knowing which painting tool a user runs. The substitution is deliberate and is recorded in `PR-A003`.
+
 The one question that carried the project's go/revise/stop test — how many finished seconds one person produces per week on an established series versus on episode 1, and after how many episodes rig-preparation cost stops mattering — is now answered by the owner-operated reference production instead, after implementation rather than before it.
 
 ## 12. Follow-Up Retrieval Tasks — Closed

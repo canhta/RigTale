@@ -14,10 +14,24 @@ Screening surfaced one distinction that most candidate lists obscure: **a permis
 
 | Authoring path | Candidates |
 |---|---|
-| **Open — a program can author content without a GUI or a proprietary tool** | OpenToonz, Synfig, Glaxnimate, Lottie (via open writers), DragonBones (format only), Inochi2D (format only, writer incomplete) |
-| **Closed — runtime is open, authoring is not** | Rive (editor is paid SaaS), Spine (each end user needs a paid editor licence), Live2D (core is a closed binary absent from the repository), Lottie by default (After Effects plus a plugin), Creature, Spriter |
+| **Open — a program can author content without a GUI or a proprietary tool** | OpenToonz, Synfig, Glaxnimate, Lottie (via open writers), DragonBones (format only), Inochi2D (format only, writer incomplete), **PSD and PSB** (via `ag-psd`, MIT), **OpenRaster** (published spec and RelaxNG schema) |
+| **Closed — runtime is open, authoring is not** | Rive (editor is paid SaaS), Spine (each end user needs a paid editor licence), Live2D (core is a closed binary absent from the repository), Lottie by default (After Effects plus a plugin), Creature, Spriter, **Krita `.kra`** (no published specification anywhere), **`.procreate`, `.clip`, `.mdp`, `.sai`** (read-only) |
 
 This distinction, not the runtime licence, is what determines fit with RigTale's premise.
+
+**The table originally listed runtime and animation formats only.** `RGT-S014` added the source-artwork formats in bold; they belong here on the same criterion and were absent from this index entirely. See `docs/research/source-artwork-formats.md`.
+
+## CPU Raster Compositing Candidates
+
+Added by `RGT-S014`. The determinism shortlist had been screened on the vector axis, which was the wrong one for a layered-raster cutout pipeline.
+
+| Candidate | Licence | Role | Gating question |
+|---|---|---|---|
+| Skia | BSD-3-Clause | Raster compositor with the `drawVertices` textured-mesh primitive and the full W3C blend set | Deterministic headless mesh compositing on macOS arm64, and binding cost from Swift or Node |
+| tiny-skia | BSD-3-Clause | **CPU raster compositor**, re-scoped from "vector rasteriser" | Per-triangle `Pattern`-shader mesh quality, and whether compiled-in SIMD level changes output |
+| libvips | LGPL-2.1+ | Threaded demand-driven compositing pipeline | Dynamic linking under an undecided distribution model; bit-reproducibility of the threaded pipeline |
+| pixman | MIT | Compositing primitives with PDF-spec-cited formulas | Whether SIMD dispatch paths agree with each other |
+| resvg | Apache-2.0 OR MIT | SVG front end, **role narrowed** | Relevant only if a vector stage exists at all |
 
 ## Source-Inspected Candidates
 

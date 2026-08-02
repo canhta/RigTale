@@ -164,7 +164,7 @@ Extensions cannot weaken core validation or modify published artifacts in place.
 
 ## Security Boundaries
 
-- User-supplied media, layered files, fonts, archives, project files, and URLs are untrusted.
+- User-supplied media, layered files, fonts, archives, project files, and URLs are untrusted. `RGT-S014` established the concrete attack surface: `psd-tools` carries a 2026 arbitrary-file-write advisory, ImageMagick has 739 Debian advisory records, and ZIP-based containers such as `.ora` and `.kra` carry attacker-controlled internal paths. Ingestion must defend against path traversal, decompression ratio, nesting depth, and length-field overflow, and the parser choice must be justified on memory safety.
 - Third-party engines and repository experiments run without production secrets.
 - Media parsing and rendering should use isolated processes with bounded resources.
 - Durable artifacts contain references to secrets, never secret values.

@@ -20,7 +20,7 @@ _No item is active. `RGT-S003` is the next eligible item; see the note below the
 |---|---|---|---|---|
 | RGT-O001 | Owner decision | Decide the provenance and licence of the reference cast, scenes, props, and music: originate, commission, or adapt | Project Owner decision; no research can resolve it | `docs/spikes/SPIKE-F001-reference-production-fixture.md` |
 
-**`RGT-O001` is now the sole blocker of the entire technical chain.** It gates the approval of `RGT-S003`, and `RGT-S002`, `RGT-S010`, `RGT-S011`, `RGT-S012`, and `RGT-S013` all depend on `RGT-S003`. After `RGT-S014` completes, no queue item below `RGT-S003` can start until this decision is made. No research can resolve it; it is an asset provenance and licensing choice.
+**`RGT-O001` is the sole blocker of the entire technical chain.** It gates the approval of `RGT-S003`, and `RGT-S002`, `RGT-S010`, `RGT-S011`, `RGT-S012`, and `RGT-S013` all depend on `RGT-S003`. With `RGT-S014` closed, **no queue item can start until this decision is made.** No research can resolve it; it is an asset provenance and licensing choice.
 
 ## Rejected
 
@@ -39,13 +39,12 @@ The queue is topologically ordered: no row depends on a row below it. The `Depen
 
 | ID | Type | Item | Depends on | Evidence |
 |---|---|---|---|---|
-| RGT-S014 | Ingestion screening | Screen source-artwork formats and settle the vector-versus-raster question. Apply the `PR-A003` criterion to the **read** side: which layered container can a program write without a GUI or proprietary tool | RGT-S001 | `docs/spikes/SPIKE-A002-asset-ingestion-and-rig-authoring.md` |
 | RGT-S003 | Fixture spike | Define the representative multi-character production fixture | RGT-S001, RGT-S009, RGT-S014, RGT-O001 | `docs/spikes/SPIKE-F001-reference-production-fixture.md` |
 | RGT-S002 | Competitive spikes | Deep-review shortlisted repositories using approved fixture cases | RGT-S001, RGT-S003 | `docs/research/repository-reviews/` |
 | RGT-S010 | Asset spike | Validate layered-asset ingestion and rig publication | RGT-S001, RGT-S003 | `docs/spikes/SPIKE-A002-asset-ingestion-and-rig-authoring.md` |
 | RGT-S011 | Foundation spike | Validate contract tooling, migration, content identity, and local storage | RGT-S001, RGT-S003 | `docs/spikes/SPIKE-CS001-contract-and-local-storage.md` |
 | RGT-S012 | Renderer gate | Determine whether `tcomposer` renders headless on macOS with no window server | RGT-S001, RGT-S003 | `docs/spikes/SPIKE-R001-renderer-backends.md` |
-| RGT-S013 | Determinism gate | Measure byte-level reproducibility of the shortlisted rasterisers on macOS across runs, thread counts, and architectures | RGT-S001, RGT-S003 | `docs/spikes/SPIKE-R001-renderer-backends.md` |
+| RGT-S013 | Determinism gate | Measure byte-level reproducibility of the shortlisted rasterisers **and compositors** on macOS across runs, thread counts, architectures, and **compiled-in instruction set** | RGT-S001, RGT-S003 | `docs/spikes/SPIKE-R001-renderer-backends.md` |
 | RGT-S008 | Orchestration research | Compare renderer-independent orchestration contracts using throwaway harnesses | RGT-S002, RGT-S003, RGT-S010 | `docs/spikes/SPIKE-A001-animation-orchestration.md` |
 | RGT-S004 | Production-engine spike | Execute shortlisted orchestration and renderer pairings | RGT-S003, RGT-S008, RGT-S012, RGT-S013 | `docs/spikes/SPIKE-R001-renderer-backends.md` |
 | RGT-D001 | Qualification | Qualify orchestration and renderer pairings for parity and platform tests | RGT-S004 | Planned qualification record |
@@ -76,6 +75,7 @@ The queue is topologically ordered: no row depends on a row below it. The `Depen
 | RGT-D000 | v1 documentation baseline reviewed and evidence work authorized | `docs/README.md`, `docs/plans/implementation-plan.md` | `e82c45b` |
 | RGT-S001 | Competitive screening complete: 19 candidates source-inspected at pinned commits plus 29 documentation-verified, 15 review records, four groups, no candidate code executed | `docs/spikes/SPIKE-C001-competitive-landscape.md`, `docs/research/landscape.md`, `docs/research/repository-reviews/` | `9296ffd`, `3cc60c2`, closed at `b2da9ad` |
 | RGT-S009 | Workflow Part A complete: labelled workflow map, gate evidence status, manual baseline protocol | `docs/spikes/SPIKE-W001-production-workflow-and-business-evidence.md`, `docs/research/small-studio-workflow.md`, `docs/research/manual-baseline-protocol.md` | closed at `b2da9ad` |
+| RGT-S014 | Ingestion screening complete: PSD/PSB and OpenRaster pass the `PR-A003` write gate, `.kra` fails for want of any published specification. Source artwork is layered raster, but the prior shortlist was screening the right libraries on the wrong axis — tiny-skia is a CPU raster compositor. New requirement `PR-R008` created; 18 propagation rows applied | `docs/research/source-artwork-formats.md` | evidence at `089cf41`, propagation applied on closure |
 
 ## Next Eligible Item
 
@@ -122,16 +122,16 @@ Found by red-team review of the closed spikes. Each is verified; none is closed.
 
 | Gap | Status |
 |---|---|
-| **Colour management and alpha semantics** — working space, straight versus premultiplied alpha, blend space, output transfer. One incidental mention across all documents. | No owner. This is the most likely reason two renderer backends will disagree, and it is unrecoverable if decided late. Needs a one-page contract before `RGT-S004`. |
+| **Colour management and alpha semantics** — working space, straight versus premultiplied alpha, blend space, output transfer. | **Closed by `RGT-S014`.** The gap now has evidence and an owner: `docs/architecture/production-contracts.md` carries the Colour and Alpha Contract, required before `SPIKE-R001` executes. `OpenColorIO` is a `reference` candidate for the working-space half. |
 | **Encoder** — which encoder ships, under what licence, and whether it is deterministic. Named only inside repository reviews; absent from requirements, contracts, spikes, and decisions. x264 is GPL; FFmpeg splits GPL and LGPL builds; VideoToolbox on macOS is a hardware encoder and hardware encoders are not bit-reproducible, which `hyperframes.md` already established for another project and RigTale never generalised. | No owner. Binds `PR-P005` and `PR-R007`. |
 | **Throughput** — no candidate has a frames-per-second figure. The benchmark is 3,600–5,040 frames and will be rendered dozens of times by one developer. | No owner. Whether that is a two-hour loop or a two-week loop determines buildability. |
 | **Fonts and text** — no licensing position (fonts are bundled assets and the charter requires redistributability), no shaping requirement, no fallback, no internationalisation. | No owner, while the charter's long-term scope names localisation. |
 | **Loudness** — no LUFS, EBU R128, or true-peak requirement for a music product on platforms that normalise. | No owner. |
 | **Photosensitive-epilepsy screening** — zero mentions, for children's content. | No owner. A real broadcast QC gate. |
 | **Failure semantics as a screening criterion** — the best failure finding in the corpus (silent exit-0 on render error) was found by accident. No other candidate was asked how it reports failure. For an agent-operated system where nobody watches the terminal, exit-code honesty is a selection criterion. | Add to `SPIKE-R001` criteria. |
-| **Untrusted-asset ingestion security** — `system-design.md` declares assets untrusted; no candidate parser was assessed. PSD, ZIP, and font parsing are memory-safety minefields and the premise is that strangers upload layered files. | Add to `RGT-S014`. |
+| **Untrusted-asset ingestion security** — `system-design.md` declares assets untrusted; no candidate parser was assessed. | **Closed by `RGT-S014`.** The attack surface is now named in `system-design.md` Security Boundaries and in the `SPIKE-A002` required cases: path traversal, decompression ratio, nesting depth, length-field overflow, and a memory-safety justification for the parser choice. No fuzzing corpus or security audit exists for any candidate reader, which stays open. |
 | **glTF may refute "Lottie is the only animation format with a published machine validator"** and unlike Lottie expresses skins, joints, and weights. | **Unverified.** Direct primary-source retrieval required before it is relied on — the same failure mode that produced the withdrawn resvg claim. |
-| **Candidates never screened** — an independent sweep surfaced populations the round missed entirely, including Japanese/Korean production formats and academic systems with released code. | Route to `RGT-S014` and a second screening pass. Not yet verified by me. |
+| **Candidates never screened** — an independent sweep surfaced populations the round missed entirely, including Japanese/Korean production formats and academic systems with released code. | `RGT-S014` covered the source-artwork and raster-compositing populations, including `.clip`, `.sai`, and `.mdp`. The animation and production-system populations remain unscreened and still need a second screening pass. |
 
 ## Screening Shortlist
 
@@ -141,7 +141,11 @@ Found by red-team review of the closed spikes. Each is verified; none is closed.
 |---|---|---|
 | OpenToonz | Only candidate with both an agent-writable text scene format and a headless frame-range renderer | `RGT-S012` — does `tcomposer` run headless on macOS? |
 | MLT Framework | Only verified timeline-scope frame-exact range render; LGPL-2.1-only build retains 2D compositing | Does a GPL-free build work on Apple Silicon? |
-| resvg + tiny-skia | CPU-only, no GPU driver variance, permissive, very active. **The "zero-pixel-difference" claim was wrong and is withdrawn** — see `candidate-screening.md`. | `RGT-S013` — **does resvg reproduce its own Linux goldens on macOS arm64 at all?** Its CI has no macOS runner. Font pinning is the secondary question. |
+| tiny-skia | **CPU raster compositor**, re-scoped by `RGT-S014` from "vector rasteriser" — it composites pixmap-on-pixmap with the full W3C blend set and no path involved. Permissive, CPU-only. | `RGT-S013` — does per-triangle `Pattern`-shader fill give acceptable mesh deformation, and does compiled-in SIMD level change output? |
+| Skia | Only candidate with the textured-mesh primitive (`drawVertices`) **and** the full W3C blend set. BSD-3-Clause. | Deterministic headless mesh compositing on macOS arm64, and binding cost from Swift or Node. |
+| libvips, pixman | Added by `RGT-S014` as raster-compositing candidates. libvips LGPL-2.1+, pixman MIT. | Is either bit-reproducible across SIMD dispatch and thread count? |
+| resvg | SVG front end, **role narrowed** by `RGT-S014` — relevant only if the pipeline has a vector stage. The "zero-pixel-difference" claim was withdrawn earlier. | `RGT-S013` — does it reproduce its own Linux goldens on macOS arm64 at all? Its CI has no macOS runner. Its 8-bit premultiply on image load is lossy exactly where haloing appears. |
+| PSD / PSB via `ag-psd` | Only layered source format every ingesting tool accepts and every target painting tool exports; MIT reader and writer, headless. | Does `ag-psd` output open cleanly in Photoshop, Clip Studio, Krita, and Live2D? Requires execution. |
 | DragonBones | Only MIT skeletal format recoverable from source; skin overlay matches the fixed-cast premise | Does multi-skin work? No shipped sample exercises it. |
 | Godot 2D skeleton stack | Only candidate with every authoring link verified: scriptable bones, scriptable per-vertex weights, scriptable scene serialisation, diffable text IR | Does `libgodot` capture windowless on macOS? Rig is a scene, not a portable format. |
 | Blender Grease Pencil | Only purpose-built 2D cutout layer model with per-layer render-target routing | Does it render headless on macOS given the unconditional GPU dependency? |

@@ -24,7 +24,16 @@ Which orchestration-model and backend pairing can compile RigTale's structured p
 - Web or native 2D render stacks combined with a code-driven timeline.
 - A custom native renderer only if existing backends fail a material requirement and the maintenance case is evidenced.
 
+- **CPU raster compositing libraries.** Added by `RGT-S014`: Skia, tiny-skia, libvips, and pixman are shortlisted for this role. tiny-skia was previously screened only as a vector rasteriser, which was the wrong axis.
+
 Candidate inclusion and pairing are provisional until screening and `SPIKE-A001` justify them.
+
+**Two screening criteria added by `RGT-S014`, neither of which existed before.**
+
+1. **Textured deformed triangle mesh with per-layer blend.** This is the operation 2D cutout is made of, verified across every rig system inspected. A backend that cannot do it is not a candidate however well it rasterises vectors. Skia exposes it as `drawVertices`; SVG has no mesh primitive and can only emulate it per triangle, with seams at shared edges and node count multiplied by mesh density.
+2. **Blend-mode profile conformance.** The backend must implement one fixed formula per mode in `PR-R008`'s profile and fail explicitly outside it. Mode *names* are not formulas: Krita ships four different soft-light implementations, and no general-purpose 2D library screened implements the twelve Photoshop modes beyond the W3C set.
+
+This spike establishes the `PR-R008` profile; `RGT-D010` accepts it. Evidence: `docs/research/source-artwork-formats.md`.
 
 ## Fixture Suite
 

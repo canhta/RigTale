@@ -89,6 +89,12 @@ The system must import at least one documented layered-artwork format and preser
 
 Any format selected under `SPIKE-A002` must satisfy: **a program can produce valid content without a graphical interface and without a proprietary tool.** This is now an explicit screening criterion, not an assumption. See `docs/research/landscape.md`.
 
+**Named candidates from `RGT-S014`.** The decision now has a default rather than an empty set. **PSD and PSB are the primary candidate source formats**: PSD is the only layered format that every ingesting tool screened accepts and every target painting tool exports, and `ag-psd` (MIT) reads and writes both headlessly. OpenRaster also passes the criterion and is the candidate fixture and round-trip format. Krita `.kra` fails it — no published specification exists anywhere. `.procreate`, `.clip`, `.mdp`, and `.sai` are read-only, and are what target users actually paint in, so export fidelity out of them is a required `SPIKE-A002` case. Evidence: `docs/research/source-artwork-formats.md`.
+
+**The preservation clause above is qualified, because uniform preservation is not achievable.** Live2D Cubism requires masks be removed before import, and Inochi Creator silently maps unsupported PSD blend modes to Normal. `SPIKE-A002` must therefore establish, per structure, which must survive, which may be flattened with a recorded diagnostic, and which cause explicit import failure. Silent flattening is prohibited by `PR-C003`.
+
+**This decision rests on format reach across ingesting tools, not on measured tool share.** `RGT-S009B` was the only route to measuring which painting tool the segment uses and was rejected by owner decision. The substitution is deliberate and is recorded here so it is not later mistaken for user evidence.
+
 ### PR-A004 — Archetype support (`charter-backed`)
 
 The reference asset library and production path must support biped, quadruped, vehicle, prop, and reusable environment archetypes without episode-specific engine changes.
@@ -134,13 +140,31 @@ The qualifying final-render path must therefore either be CPU-only, or demonstra
 
 `RGT-S013` measures this. **`RGT-D015` accepts the policy.** Until `RGT-D015` exists, the phrase "the accepted determinism policy" in `docs/quality/quality-system.md` has no referent and release qualification cannot be evaluated.
 
+**`RGT-S014` adds three variables to what `RGT-S013` must measure, and extends it to the compositing stage.**
+
+- **Compiled-in instruction set.** tiny-skia's own README states that portability changes with the SIMD level the binary was compiled for; pixman ships SIMD paths with no numeric-equivalence claim. Instruction set joins thread count and architecture as a determinism variable.
+- **8-bit premultiplication precision.** resvg premultiplies raster images into an 8-bit pixmap on load, which is lossy under low alpha — exactly where cutout edge haloing appears, and exactly the region its own golden tests exempt from comparison.
+- **No compositing candidate makes a determinism claim at all.** The determinism class must therefore be established by measurement at the compositing stage, not only at the rasterisation stage.
+
 ### PR-R002 — Structured 2D feature set (`charter-backed`)
 
 The production path must support hierarchical transforms, reusable motion clips, sprite or expression swapping, masks, explicit layer ordering, parallax, camera movement, and basic mesh or bone deformation.
 
+**`RGT-S014` names the primitive this reduces to.** Every 2D cutout rig system inspected deforms a **textured triangle mesh** and composites the result with a per-layer blend mode. That pairing — textured deformed mesh with per-layer blend — is now an explicit renderer screening criterion under `SPIKE-R001`; it was not one before, and it is the operation the product is made of. SVG has no mesh primitive and can only emulate it; Skia exposes it directly as `drawVertices`. Evidence: `docs/research/source-artwork-formats.md` §2.3 and §2.5.
+
 ### PR-R003 — Preview and final consistency (`hypothesis`)
 
 Preview and final rendering should consume the same authoritative production state so that timing, composition, interactions, and shot boundaries do not drift. Permitted raster differences and the required parity threshold must be measured by `SPIKE-A001`, `SPIKE-R001`, and the preview-parity spike.
+
+**Parity cannot be asserted across two backends until `PR-R008` fixes one formula per blend mode.** `RGT-S014` established that a blend-mode *name* is not a formula: Krita ships four different soft-light implementations side by side, including separate Photoshop and SVG variants. Two backends can therefore both claim to support "soft light" and disagree visibly.
+
+### PR-R008 — Supported blend-mode profile (`decision-pending`)
+
+**New requirement from `RGT-S014`.** Photoshop defines 28 blend keys and publishes no formula for any of them. W3C Compositing-1 defines 16 with normative formulas. **No general-purpose 2D graphics library screened implements the twelve extra Photoshop modes** — not Skia, tiny-skia, Cairo, pixman, libvips, or raqote. A user's PSD using Linear Light therefore has nothing to map onto in any candidate backend.
+
+RigTale must declare a **supported blend-mode profile** that fixes one formula per supported mode, and must fail explicitly on any mode outside it. Silent substitution to Normal is prohibited — it is `PR-C003` applied to compositing, and it is the shipped behaviour of Inochi Creator that this requirement exists to avoid.
+
+The profile's contents are `decision-pending`. Implementing the missing modes requires a reference implementation, and the only available oracles are Krita and ImageMagick, which are copyleft and bespoke-licensed respectively; Aseprite's `src/doc` is MIT but covers only the W3C set plus three. `SPIKE-R001` establishes the profile and `RGT-D010` accepts it. Evidence: `docs/research/source-artwork-formats.md` §2.4.
 
 ### PR-R004 — Frame and shot addressability (`charter-backed`)
 
@@ -153,6 +177,8 @@ The core production contracts should not expose episode-specific renderer code. 
 **Evidence strengthens the case for this hypothesis rather than weakening it.** `RGT-S001` found **no candidate that supplies both a reusable character rig system and a deterministic frame-addressable renderer.** The systems with the strongest rig models — OpenToonz, Blender Grease Pencil, DragonBones — differ from the systems with the strongest determinism evidence — resvg and tiny-skia, MLT. (`rlottie` was named here in an earlier draft and has been removed: it carries a screening disposition but **no review record**, so it cannot be cited as evidence. See `docs/research/landscape.md`.) The one format with a published machine validator, Lottie, **cannot express a bone hierarchy at all**: no bone, joint, skin, weight, inverse-kinematics, or deformer concept exists in its schema.
 
 **Working hypothesis, not a decision:** RigTale should expect to own its rig representation and compile it down to whatever renderer is selected, rather than obtaining a rig by choosing a renderer. This must be tested by `SPIKE-A001` and `SPIKE-R001` and settled by `RGT-D010`, not here.
+
+**`RGT-S014` narrows what the adapter boundary must carry.** The backend-independent surface is textured deformed mesh plus a blend mode drawn from `PR-R008`'s profile — not an SVG document and not a vector scene. A backend qualifies on whether it can composite that primitive deterministically, which is a different question from whether it rasterises vectors well.
 
 ### PR-R006 — Production workload (`decision-pending`)
 
@@ -207,7 +233,9 @@ No dependency may be adopted that:
 
 Screening dispositions are inputs to this requirement, not exemptions from it. A candidate marked `defer` with a recorded licence conflict remains subject to this test at `RGT-D010`. The distribution model itself is not yet decided and is an owner decision; until it is recorded, the copyleft clause above cannot be evaluated and must not be treated as passed.
 
-Evidence: `docs/research/candidate-screening.md`, `docs/research/landscape.md`.
+**Licence facts added by `RGT-S014`**, all read from the licence file rather than a badge: ImageMagick uses a bespoke licence; Aseprite's repository is proprietary with an MIT sub-module (`src/doc`); GEGL is LGPL-3 inside a GPL-3 project; libvips is LGPL-2.1+, so it turns on the undecided distribution model; `ag-psd` and pixman are MIT; Skia is BSD-3-Clause. Separately, **the OpenRaster specification text carries no licence at all** — that affects documentation reuse rather than code, and is new.
+
+Evidence: `docs/research/candidate-screening.md`, `docs/research/landscape.md`, `docs/research/source-artwork-formats.md`.
 
 ## 10. Reference-Production Acceptance
 
@@ -274,7 +302,8 @@ Every completed research or spike item must identify affected requirement IDs an
 | `PR-R004` | `RenderJob`, dependency digests, manifests | Render, correction, recovery | 9, 10 | `F001`, `R001`, `I001` |
 | `PR-R005` | `CompiledShot`, renderer adapter contract | Compilation and renderer qualification | 9, 10 | `C001`, `A001`, `R001` |
 | `PR-R006` | `RenderJob`, `RenderManifest` measurements | Full-production qualification | 4, 10, 13 | `R001`, `I001` |
-| `PR-R007` | `RenderJob`, `RenderManifest`, backend capability declaration | Final-render qualification; `RGT-D015` accepts the policy | 4, 10 | `C001`, `R001`, `R002` |
+| `PR-R007` | `RenderJob`, `RenderManifest`, backend capability declaration | Final-render qualification; `RGT-D015` accepts the policy | 4, 10 | `C001`, `R001`, `R002`, `S014` |
+| `PR-R008` | Backend capability declaration, `CompiledShot` layer blend fields | Compilation and final-render validation; `RGT-D010` accepts the profile | 9, 10 | `S014`, `R001` |
 | `PR-Q001` | `ValidationReport`, structured errors | Deterministic gates 1–7 | 7–13 | `F001` and each technical spike |
 | `PR-Q002` | `ValidationReport`, `ReviewReport` | Preview and final visible review | 13, 14 | `W001`, `F001`, `R001` |
 | `PR-Q003` | `ReviewReport`, approval state | Red-Team and delivery gates | 11, 13, 14 | agent evaluation in Phase 11 |

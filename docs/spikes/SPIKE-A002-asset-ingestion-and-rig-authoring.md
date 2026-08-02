@@ -33,7 +33,8 @@ Prepared reference packs may bootstrap experiments, but the spike must measure t
 - vehicle with character and prop attachments;
 - layered scene with foreground, background, masks, and parallax metadata;
 - asset version change affecting a known set of shots;
-- malformed, flattened, ambiguous, incompatible, and unlicensed inputs; and
+- malformed, flattened, ambiguous, incompatible, and unlicensed inputs, specifically including **path traversal, decompression ratio, nesting depth, and length-field overflow** — `psd-tools` carries a 2026 arbitrary-file-write advisory, ImageMagick has 739 Debian advisory records, and ZIP-based containers carry attacker-controlled internal paths, so the parser choice must be justified on memory safety;
+- **source-tool data loss, as a diagnostic class distinct from malformed input** — Clip Studio Paint rasterises and drops vector-layer pixel data on PSD export, so the file is well-formed and already lossy before RigTale sees it, and this must be detected and reported rather than silently accepted;
 - backend-specific derived conversion that remains traceable to the published source pack.
 
 ## Method

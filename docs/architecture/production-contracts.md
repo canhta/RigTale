@@ -99,6 +99,21 @@ Groups an ordered set of shots that share narrative, educational, musical, spati
 
 Authoring contracts must support human-readable time plus an exact frame or rational-time representation. Compiled output must avoid cumulative floating-point drift. Frame rate, sample rate, rounding rules, and boundary ownership belong to the project configuration and render manifest.
 
+## Colour and Alpha Contract
+
+**Required before `SPIKE-R001` executes.** `RGT-S014` supplied the evidence this gap was missing, and it is the most likely reason two renderer backends will disagree.
+
+Alpha semantics are not uniform across the pipeline's own boundaries: PNG and XCF store straight alpha, OpenEXR and tiny-skia and Skia work premultiplied, and PSD stores straight alpha per layer with a white-matted composite. Converting between them at the wrong point is what produces visible edge haloing on cutout artwork, and an 8-bit premultiply is lossy under low alpha.
+
+This contract must fix, in one page and before any renderer is qualified:
+
+- the working colour space and the output transfer function;
+- straight versus premultiplied alpha **at each boundary**: ingestion, published pack, compiled shot, compositing, encode;
+- the space blending occurs in, which binds `PR-R008`;
+- bit depth at each stage, and where any narrowing is permitted.
+
+`OpenColorIO` is a `reference` candidate for the working-space half. Evidence: `docs/research/source-artwork-formats.md`.
+
 ## Asset Contracts
 
 ### `CharacterPack`

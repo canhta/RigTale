@@ -163,6 +163,7 @@ Qt is pinned to Qt5, and Homebrew's Qt5 is end-of-life upstream.
 - **Global seeding inside render nodes.** Thread a seed through explicitly.
 - **Execution policy persisted in the document.** Thread count in the scene file makes output machine-dependent.
 - **A test framework with no tests**, and dead files left in tree.
+- **A registered writer that writes nothing.** `TLevelWriterPsd` is declared and registered, and `TLevelWriterPsd::save()` has an empty body (`toonz/sources/image/psd/tiio_psd.cpp:189`), so PSD export presents as supported and silently produces no data. Found by `RGT-S014`. It is a concrete instance of the screening failure mode this repository has twice had to correct: a capability that exists in the declaration and not in the implementation.
 - **Success exit code 1.**
 - **A rig that lives only inside the scene**, with copy-import as the only reuse path.
 
