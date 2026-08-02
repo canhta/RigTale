@@ -40,6 +40,24 @@ Three documentation-level claims were rejected because source inspection contrad
 
 No technology was selected. Every disposition is a screening outcome routed to a later spike or to `RGT-D010`.
 
+### What screening failed to do, found by independent review
+
+These are defects, not scope decisions. They are recorded here because `SPIKE-C001` was closed before they were found.
+
+**1. The screening answered the output question and never asked the input question.** After 48 candidates and 15 review records, **no document in this repository names a single candidate layered-artwork ingestion format.** A scan of `docs/` for `PSD`, `OpenRaster`, `.ora`, `Krita`, `.kra`, `Procreate`, or `Clip Studio` returns exactly one hit, incidental, inside a licensing paragraph in `mlt-glaxnimate-lottie.md`.
+
+`PR-A003` is `charter-backed` and requires ingestion of "at least one documented layered-artwork format". `SPIKE-A002`'s stated precondition is that `SPIKE-C001` "has screened relevant authoring tools, formats, and runtimes". **It screened runtimes and did not screen authoring formats.** The organising finding — that a program must be able to write a format without a GUI — was applied only to the write side, when it applies at least as forcefully to the read side: `.kra` and `.ora` are open ZIP+XML containers a program can write, PSD is reverse-engineered but has MIT read/write libraries, and `.procreate` and `.clip` are closed and are what the target users actually use.
+
+**2. No vector-versus-raster decision exists, yet the determinism shortlist is composed almost entirely of vector rasterisers.** resvg/tiny-skia, ThorVG, Vello, and Skia are all vector paths. If the source artwork is layered raster — which is what "layered artwork ingestion" ordinarily means — the shortlist answers a question nobody asked, and the correct candidate set is a layered-raster compositing set that was never enumerated. This may be a substantial part of why the round concluded that no candidate supplies both a rig and a deterministic renderer: the search ran across two disjoint universes.
+
+**3. "Lottie is the only animation format with a published machine validator" appears to be false.** glTF 2.0 publishes a JSON schema with an official validator, and unlike Lottie it expresses skins, joints, and weights — the exact capability `PR-R005` records Lottie as lacking. **This has not been verified from primary source and must not be relied on until it is.** It is recorded as an open retrieval task precisely because the same failure mode — asserting a superlative from search-index confidence — produced the withdrawn resvg claim.
+
+**4. Colour management and alpha semantics were never asked of any candidate.** A scan of `docs/` for colour space, ICC, sRGB, premultiplied alpha, or linear light returns one hit. For layered cutout compositing, straight-versus-premultiplied alpha and blend space are the most common source of visible edge haloing and the most likely reason two renderer backends will disagree — which is the whole substance of `PR-R003` and `PR-R005`.
+
+**5. No candidate has a throughput figure.** Not one frames-per-second measurement exists across 15 review records. The benchmark is 3,600–5,040 frames.
+
+`RGT-S014` is created to close defect 1 and 2. Defects 3, 4, and 5 are routed in `TODO.md`.
+
 ## Question
 
 Which open-source products, animation engines, code-driven video systems, and agentic production pipelines contain proven patterns that can reduce RigTale's product or engineering risk?

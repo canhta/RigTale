@@ -59,7 +59,9 @@ The index is corrected to list `skia-canvas` and `node-canvas` as separate rows,
 - **Headless Node execution is not in core.** It requires the userland package `pixijs-userland/node`, which is outside the `pixijs` organisation, has 49 stars, was last pushed 2026-04-19, does not state its supported PixiJS version, requires native `gl` and `canvas` with a Homebrew dependency chain on macOS, and whose README advises using `xvfb` as a virtual frame buffer in headless environments.
 - Determinism: not verified. No documentation asserts reproducible pixel output. There is no timeline concept, so frame addressing would be RigTale's responsibility.
 - Audio: not in core; `pixijs/sound` is WebAudio and browser-only.
-- Skeletal add-ons carry licence obligations. `@esotericsoftware/spine-pixi-v8` declares a non-SPDX `LicenseRef-LICENSE`; the governing terms require that "each user of the Products must obtain their own Spine Editor license". As with Remotion, this is a downstream-user obligation rather than a block on RigTale's redistribution — but it is a heavier one, because it requires a paid **authoring tool** to produce assets at all, which conflicts with RigTale's premise that users supply their own layered artwork. Recorded as a cost and workflow risk for `RGT-D010`. `pixijs-userland/spine` is `NOASSERTION` and was last pushed 2025-03-24. `DragonBones/DragonBonesJS` is MIT and was last pushed 2026-01-23, but has 82 open issues and no verified PixiJS v8 binding.
+- Skeletal add-ons carry licence obligations. `@esotericsoftware/spine-pixi-v8` declares a non-SPDX `LicenseRef-LICENSE`; the governing terms require that "each user of the Products must obtain their own Spine Editor license". As with Remotion, this is a downstream-user obligation rather than a block on RigTale's redistribution — but it is a heavier one, because it requires a paid **authoring tool** to produce assets at all, which conflicts with RigTale's premise that users supply their own layered artwork. Recorded as a cost and workflow risk for `RGT-D010`. `pixijs-userland/spine` is `NOASSERTION` and was last pushed 2025-03-24. `DragonBones/DragonBonesJS` is MIT and was last pushed 2026-01-23, and has 82 open issues.
+
+  **Correction.** An earlier draft of this line added "and no verified PixiJS v8 binding." That was wrong and is refuted by the clone at the pinned commit `64b6c69a`: `Pixi/8.x/` exists with `src/`, `libs/`, `out/`, and its own `package.json`, and the commit that created it is titled `add pixi 8 runtime` (2025-05-24). The claim was made from search-index signals rather than from the source that had already been cloned, and it wrongly weakened PixiJS's skeletal story in this record. The 2026-01-23 date is defensible — it is the tip of `origin/6.0.2` — and the fact that nobody followed that date to that branch is the same defect that produced the withdrawn "DragonBones is dead" verdict in its review record.
 - **Relevance: medium. Route to `SPIKE-R001`, not a dedicated review.** It is a drawing library, not a production system; the dedicated-review question reduces to the renderer question.
 
 ### Remotion
@@ -143,7 +145,39 @@ Recorded because each one would have misled a checklist-based screening.
 
 Determinism is graded on what each project's own test infrastructure asserts, not on what it claims. Ranked by strength of evidence.
 
-### resvg and tiny-skia — the strongest evidence found
+### resvg and tiny-skia — claim corrected against source
+
+**This section previously read "the strongest evidence found" and concluded "This is the most credible determinism posture in the entire screening round." Both are withdrawn.** The original claim was made from documentation and search results **without cloning or reading the source**, in a screening round whose own rule is that documentation is a discovery signal and not sufficient technical evidence. It was the top-ranked determinism candidate in `TODO.md`, and it was the one candidate whose central claim was never source-inspected.
+
+Verified directly at `linebender/resvg` commit `68b14c4c3bccdb60344c777406486b54c36ec1a4`:
+
+**1. The comparison is tolerance-based, not byte-exact.** `crates/resvg/tests/integration/main.rs:152` sets `const DIFF_THRESHOLD: u8 = 1;`, and `:213-226` defines:
+
+```rust
+fn is_pix_diff(pixel1: &Rgba<u8>, pixel2: &Rgba<u8>, threshold: u8) -> bool {
+    if pixel1.a == 0 && pixel2.a == 0 {
+        return false;
+    }
+    let mut different = false;
+    different |= pixel1.r.abs_diff(pixel2.r) > threshold;
+    // g, b, a identical
+    different
+}
+```
+
+`assert_eq!(render(...), 0)` therefore means "no pixel differs by **more than** 1/255 on any channel." Every pixel may differ by ±1 on every channel and the test still passes. **Fully transparent pixels are exempted from comparison entirely** — RGB under zero alpha is never checked, which for a layered cutout compositor is precisely where premultiplication defects hide.
+
+This collapses the comparative ranking built on it. resvg sits on the **same axis** as candidates ranked beneath it — Blender's 4/255 at 1%, ThorVG's max-diff 5 — merely tighter. Vello was demoted in this same document for a stated tolerance of 1–2 on its CPU paths; resvg's is 1 and was described as zero.
+
+**2. The suite never runs on macOS.** `.github/workflows/` contains exactly `main.yml` and `tagged-release.yml`. In `main.yml`, `cargo test --all --release` appears in exactly one job (`build`, line 41), which is `runs-on: ubuntu-latest`. The `windows` job runs `cargo build` only. **There is no macOS runner anywhere in the project.** RigTale's primary and currently only supported platform has zero upstream evidence of reference-matching output — the exact gap for which Vello was demoted, except Vello documented its Apple divergence and resvg has never looked.
+
+**3. Two facts the original screening did not record.** resvg has no animation support and states it has no plans to add any (`README.md:75`), so using it means serialising and re-parsing a complete SVG document per frame — roughly 5,040 times for the benchmark production, a per-frame cost never estimated for the top-ranked candidate. And its goldens are self-baselines: `crates/resvg/tests/README.md` describes the directory as "a collection of SVG files used during *resvg* regression testing." That establishes self-consistency across commits, which is what regression testing is for; it is not evidence of correctness or of cross-platform reproducibility.
+
+**What survives.** resvg/tiny-skia remains a strong candidate: CPU-only with no GPU driver variance, permissively licensed, very active, and a ±1/255 tolerance with one explicitly quarantined SIMD case is genuinely tighter discipline than its peers. **What does not survive is the superlative and the ranking derived from it.**
+
+`RGT-S013` is re-scoped accordingly: the question is no longer only "does determinism hold with unpinned fonts" but **"does resvg reproduce its own Linux goldens on macOS arm64 at all."**
+
+### The superseded claim, retained for the record
 
 `https://github.com/linebender/resvg` (Apache-2.0 OR MIT) and `https://github.com/linebender/tiny-skia` (BSD-3-Clause).
 
@@ -157,7 +191,7 @@ Determinism is graded on what each project's own test infrastructure asserts, no
 
 **Caveat:** text rendering depends on the resolved font set, so reproducibility requires pinning fonts. The harness does exactly that with a fixed font database. Cross-machine text determinism with unpinned system fonts is unproven.
 
-This is the most credible determinism posture in the entire screening round.
+~~This is the most credible determinism posture in the entire screening round.~~ **Withdrawn — see the correction above. The claim "asserting zero means byte-exact reproduction, enforced in CI across the whole suite" is false on both halves: the assertion tolerates ±1/255 and exempts transparent pixels, and CI runs the suite on Linux only.**
 
 ### Vello — documents non-exact output on Apple platforms
 

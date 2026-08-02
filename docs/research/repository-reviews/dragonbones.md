@@ -26,7 +26,9 @@ The single hard gate is `ObjectDataParser.ts:2294-2352`: a version-string check,
 
 **The caveat that downgrades this from trivial to `adapt`:** skinned mesh authoring with weights requires reproducing editor-side bind-pose matrix maths. For pure cutout — image displays on slots, bone hierarchy, transform timelines, multiple skins, draw-order changes — no derived data is needed.
 
-## Recovered Schema
+## Recovered Schema (`origin/master` — 5.6-era, superseded)
+
+**Scope warning added after the maintenance correction below.** Everything in this section was read from `origin/master`. `origin/6.0.2` rewrites `ObjectDataParser.ts` by +375 lines and adds physics, path constraints, and shape skinning. This is the schema of the branch a default clone gives you, not the schema of current DragonBones. It must be re-derived before any format decision.
 
 Root (`ObjectDataParser.ts:2294-2340`): `version`, `compatibleVersion`, `name`, `frameRate` (default 24; 0 coerced to 24), `armature[]`, `stage`, `textureAtlas`, `userData`.
 
@@ -91,9 +93,32 @@ Cleanly renderer-independent. A search for engine references across `DragonBones
 
 `.dbbin` is parsed by `BinaryDataParser.ts` and is fully open: magic `DBDT`, a length-prefixed UTF-8 JSON header, then packed typed arrays. It subclasses the JSON parser and calls it on the header — **the binary header is the same JSON schema**; only bulk numeric arrays move into the buffer. `ObjectDataParser._modifyArray` (`:2215-2292`) builds exactly that buffer from JSON, so the repository contains a de-facto JSON-to-binary encoder to work from.
 
-## Maintenance Health — Dead
+## Maintenance Health — Correction: Not Dead, and This Review Read the Wrong Branch
 
-From full git history.
+**This section previously concluded "dead, with a 2025 rebranding twitch — the core runtime has had no functional change in over six years." That conclusion is wrong.** It was derived from `origin/master` alone and presented as a project-wide verdict "from full git history." An independent citation audit found the defect and it is confirmed against the clone.
+
+`origin/6.0.2` is an active branch with a tip of **2026-01-23** and 33 commits to `DragonBones/src` in 2024–2026:
+
+```
+$ git log --format='%ad' --date=format:%Y origin/6.0.2 -- DragonBones/src | sort | uniq -c
+   5 2024   27 2025    1 2026
+$ git diff --stat origin/master origin/6.0.2 -- DragonBones/src | tail -1
+ 38 files changed, 2180 insertions(+), 226 deletions(-)
+```
+
+The commits are functional, not cosmetic. Verbatim subjects include `fix transform constrain bug`, `fix physics bug`, `fix shape weight parse error`, `fix timeline duration bug`, `shape支持skinned和ffd` (shape supports skinned and FFD), `路径约束的间隔增加百分比模式` (path constraint interval gains a percentage mode), and `修复ik和transform约束的技术顺序` (fix IK and transform constraint ordering). `ObjectDataParser.ts` alone gains **+375 lines** on that branch.
+
+**Three consequences for this review.**
+
+1. The "frozen format specification" framing is withdrawn. Physics, IK, path constraints, and shape skinning are under active change.
+2. **The Recovered Schema section below describes the 5.6-era format on `master`, not the current format.** It does not say so and must not be treated as the schema of a live DragonBones.
+3. The "bus factor one, dead since 2020" risk framing is withdrawn. The risk is different and arguably worse in a different way: development continues on a **non-default branch**, so the default clone of this repository silently yields six-year-old code.
+
+The disposition remains `adapt` with a decision gate, but the gate now has a second question: which branch is the specification? Nothing in this review may be cited as evidence of DragonBones' maintenance state until it is re-audited against `origin/6.0.2`.
+
+### The superseded master-branch data, retained for the record
+
+From `origin/master` only.
 
 | Period | Commits |
 |---|---|
@@ -108,7 +133,7 @@ Total 416 commits; **zero in the last 12 months, two in the last 36**. Roughly 6
 
 The two 2025 commits are not substantive: one bumps a copyright year, the other changes a `console.info` URL to point at a rebrand. A new maintainer attached a Pixi 8 binding and repointed the website; the README now promotes a different commercial editor over the original tooling.
 
-**Verdict: dead, with a 2025 rebranding twitch.** The core runtime has had no functional change in over six years. Treat it as a frozen format specification with a reference implementation, not a living dependency.
+**Superseded verdict, retained so the error is not silently erased:** "dead, with a 2025 rebranding twitch. The core runtime has had no functional change in over six years. Treat it as a frozen format specification with a reference implementation, not a living dependency." See the correction above. Every clause of that verdict is false of `origin/6.0.2`.
 
 ## Test Strategy — None
 

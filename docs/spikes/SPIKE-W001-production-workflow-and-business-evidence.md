@@ -142,4 +142,14 @@ The charter's two hands-on production evaluations remain in the production-evalu
 
 ## Downstream Gating
 
-`RGT-S003`, `RGT-S002`, `RGT-S010`, and `RGT-S011` may proceed on Part A, because they gather technical evidence rather than commit to an architecture. `RGT-D010`, `RGT-D012`, and `RGT-D009` require Part B, because they convert evidence into an accepted product architecture and would otherwise be selected without user-value evidence.
+This list is exhaustive. Every tracker item must appear in exactly one row.
+
+| Items | Gating |
+|---|---|
+| `RGT-S003`, `RGT-S002`, `RGT-S010`, `RGT-S011` | **May proceed on Part A**, because they gather technical evidence rather than commit to an architecture. |
+| `RGT-S012`, `RGT-S013`, `RGT-S004`, `RGT-D001`, `RGT-S005`, `RGT-S006`, `RGT-D015` | **May proceed on Part A**, but only after the fixture is approved. They inherit Part B indirectly through fixture approval, not directly. |
+| `RGT-S008` | **Requires Part B.** `SPIKE-A001` states as a precondition that `SPIKE-W001` has *validated* production workflow and user priorities. Part A validated nothing; it recorded labelled desk research. |
+| `RGT-D010`, `RGT-D012`, `RGT-D009` | **Require Part B**, because they convert evidence into an accepted product architecture and would otherwise be selected without user-value evidence. |
+| `RGT-S007`, `RGT-D011`, `RGT-D013`, `RGT-D014` | Gated transitively through `RGT-D009` and `RGT-D013`. |
+
+**Approval of `RGT-S003` also requires Part B**, even though drafting does not. `SPIKE-F001` names "target-user workflow, gate, and value evidence" as a precondition, and Part B exit criteria require that fixture priorities reflect real production failures. An earlier version of this section listed `RGT-S003` as Part-A-eligible without that distinction, and `TODO.md` propagated the looser reading.

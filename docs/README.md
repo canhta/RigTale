@@ -45,4 +45,20 @@ The pre-research documentation baseline is complete when every planned document 
 
 Documents are drafted in dependency order, but downstream drafts may reference explicitly unresolved upstream decisions. After research begins, findings must update the affected requirements, contracts, designs, tests, and plans rather than living only in a spike report.
 
+## Propagation Audit
+
+**The rule above failed its first test.** An independent review of the two completed spikes found that four of their eight material findings never reached a requirement, contract, or plan — including the one the spike itself labelled the sharpest architectural constraint it had found and marked "not deferred." The rule was stated in four documents and executed in none of them.
+
+A propagation audit is therefore a mandatory exit criterion for every spike, not a sentence in this file. Closing a spike requires a table with one row per material finding:
+
+| Column | Meaning |
+|---|---|
+| Finding | The labelled statement, cited to its source line |
+| Target | The exact requirement, contract, design, test, or plan it binds |
+| Edit | What changed there, or `none` |
+| Commit | Where the edit landed |
+| If `none` | An explicit recorded reason, signed off by the Project Owner |
+
+A spike whose findings all land in `Target: none` without recorded reasons is not closed. The four findings that escaped the first audit were: the Music & Effects and textless-picture delivery constraint, the platform monetisation constraint on made-for-kids content, the raster-determinism divergence on Apple platforms, and the licensing obligations of the dependency stack. The first, third, and fourth are now recorded as `PR-F003`, `PR-R007`, and `PR-P005`. The second is an owner decision with no route into any document and remains open.
+
 Renderer, server language, cloud infrastructure, and hosted model-provider choices are intentionally not selected during documentation. The design must preserve their integration boundaries, while the implementation plan must block dependent work on the relevant evidence and decision records.

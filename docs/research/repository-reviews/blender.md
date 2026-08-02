@@ -27,7 +27,7 @@ This is a statement of what the files say, not legal advice. The consequence for
 
 ## Why This Is the Strongest Capability Match Found
 
-Blender is the only system screened in this round with a purpose-built 2D cutout layer model.
+Blender has a purpose-built 2D cutout layer model. **An earlier draft called it "the only system screened in this round" with one; that is withdrawn** — `godot.md`, `dragonbones.md`, `opentoonz.md`, and `inochi2d.md` each document a 2D cutout model from source in the same round.
 
 ### Grease Pencil is layer-native and time-native
 
@@ -44,7 +44,7 @@ Frames are an explicit sorted keyframe map from frame number to drawing index (`
 
 `char *viewlayername` — "Only include Layer in this View Layer render output" (`:376-377`), exposed as `layer.viewlayer_render` (`rna_grease_pencil.cc:1229-1234`) with `use_viewlayer_masks` (`:1236-1240`), enforced in the engine (`gpencil_engine_private.hh:345-354`). Combined with `GREASE_PENCIL_AS_SEPARATE_PASS` on `ViewLayer::grease_pencil_flags` (`DNA_layer_types.h:80-82,284`), a single character can be split into separate render passes for external layered compositing.
 
-This is the primitive RigTale's isolated-layer rerender requirement would build on, and no other candidate has it.
+This is a primitive RigTale's isolated-layer rerender requirement could build on. **"No other candidate has it" is withdrawn:** OpenToonz exposes headless per-layer render separation through `tcomposer -multimedia` and `MultimediaRenderer`, whose listener interface is column-scoped — under BSD-3 rather than GPL. See `opentoonz.md`.
 
 ### Bone-driven cutout deformation
 
@@ -141,6 +141,6 @@ This is a hypothesis about an adapter shape, not a renderer selection. It must r
 
 `defer`.
 
-Blender is the only surveyed system with a purpose-built 2D cutout layer model, per-layer render separation, frame-exact CLI addressing, and a UI-free data API — the four capabilities RigTale's benchmark actually requires. Rejecting it on scale alone would be wrong.
+Blender combines a purpose-built 2D cutout layer model, per-layer render separation, frame-exact CLI addressing, and a UI-free data API — four capabilities RigTale's benchmark requires. **It is not the only surveyed system to do so**; OpenToonz supplies the first three from source, under BSD-3 instead of GPL with no linking exception, which is the more material difference. Rejecting Blender on scale alone would still be wrong, but the case for it must be made on quality of implementation rather than uniqueness.
 
 Committing to it now would also be wrong. Three questions are unanswered and one is a go/no-go: whether Grease Pencil renders headless on macOS at all. Determinism has suggestive evidence and an explicit unresolved contradiction in the project's own test suite. And the GPL posture, with no linking exception and three inconsistent self-descriptions in the repository, is a decision for the Project Owner rather than a research finding.

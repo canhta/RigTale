@@ -21,7 +21,9 @@ This distinction, not the runtime licence, is what determines fit with RigTale's
 
 ## Source-Inspected Candidates
 
-Each has a review record under `docs/research/repository-reviews/`.
+Eighteen of the nineteen have a review record under `docs/research/repository-reviews/`; fifteen records cover them, because Glaxnimate and the Lottie specification share a record with MLT, and Inochi Creator shares one with the Inochi2D runtime.
+
+**`rlottie` has no review record.** It was screened at a pinned commit and given a disposition, but no dedicated evidence was recorded. No conclusion elsewhere may cite it as evidence until that record exists.
 
 | Candidate | Pinned commit | Licence | Disposition |
 |---|---|---|---|
@@ -51,7 +53,7 @@ Evidence in `docs/research/candidate-screening.md`.
 
 | Candidate | Licence | Disposition and routing |
 |---|---|---|
-| resvg + tiny-skia | Apache-2.0 OR MIT / BSD-3-Clause | **Enter index. Strongest determinism evidence found** — CI-enforced zero-pixel-difference golden tests, CPU-only. Route to `SPIKE-R001`. |
+| resvg + tiny-skia | Apache-2.0 OR MIT / BSD-3-Clause | **Claim corrected against source at `68b14c4c`.** Goldens tolerate ±1/255 per channel and exempt fully transparent pixels; CI runs the suite on Linux only, with **no macOS runner**. Still a strong CPU-only candidate; **no longer the determinism superlative**. Route to `SPIKE-R001`; `RGT-S013` re-scoped to macOS reference matching. |
 | Theatre.js | Apache-2.0 core, **AGPL studio** | `reference` for the state format. Format is data with stored duration; project dormant since 2024. |
 | ThorVG | MIT | `defer`. Headless and frame-addressable, very active — but ships a run-to-run non-reproducibility detector. Route to `SPIKE-R001`. |
 | Remotion | **Source-available, not open source** | `defer`, eligible for spiking. Best documented frame-range API of any candidate. Four-employee gate conflicts with the charter's target studio size; recorded as an `RGT-D010` input. |
@@ -96,7 +98,7 @@ Evidence in `docs/research/candidate-screening.md`.
 | Criterion | Result |
 |---|---|
 | Candidates screened | 19 by source inspection at pinned commits, plus 29 by primary documentation |
-| Dedicated review records | 14, under `docs/research/repository-reviews/` |
+| Dedicated review records | 15, under `docs/research/repository-reviews/` |
 | Candidate groups covered | Four: DCC and animation applications, skeletal and vector runtimes, code-driven video frameworks, agentic production systems |
 | Every material conclusion cites primary evidence | Yes, with rejected claims recorded where source contradicted documentation |
 | No candidate code executed | Confirmed; screening was read-only throughout |

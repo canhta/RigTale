@@ -87,7 +87,11 @@ The names below define ownership boundaries, not selected languages or build too
 6. Route executable claims to later fixture-based reviews or technical spikes.
 7. Update workflow requirements, fixture priorities, candidate landscape, and bounded repository-review plans.
 
-**Tests of completion:** Five qualifying interviews and a privacy-safe synthesis exist; workflow claims distinguish facts from hypotheses; the manual baseline protocol is approved; every competitive claim cites primary evidence and exact source revisions; no candidate code was executed during screening.
+**Tests of completion, Part A (`RGT-S009`, `RGT-S001`) — met:** workflow claims distinguish facts from hypotheses; every pipeline gate carries an explicit evidence status; the manual baseline protocol is drafted and its bias controls are recorded; every competitive claim cites primary evidence and exact source revisions; no candidate code was executed during screening.
+
+**Tests of completion, Part B (`RGT-S009B`) — not met:** five qualifying interviews and a privacy-safe synthesis exist; the manual baseline protocol is *approved* rather than drafted, which the protocol itself conditions on interview evidence confirming tool class, cast size, and revision behaviour.
+
+**Phase 1 is therefore not complete.** Phase 2 may open under the exit gate below; that is a deliberate partial pass, not a completed phase.
 
 **Exit gate:** Workflow/business and competitive reports are approved. Phase 2 evidence work may begin once `RGT-S009` and `RGT-S001` are approved, but `RGT-D010` and `RGT-D012` must not select a production architecture until `RGT-S009B` user-value evidence and the manual baseline are accepted. No technology is selected solely by this phase.
 

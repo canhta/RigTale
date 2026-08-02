@@ -8,7 +8,7 @@
 
 **License:** MIT/Expat (`LICENSE.txt`). Third-party inventory in `COPYRIGHT.txt` lists 106 stanzas covering Apache-2.0, BSD, BSL-1.0, CC0, CC-BY-4.0, Expat, MPL-2.0, OFL-1.1, Zlib and others. No GPL, LGPL, or AGPL. MPL-2.0 applies only to `thirdparty/certs/ca-bundle.crt` and one further stanza; CC-BY-4.0 covers `misc/logo/*` and is avoidable by not redistributing the logo. Obligation profile for redistribution is attribution plus licence-text inclusion.
 
-**Disposition:** `reference`, with `adapt` open for specific subsystems if the embedding question resolves.
+**Disposition:** `adapt`. Revised upward from `reference` after the authoring self-correction recorded below. The `libgodot` windowless-capture question remains the gate on any selection, but it does not gate the screening disposition. See the Conclusion.
 
 ## Purpose and Production Model
 
@@ -121,7 +121,9 @@ There is also a stable C ABI for GDExtension (`core/extension/gdextension_interf
 
 **`adapt`**, revised upward from `reference` after the authoring correction above.
 
-Godot is the **only candidate where every link in the authoring chain is verified from primary source**: scriptable bone creation, scriptable per-vertex bone weights, scriptable scene serialisation, a diffable text intermediate representation with a real parser, an explicit deterministic-blending flag, and a single-step embedding API — all under MIT with a copyleft-free dependency graph and first-class macOS support.
+Godot verifies **every link in the authoring chain from primary source**: scriptable bone creation, scriptable per-vertex bone weights, scriptable scene serialisation, a diffable text intermediate representation with a real parser, an explicit deterministic-blending flag, and a single-step embedding API — all under MIT with a copyleft-free dependency graph and first-class macOS support.
+
+**The word "only" is withdrawn from this claim.** `opentoonz.md` asserts a fully verified authoring chain for OpenToonz under BSD-3, and its load-bearing citations were independently confirmed. Godot's distinguishing properties are the MIT licence, the copyleft-free dependency graph, and per-vertex weight scripting — not exclusivity. What separates Godot from OpenToonz here is that Godot's rig is a scene rather than a portable format, and that its headless display server returns only `"dummy"`; those remain the gating facts.
 
 It remains source-verified weak on the rendering-as-a-job half: headless builds have no rasteriser, the movie writer captures the main OS window, output has no time-range control, and there is no pixel-level regression test anywhere in a suite that itself runs against a dummy renderer. Its 2D-skeletal subsystem has **no upstream tests at all**.
 

@@ -87,7 +87,9 @@ Owns narration, dialogue, lyrics when applicable, structural beats, factual cita
 
 ### `AudioTimeline`
 
-Represents optional but authoritative synchronized media. It may contain audio assets, stems, sections, beats, bars, word intervals, phonemes, visemes, cues, and silence regions. It never replaces semantic scene direction.
+Represents optional but authoritative synchronized media. It may contain audio assets, sections, beats, bars, word intervals, phonemes, visemes, cues, and silence regions. It never replaces semantic scene direction.
+
+**Stems are required structure, not optional content, for any production containing sung vocals.** Under `PR-F003` the contract must carry each vocal and instrumental element as a separately addressable stem with a declared delivery role — music and effects, optional vocal track, or dialogue guide — because a split-stem delivery cannot be reconstructed from a stereo bounce. A production that declares sung vocals and supplies only a mixed bounce is a validation failure at media lock, not at delivery.
 
 ### `Sequence`
 
@@ -191,6 +193,8 @@ Contains Red-Team or human findings with reviewer identity, rubric version, seve
 ### `DeliveryManifest`
 
 Records approved source versions, final media, captions, thumbnails where applicable, codecs and profiles, checksums, QC reports, attribution, licenses, and archive metadata.
+
+It must also record the servicing package required by `PR-F003`: a Music & Effects track, the optional vocal tracks, a dialogue guide, and a **textless picture master** in which animated text over picture is absent. The manifest declares which of these are present; a production whose brief requires broadcast or platform servicing and whose manifest omits them fails delivery approval.
 
 ## Error Contract
 

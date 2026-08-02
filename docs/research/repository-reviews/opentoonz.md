@@ -12,7 +12,9 @@
 
 ## Why This Is the Most Significant Result of the Screening Round
 
-OpenToonz answers RigTale's hardest question affirmatively, and it is the only candidate that does so.
+OpenToonz answers RigTale's hardest question affirmatively.
+
+**Exclusivity claim withdrawn.** This line previously read "and it is the only candidate that does so." A cross-record audit refuted it: `synfig.md` documents the same conjunction — a genuine in-tree saver (`savecanvas.h:55-59`), an external program that demonstrably writes valid `.sif` (an 82-line Python plugin), a headless CLI that calls no GTK or X11, `--begin-time`/`--end-time` range rendering, and **absolute** output-sequence numbering (`trgt_png.cpp:115,149`), which is precisely what isolated shot rerender needs. `mlt-glaxnimate-lottie.md` makes a comparable claim for MLT. The difference between OpenToonz and Synfig is licence (BSD-3 versus GPL-3) and rig portability, not the existence of the authoring path.
 
 **A program can author a complete production scene — layers, hierarchy, rig, keyframes, camera, and effect graph — as human-readable text, with no GUI and no proprietary tool, and then render an arbitrary frame range headlessly. Both halves are BSD-3 and in-tree.**
 
@@ -183,7 +185,19 @@ Route to `SPIKE-R001` (1, 3, 4, 7), `SPIKE-A002` (2, 6, 8), `SPIKE-I001` (5).
 
 `reference`, trending `adapt`.
 
-OpenToonz is the only candidate that answers the authoring question affirmatively **and** ships a headless range renderer with the exact semantics RigTale needs. It adds a production-proven cutout model, native parallax and multi-camera, a BSD-3 core with almost no per-file exceptions, and genuinely healthy multi-author maintenance with a demonstrated succession.
+OpenToonz answers the authoring question affirmatively **and** ships a headless range renderer with the exact semantics RigTale needs. Synfig and MLT satisfy comparable conjunctions; OpenToonz is distinguished by licence (BSD-3, almost no per-file exceptions), a production-proven cutout model, native parallax and multi-camera, and genuinely healthy multi-author maintenance with a demonstrated succession — not by being alone. The earlier "only candidate" framing is withdrawn.
+
+### Per-layer render separation: `-multimedia`
+
+**Recorded after an audit found this flag transcribed but never analysed.** The CLI surface section lists `-multimedia` as "Multimedia rendering mode" and stops there. In source it is a per-layer render path:
+
+- `tcomposer.cpp:485,491-492` reads `outputSettings.getMultimediaRendering()` and, when set, constructs `MultimediaRenderer` instead of the normal movie renderer.
+- `include/toonz/multimediarenderer.h:49` declares `class DVAPI MultimediaRenderer final : public QObject`, whose `Listener` interface is column-scoped throughout: `onFrameCompleted(int frame, int column)`, `onFrameFailed(int frame, int column, ...)`, `onSequenceCompleted(int column)`.
+- `tcomposer.cpp:504-505` sizes the output by `getFrameCount() * getColumnsCount()`.
+
+A column in OpenToonz is a layer. This is **headless per-layer render separation under BSD-3**, reachable from the command line. `blender.md` claims per-layer render separation as a capability "no other candidate has" and lists it among four capabilities that make Blender "the only surveyed system"; that claim is false, and this is the counter-evidence. It also bears directly on `PR-F003`'s textless-master obligation, which requires that on-screen text be renderable separately from picture.
+
+This does not close the gating question: `-multimedia` runs through the same `tcomposer` path whose headless viability on macOS is unproven and is `RGT-S012`.
 
 It is not adoptable as-is, for structural reasons: no automated tests against 1,076 source files, demonstrable non-determinism including machine-dependent thread count baked into the document, a renderer that constructs a GUI application object and needs a GL context, a scripting layer that cannot reach keyframes or cameras, and no upstream Apple Silicon build.
 

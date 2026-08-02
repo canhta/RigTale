@@ -60,6 +60,17 @@ This requirement therefore stays `hypothesis` and cannot be promoted by desk res
 
 Audio, lyrics, beat, phoneme, viseme, and timing data must be accepted when required by the production. Locked audio constrains synchronized animation but is not the mandatory product entry point or the sole source of character direction.
 
+**New obligation from `RGT-S009` Part A.** A published distributor specification requires a Music & Effects package in which background music is carried "exactly as it is represented in the original language mix", while **sung vocals — including character songs — must be delivered as separate optional tracks and again as a dialogue guide**. It also requires a textless picture covering "any graphic and/or animated text that occurs over picture".
+
+Two consequences are structural, not optional:
+
+1. **Song vocals and instrumental must be separable from the session onward.** A split-stem delivery cannot be reconstructed from a stereo song bounce. `AudioTimeline` must therefore treat stems as required structure for any production containing sung vocals, not as optional content.
+2. **On-screen animated text must live on removable layers.** A textless master cannot be reconstructed from a flattened render.
+
+Neither can be retrofitted. Both bind `AudioTimeline`, `DeliveryManifest`, and the `SPIKE-F001` fixture, which must include at least one sung passage with on-screen lyric text so that the obligation is exercised rather than assumed. Evidence: `docs/research/small-studio-workflow.md` section 8.
+
+This requirement was recorded in the spike and did not reach any requirement, contract, or fixture for two commits. That propagation failure is recorded in `docs/README.md`.
+
 ## 5. Asset and Rig Requirements
 
 ### PR-A001 — Versioned published asset packs (`charter-backed`)
@@ -110,6 +121,19 @@ Multi-character and character-prop interactions must preserve role assignment, t
 
 Given the same versioned production data, assets, engine configuration, and random seeds, the system must reproduce the same choreography, timing, scene state, and delivery structure without calling an AI provider.
 
+### PR-R007 — Declared raster determinism class (`decision-pending`)
+
+**New requirement from `RGT-S001`.** `PR-R001` constrains the production path but says nothing about the raster, and screening found that the primary target platform is where determinism most often breaks:
+
+- Vello's own snapshot tests use a non-exact comparison metric and name "differences from 'fast math' on Apple platforms" as a cause.
+- skia-canvas is hardware-accelerated by default using Metal on macOS, and documents no output-parity guarantee between its GPU and CPU paths.
+- ThorVG ships a run-to-run non-reproducibility detector, which is only built by a project that has experienced run-to-run non-reproducibility.
+- HyperFrames documents that hardware encoders are not bit-reproducible, and enables a static-frame deduplication heuristic by default whose wrong prediction silently duplicates a frame.
+
+The qualifying final-render path must therefore either be CPU-only, or demonstrate documented GPU-to-CPU output parity on the supported hardware. Every backend must declare a determinism class — byte-equal, threshold-equal with a stated metric and bound, or non-deterministic — and non-deterministic backends are ineligible for final render regardless of preview quality.
+
+`RGT-S013` measures this. **`RGT-D015` accepts the policy.** Until `RGT-D015` exists, the phrase "the accepted determinism policy" in `docs/quality/quality-system.md` has no referent and release qualification cannot be evaluated.
+
 ### PR-R002 — Structured 2D feature set (`charter-backed`)
 
 The production path must support hierarchical transforms, reusable motion clips, sprite or expression swapping, masks, explicit layer ordering, parallax, camera movement, and basic mesh or bone deformation.
@@ -126,7 +150,7 @@ The engine must render deterministic frames or time ranges, resume interrupted w
 
 The core production contracts should not expose episode-specific renderer code. The viable adapter boundary and whether one runtime can serve preview and final output must be established through `SPIKE-A001` and `SPIKE-R001`.
 
-**Evidence strengthens the case for this hypothesis rather than weakening it.** `RGT-S001` found **no candidate that supplies both a reusable character rig system and a deterministic frame-addressable renderer.** The systems with the strongest rig models — OpenToonz, Blender Grease Pencil, DragonBones — differ from the systems with the strongest determinism evidence — resvg and tiny-skia, rlottie, MLT. The one format with a published machine validator, Lottie, **cannot express a bone hierarchy at all**: no bone, joint, skin, weight, inverse-kinematics, or deformer concept exists in its schema.
+**Evidence strengthens the case for this hypothesis rather than weakening it.** `RGT-S001` found **no candidate that supplies both a reusable character rig system and a deterministic frame-addressable renderer.** The systems with the strongest rig models — OpenToonz, Blender Grease Pencil, DragonBones — differ from the systems with the strongest determinism evidence — resvg and tiny-skia, MLT. (`rlottie` was named here in an earlier draft and has been removed: it carries a screening disposition but **no review record**, so it cannot be cited as evidence. See `docs/research/landscape.md`.) The one format with a published machine validator, Lottie, **cannot express a bone hierarchy at all**: no bone, joint, skin, weight, inverse-kinematics, or deformer concept exists in its schema.
 
 **Working hypothesis, not a decision:** RigTale should expect to own its rig representation and compile it down to whatever renderer is selected, rather than obtaining a rig by choosing a renderer. This must be tested by `SPIKE-A001` and `SPIKE-R001` and settled by `RGT-D010`, not here.
 
@@ -170,6 +194,21 @@ Language, speech, music, alignment, and future generative capabilities must use 
 
 Installation, production execution, interruption recovery, migration, backup, troubleshooting, and upgrades must be documented and reproducible on a clean supported machine.
 
+### PR-P005 — Redistributable dependency stack (`charter-backed`)
+
+**New requirement closing an untraced charter constraint.** The charter requires that source code and bundled reference assets permit legal open-source redistribution. That constraint previously had no requirement, therefore no traceability row, no gate, and no phase — while `RGT-S001` produced the project's largest body of licensing evidence.
+
+No dependency may be adopted that:
+
+- withholds a redistribution or sublicensing grant, as GSAP's licence does;
+- imposes a paid licence on RigTale **or on its stated target users** — the charter's initial users are studios of approximately two to five people, and a dependency free only to organisations of three or fewer employees does not satisfy this;
+- is source-available or noncommercial rather than open source, as PolyForm Noncommercial dependencies are; or
+- imposes copyleft obligations incompatible with the intended distribution model, which requires a stated distribution model before the test can be applied.
+
+Screening dispositions are inputs to this requirement, not exemptions from it. A candidate marked `defer` with a recorded licence conflict remains subject to this test at `RGT-D010`. The distribution model itself is not yet decided and is an owner decision; until it is recorded, the copyleft clause above cannot be evaluated and must not be treated as passed.
+
+Evidence: `docs/research/candidate-screening.md`, `docs/research/landscape.md`.
+
 ## 10. Reference-Production Acceptance
 
 The reference production must:
@@ -202,6 +241,10 @@ Quantitative visual-quality, performance, parity, recovery, and interaction thre
 | Swift and renderer integration | `SPIKE-I001` |
 | MCP host-operated and embedded-agent execution | `SPIKE-M001` |
 | Hands-on user evaluation against the approved manual baseline | Implementation Phase 14 |
+| Agent behaviour, Red-Team rubric calibration, and review-independence evidence | Implementation Phase 11. **No spike document, exit criteria, or tracker item exists for this owner.** It is cited by `PR-Q003` and must be given one before Phase 11. |
+| Provider capability, cost, latency, and neutrality evidence | Implementation Phase 11. Same gap: cited by `PR-F003` and `PR-P003`, with no defining document. |
+
+Every owner named in the traceability matrix must appear in this table. Three Phase-11 owners were previously cited in the matrix and absent here; they are now recorded together with the fact that they are undefined.
 
 Every completed research or spike item must identify affected requirement IDs and update this document. Accepted architecture choices belong in decision records; this document records what the product must achieve, not which library is fashionable or convenient.
 
@@ -211,14 +254,14 @@ Every completed research or spike item must identify affected requirement IDs an
 |---|---|---|---|---|
 | `PR-O01` | `CreativeBrief`, `Episode`, `ShotPlan`, asset packs | Intent, asset, shot-plan gates | 8, 9, 11 | `W001`, `A001`, `R001` |
 | `PR-O02` | `MotionPack`, `CapabilityManifest`, `CompiledShot` | Asset, compilation, preview gates | 8, 9, 14 | `A002`, `A001`, `R001` |
-| `PR-O03` | `Production`, `AssetLock`, `CompiledShot`, manifests | Dependency, correction, archive gates | 7, 9, 10 | `F001`, `CS001`, `A001`, `R001` |
+| `PR-O03` | `Production`, `AssetLock`, `CompiledShot`, manifests | Dependency, correction, archive gates | 7, 9, 10 | `C001`, `W001`, `F001`, `CS001`, `A001`, `R001` |
 | `PR-O04` | `ValidationReport`, `ReviewReport`, `DeliveryManifest` | Preview, final, delivery gates | 10, 13, 14 | `W001`, `F001`, `R001` |
 | `PR-F001` | `CreativeBrief`, `Script`, `Episode` | Intent and creative approval | 11, 12 | `W001` |
 | `PR-F002` | All authoring artifacts and lifecycle states | All artifact handoff gates | 1, 11, 12 | `W001` |
 | `PR-F003` | `AudioTimeline`, `ShotPlan` | Media lock when applicable | 10, 11 | `W001`, provider evidence during Phase 11 |
 | `PR-A001` | Asset packs, `AssetLock`, common envelope | Asset publication | 7, 8 | `A002`, `CS001` |
 | `PR-A002` | `CapabilityManifest`, `MotionPack` | Capability and compile validation | 8, 9 | `A002`, `A001` |
-| `PR-A003` | `CharacterPack`, `ScenePack`, `PropPack` | Asset ingestion and publication | 8 | `A002` |
+| `PR-A003` | `CharacterPack`, `ScenePack`, `PropPack` | Asset ingestion and publication | 8 | `C001`, `A002` |
 | `PR-A004` | All asset-pack archetypes | Asset and fixture approval | 8 | `F001`, `A002` |
 | `PR-C001` | `ShotPlan`, character instances | Shot-plan and compilation gates | 9, 11 | `A001`, `R001` |
 | `PR-C002` | `MotionPack`, choreography in `ShotPlan` | Compilation and preview gates | 9 | `A001`, `R001` |
@@ -229,8 +272,9 @@ Every completed research or spike item must identify affected requirement IDs an
 | `PR-R002` | Asset packs and compiled tracks | Asset, compilation, final render | 8, 9, 10 | `A002`, `R001` |
 | `PR-R003` | `CompiledShot`, renderer capabilities | Preview and final parity | 4, 10 | `R002` |
 | `PR-R004` | `RenderJob`, dependency digests, manifests | Render, correction, recovery | 9, 10 | `F001`, `R001`, `I001` |
-| `PR-R005` | `CompiledShot`, renderer adapter contract | Compilation and renderer qualification | 9, 10 | `A001`, `R001` |
+| `PR-R005` | `CompiledShot`, renderer adapter contract | Compilation and renderer qualification | 9, 10 | `C001`, `A001`, `R001` |
 | `PR-R006` | `RenderJob`, `RenderManifest` measurements | Full-production qualification | 4, 10, 13 | `R001`, `I001` |
+| `PR-R007` | `RenderJob`, `RenderManifest`, backend capability declaration | Final-render qualification; `RGT-D015` accepts the policy | 4, 10 | `C001`, `R001`, `R002` |
 | `PR-Q001` | `ValidationReport`, structured errors | Deterministic gates 1–7 | 7–13 | `F001` and each technical spike |
 | `PR-Q002` | `ValidationReport`, `ReviewReport` | Preview and final visible review | 13, 14 | `W001`, `F001`, `R001` |
 | `PR-Q003` | `ReviewReport`, approval state | Red-Team and delivery gates | 11, 13, 14 | agent evaluation in Phase 11 |
@@ -239,8 +283,20 @@ Every completed research or spike item must identify affected requirement IDs an
 | `PR-P002` | Application API, CLI operations, MCP adapter | Automation and integration qualification | 11, 12, 15 | `I001`, `M001` |
 | `PR-P003` | Provider adapters, provenance, run records | Agent and offline-render gates | 11 | `M001`, provider evaluation in Phase 11 |
 | `PR-P004` | Jobs, manifests, migrations, archives | Recovery and operational qualification | 10, 13 | `F001`, `CS001`, `R001`, `I001` |
+| `PR-P005` | Dependency inventory, `DeliveryManifest` attribution and licence fields | Capability and licence validation; `RGT-D010` and `RGT-D012` selection gates | 2, 5, 6 | `C001`, `R001`, `I001` |
 
 The matrix is updated whenever an artifact, phase, evidence owner, or accepted decision changes. A requirement with no contract, gate, phase, or evidence owner blocks baseline validation.
+
+### Charter objectives with no requirement
+
+`PR-*` coverage is complete for every requirement defined here, but two charter items map to nothing:
+
+| Charter item | State |
+|---|---|
+| Objective 5 — five problem interviews, two hands-on evaluations, and at least a 50% reduction in hands-on time | **No requirement exists.** The charter's only business-value objective is untraceable, and `RGT-S009` established that the 50% claim is currently unfalsifiable for want of any documented baseline. |
+| Constraint — agent work must run within bounded context, retries, time, and cost | **No requirement exists.** Budgets are specified in `docs/architecture/agent-system.md`, which is architecture, not a requirement, so they carry no gate, phase, or evidence owner. |
+
+Section 13 states that "every charter objective and release-scope item maps to at least one requirement." That criterion is **not currently met**, and this table records the exceptions rather than concealing them.
 
 `RGT-D009` reconciles the core and local subset after its technical evidence. MCP and embedded-agent requirements remain explicitly evidence-pending until `RGT-D011` and are reconciled by `RGT-D014`. Full business validation still requires the Phase 14 hands-on evaluations.
 
