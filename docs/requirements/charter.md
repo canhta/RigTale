@@ -65,3 +65,11 @@ A small studio or creator will adopt RigTale if it can produce an approximately 
 - allows individual shots, actions, and timings to be edited as structured data;
 - reaches a quality threshold suitable for publication; and
 - is materially faster and less expensive to revise than a comparable manual cutout-animation workflow.
+
+## Vision
+
+RigTale enables small creative teams to turn locked audio and a reusable cast into editable, publication-ready animated videos by directing structured assets with AI instead of generating pixels.
+
+RigTale should operate like an agent-controlled animation studio: artists retain authority over character design, rigs, visual style, and reusable motion assets, while the system automates production planning, shot construction, choreography, timing, compositing, validation, and rendering.
+
+Every production must remain inspectable, reproducible, versionable, and editable as structured data. The initial product will focus on multi-character, approximately three-minute 2D cutout music videos. Future character generation, assisted rigging, localization, and alternative 2D or 3D renderers must integrate through stable production contracts rather than requiring a replacement of the core pipeline.
