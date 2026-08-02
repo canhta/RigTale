@@ -139,6 +139,20 @@ Recorded because each one would have misled a checklist-based screening.
 4. **Activity signal inverts reputation.** The likely intended "Skia Canvas" candidate has had no commits for roughly ten months, while the ostensibly older `node-canvas` committed in July 2026.
 5. **`3b1b/manim`** commits are current but its last tagged release is twenty months old.
 
+## Screening Claims Rejected on Cross-Verification
+
+Documentation-level screening produced three claims that contradict evidence obtained by direct source inspection of the pinned clones. Source inspection wins in each case. Recorded so the rejected claims are not reintroduced.
+
+| Rejected claim | Contradicting evidence |
+|---|---|
+| "Code2MP4 is likely a mis-recorded name; no such project was found, and the index probably means `showlab/Code2Video`." | Code2MP4 exists and was inspected at commit `91d7ba45`. Its declared repository, `NOTICE`, `LICENSE`, and workspace are recorded in `docs/research/repository-reviews/code2mp4.md`. `showlab/Code2Video` is a **separate, additional** candidate, not the same project. |
+| "The Revideo-as-Motion-Canvas-fork lineage is not substantiated; its README says it is zero-dep and borrows concepts from Remotion and Rive." | Source inspection at commits `7b91435c` and `b5de67a0` found byte-identical `LICENSE` files — Revideo's still reads "Copyright (c) 2022 motion-canvas" — identical `commitlint.config.js`, `tsdoc.json`, and workspace layout, and `packages/renderer/server/render-video.ts:16` importing the Vite plugin under the upstream binding name. A README self-description is a discovery signal; the licence file and import graph are evidence. |
+| "The OpenMontage index entry points at the wrong repository and the licence field may be wrong." | The inspected clone is `calesthio/OpenMontage` at commit `c36e4122`, and its `LICENSE` was read directly: GNU AGPL v3, confirmed at `README.md:755`. The index is correct. |
+
+The third claim did surface something real: near-identical copies of OpenMontage exist at other organisations advertising different licences and different feature counts. That is a reason to keep citing exact commits, not a reason to change the index.
+
+**Star counts and fork counts from this screening round are not recorded as evidence.** Several were unobtainable due to API rate limiting, several conflicted between sources, and none bear on whether a candidate meets a RigTale requirement.
+
 ## Facts That Could Not Be Verified
 
 - Manim's platform and macOS support matrix, its `Camera` API, parallax, and `z_index` layer ordering — `docs.manim.community` returned HTTP 429 on repeated attempts.

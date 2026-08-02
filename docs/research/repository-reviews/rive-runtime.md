@@ -22,14 +22,18 @@ This is the finding that determines the disposition.
 
 | Evidence | Source |
 |---|---|
-| File magic `"RIVE"` appears only in read code; `RuntimeHeader` exposes `read` and no `write` | `include/rive/runtime_header.hpp` |
+| File magic `"RIVE"` at `include/rive/runtime_header.hpp:15`; the only method is `static bool read(...)` at `:47`. There is no `write`. Verified directly at the pinned commit. | `include/rive/runtime_header.hpp:15,47` |
 | Both fingerprint call sites are read paths | `src/file.cpp:255`, `src/file.cpp:1421` |
-| The code generator emits `deserialize(uint16_t, BinaryReader&)` only, with no serialize counterpart | `dev/core_generator/lib/src/definition.dart:484-510` |
+| The code generator emits `deserialize(uint16_t, BinaryReader&)` only, with no serialize counterpart. Every `serialize` substring match in that file is inside `deserialize`. Verified directly. | `dev/core_generator/lib/src/definition.dart:484,496,499` |
 | `BinaryWriter` exists but no consumer writes a `.riv`: property-reset blobs, test render-command serialization, Lua console buffer | `include/rive/property_recorder.hpp`, `include/utils/serializing_factory.hpp`, `include/rive/lua/rive_lua_libs.hpp:2156` |
 
 Consequence: authoring RigTale productions into Rive content would require reverse-engineering and permanently maintaining a `.riv` encoder against `dev/defs/*.json` and a version gate (`File::majorVersion = 7`) that Rive controls unilaterally. Import-stack ordering constraints in `src/file.cpp:298-668` may encode invariants not expressed in the defs at all.
 
 This contradicts RigTale's premise that AI writes structured production direction into a reviewable, diffable format.
+
+**The authoring tool is also a paid proprietary service.** `https://rive.app/pricing` (accessed 2026-08-02) is positioned as "Free to create $9/mo to ship", with tiers Free, Cadet at USD 9 per seat per month capped at three seats, Voyager at USD 32 per seat per month, and Enterprise at USD 120 per seat per month.
+
+An MIT runtime does not make the pipeline open. This is the general pattern the screening must detect: **runtime licence and authoring-path openness are separate questions, and only the second one determines whether an agent can produce content.**
 
 ## Data Contracts
 

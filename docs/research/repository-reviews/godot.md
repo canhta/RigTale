@@ -61,7 +61,7 @@ These are architectural, not configuration issues.
 
 ## The Finding That Could Change the Disposition
 
-`core/extension/libgodot.h:59,70` exports `libgodot_create_godot_instance` and `libgodot_destroy_godot_instance` (marked `@since 4.6`). `GodotInstance` (`core/extension/godot_instance.h:36-58`) exposes `initialize / start / is_started / iteration / stop / pause / resume`, and `GodotInstance::iteration()` calls `Main::iteration()` directly (`godot_instance.cpp:81-83`). The build gate is `library_type=shared_library` requiring `"library"` in the platform's supported list (`SConstruct:600-604`); macOS declares `["library", "metal", "mono"]` (`platform/macos/detect.py:86-91`) and ships `platform/macos/libgodot_macos.mm`.
+`core/extension/libgodot.h:60,71` exports `libgodot_create_godot_instance` and `libgodot_destroy_godot_instance` (verified directly at the pinned commit). `GodotInstance` (`core/extension/godot_instance.h:36-58`) exposes `initialize / start / is_started / iteration / stop / pause / resume`, and `GodotInstance::iteration()` calls `Main::iteration()` directly (`godot_instance.cpp:81-83`). The build gate is `library_type=shared_library` requiring `"library"` in the platform's supported list (`SConstruct:600-604`); macOS declares `["library", "metal", "mono"]` (`platform/macos/detect.py:86-91`) and ships `platform/macos/libgodot_macos.mm`.
 
 This is precisely the boundary RigTale needs: an external deterministic orchestrator owning the clock and pumping frames one at a time. It also makes the window-bound movie writer bypassable in principle. Whether it works windowless on macOS with Metal is unverified and is the decisive executable question.
 
