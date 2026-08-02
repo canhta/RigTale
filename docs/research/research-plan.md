@@ -19,7 +19,7 @@ Search results, marketing pages, and generated summaries may identify candidates
 2. Verify the canonical repository, license, release history, recent activity, and documentation.
 3. Screen candidates against RigTale's actual production model before spending time on a deep review.
 4. Create a dedicated spike result for every shortlisted repository.
-5. Clone the exact revision into the external research workspace (`~/Solo/OSS/videos/<repository>` for the primary development environment) and record its commit SHA. External clones are never committed into RigTale.
+5. Clone the exact revision into `.research/clones/<repository>` and record its commit SHA. The ignored research workspace is local-only and external clones are never committed into RigTale.
 6. Inspect source layout, contracts, renderer boundaries, asset model, agent instructions, tests, examples, packaging, and failure handling.
 7. Run code only when static inspection cannot answer a material question. Treat third-party setup scripts as untrusted and run them without project secrets.
 8. Record strengths, weaknesses, reusable patterns, rejected patterns, and unresolved questions with file-level evidence.

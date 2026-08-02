@@ -1,6 +1,6 @@
 # Competitive and Technology Landscape
 
-**Status:** Discovery in progress under `SPIKE-C001`.
+**Status:** Planned under `SPIKE-C001`; execution is deferred until the production documentation baseline and implementation plan are approved.
 
 This document indexes candidates. Inclusion is not endorsement, and no candidate is selected until the required review and executable evidence are complete.
 
@@ -36,5 +36,4 @@ This document indexes candidates. Inclusion is not endorsement, and no candidate
 
 ## Discovery Output
 
-`SPIKE-C001` will verify canonical sources, remove irrelevant candidates, add missing candidates, and create prioritized deep-review spikes. Detailed conclusions must not be written into this index.
-
+When started, `SPIKE-C001` will verify canonical sources, remove irrelevant candidates, add missing candidates, and create prioritized deep-review spikes. Detailed conclusions must not be written into this index.
