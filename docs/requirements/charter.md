@@ -206,3 +206,15 @@ All predictable operations remain deterministic software:
 - The system must run locally on a standard creator workstation. Cloud AI and hardware acceleration may be optional extensions.
 - Source code and bundled reference assets must permit legal open-source redistribution. Imported assets must retain license and provenance metadata.
 - RigTale may study comparable production techniques but must not copy protected characters, artwork, music, or brand identity.
+
+## Success Criteria
+
+RigTale is successful when:
+
+- It produces the reference three-minute, multi-character video through the complete structured workflow.
+- It produces a second, materially different video without modifying engine source code.
+- A production can be installed, opened, edited, resumed, and rendered on a clean supported machine using documented steps.
+- A single shot can be changed and re-rendered without rebuilding unaffected shots.
+- Final output passes deterministic validation, Red-Team review, and the defined human quality threshold.
+- The workflow reduces hands-on layout and animation time by at least 50% against the documented manual baseline.
+- Every distributed or imported asset has traceable provenance and license metadata.
