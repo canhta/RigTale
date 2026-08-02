@@ -1,6 +1,6 @@
 # RigTale Product Requirements
 
-**Status:** Draft; evidence-pending.
+**Status:** v1 draft.
 
 **Authority:** The approved project charter defines product intent and scope. This document translates it into testable product requirements. Requirements marked as hypotheses must be revised after the linked research or spike; they are not accepted architecture decisions.
 
@@ -46,7 +46,7 @@ The system must accept a creative prompt or brief as the earliest input. A user 
 
 ### PR-F002 — Structured artifact progression (`hypothesis`)
 
-The product should preserve explicit artifacts and approval gates for creative intent, script or lyrics, audio when applicable, scene plan, storyboard or animatic, published assets, compiled shots, review output, and delivery output. Exact gate names and which gates are mandatory require workflow research.
+The product should preserve explicit artifacts and approval gates for creative intent, script or lyrics, audio when applicable, scene plan, storyboard or animatic, published assets, compiled shots, review output, and delivery output. `SPIKE-W001` determines which gates are mandatory, optional, or impractical in real small-studio work.
 
 ### PR-F003 — Audio is conditional production data (`charter-backed`)
 
@@ -64,7 +64,7 @@ Each published character or asset must declare the actions, expressions, attachm
 
 ### PR-A003 — Layered artwork ingestion (`charter-backed`)
 
-The system must import at least one documented layered-artwork format and preserve the structure required for rigging, masks, draw order, deformation, expression changes, and animation. The precise import format and rig representation are `decision-pending` under `SPIKE-A001` and `SPIKE-R001`.
+The system must import at least one documented layered-artwork format and preserve the structure required for rigging, masks, draw order, deformation, expression changes, and animation. The source format, authoring workflow, preparation effort, and rig-publication model are `decision-pending` under `SPIKE-A002`; orchestration and backend compatibility follow under `SPIKE-A001` and `SPIKE-R001`.
 
 ### PR-A004 — Archetype support (`charter-backed`)
 
@@ -108,7 +108,7 @@ Preview and final rendering should consume the same authoritative production sta
 
 ### PR-R004 — Frame and shot addressability (`charter-backed`)
 
-The engine must render deterministic frames or time ranges, resume interrupted work, and rerender an isolated shot without rebuilding unaffected shots. Cache keys and invalidation behavior are `decision-pending`.
+The engine must render deterministic frames or time ranges, resume interrupted work, and rerender an isolated shot without rebuilding unaffected shots. Cache keys and invalidation behavior are evidence-pending under `SPIKE-F001`, `SPIKE-A001`, and `SPIKE-R001`.
 
 ### PR-R005 — Backend independence (`hypothesis`)
 
@@ -116,7 +116,7 @@ The core production contracts should not expose episode-specific renderer code. 
 
 ### PR-R006 — Production workload (`decision-pending`)
 
-Quality, latency, throughput, memory, storage, and recovery targets must be measured on the representative full-length production and supported hardware. A successful short clip is insufficient evidence.
+Quality, latency, throughput, memory, storage, cache, and recovery targets must be measured through `SPIKE-F001`, `SPIKE-R001`, and `SPIKE-I001` on the representative full-length production and supported hardware. A successful short clip is insufficient evidence.
 
 ## 8. Review, Correction, and Quality
 
@@ -175,21 +175,64 @@ Quantitative visual-quality, performance, parity, recovery, and interaction thre
 
 | Requirement area | Evidence owner |
 |---|---|
-| Comparable production and open-source patterns | `SPIKE-C001` and repository-specific reviews |
-| Rig, motion composition, choreography, interaction, and frame compilation | `SPIKE-A001` |
-| Renderer quality, packaging, headless execution, and backend boundary | `SPIKE-R001` |
-| Preview and final-render parity | `RGT-S005` |
-| Swift and engine integration | `RGT-S006` |
-| MCP subscription-hosted operation | `RGT-S007` |
+| Small-studio workflow, artifact gates, user problems, and manual baseline | `SPIKE-W001` |
+| Comparable production and open-source patterns | `SPIKE-C001` and fixture-based repository reviews |
+| Reference workload, quality assertions, recovery cases, and rubric-calibration plan | `SPIKE-F001` |
+| Layered-asset ingestion, rig preparation, authoring effort, and publication | `SPIKE-A002` |
+| Orchestration contracts, motion composition, choreography, interaction, and invalidation hypotheses | `SPIKE-A001` |
+| Visible orchestration quality, renderer quality, deterministic execution, cache behavior, recovery, packaging, and headless execution | `SPIKE-R001` |
+| Preview and final-render parity | `SPIKE-R002` |
+| Swift and renderer integration | `SPIKE-I001` |
+| MCP host-operated and embedded-agent execution | `SPIKE-M001` |
+| Hands-on user evaluation against the approved manual baseline | Implementation Phase 14 |
 
 Every completed research or spike item must identify affected requirement IDs and update this document. Accepted architecture choices belong in decision records; this document records what the product must achieve, not which library is fashionable or convenient.
 
-## 12. Draft Exit Criteria
+## 12. Requirement Traceability
 
-This draft may advance to `evidence-pending` when:
+| Requirement | Primary contracts or design | Pipeline or quality gate | Implementation phase | Evidence owner |
+|---|---|---|---|---|
+| `PR-O01` | `CreativeBrief`, `Episode`, `ShotPlan`, asset packs | Intent, asset, shot-plan gates | 8, 9, 11 | `W001`, `A001`, `R001` |
+| `PR-O02` | `MotionPack`, `CapabilityManifest`, `CompiledShot` | Asset, compilation, preview gates | 8, 9, 14 | `A002`, `A001`, `R001` |
+| `PR-O03` | `Production`, `AssetLock`, `CompiledShot`, manifests | Dependency, correction, archive gates | 7, 9, 10 | `F001`, `A001`, `R001` |
+| `PR-O04` | `ValidationReport`, `ReviewReport`, `DeliveryManifest` | Preview, final, delivery gates | 10, 13, 14 | `W001`, `F001`, `R001` |
+| `PR-F001` | `CreativeBrief`, `Script`, `Episode` | Intent and creative approval | 11, 12 | `W001` |
+| `PR-F002` | All authoring artifacts and lifecycle states | All artifact handoff gates | 1, 11, 12 | `W001` |
+| `PR-F003` | `AudioTimeline`, `ShotPlan` | Media lock when applicable | 10, 11 | `W001`, provider evidence during Phase 11 |
+| `PR-A001` | Asset packs, `AssetLock`, common envelope | Asset publication | 7, 8 | `A002` |
+| `PR-A002` | `CapabilityManifest`, `MotionPack` | Capability and compile validation | 8, 9 | `A002`, `A001` |
+| `PR-A003` | `CharacterPack`, `ScenePack`, `PropPack` | Asset ingestion and publication | 8 | `A002` |
+| `PR-A004` | All asset-pack archetypes | Asset and fixture approval | 8 | `F001`, `A002` |
+| `PR-C001` | `ShotPlan`, character instances | Shot-plan and compilation gates | 9, 11 | `A001`, `R001` |
+| `PR-C002` | `MotionPack`, choreography in `ShotPlan` | Compilation and preview gates | 9 | `A001`, `R001` |
+| `PR-C003` | `CapabilityManifest`, structured errors | Capability validation | 8, 9, 11 | `A001`, `R001` |
+| `PR-C004` | `ShotPlan`, `CompiledShot` | Compilation | 9 | `A001`, `R001` |
+| `PR-C005` | Interaction instructions and compiled tracks | Compilation and visible preview | 9, 13 | `A001`, `R001` |
+| `PR-R001` | `CompiledShot`, `RenderJob`, `RenderManifest` | Compilation and final render | 9, 10 | `R001` |
+| `PR-R002` | Asset packs and compiled tracks | Asset, compilation, final render | 8, 9, 10 | `A002`, `R001` |
+| `PR-R003` | `CompiledShot`, renderer capabilities | Preview and final parity | 4, 10 | `R002` |
+| `PR-R004` | `RenderJob`, dependency digests, manifests | Render, correction, recovery | 9, 10 | `F001`, `R001`, `I001` |
+| `PR-R005` | `CompiledShot`, renderer adapter contract | Compilation and renderer qualification | 9, 10 | `A001`, `R001` |
+| `PR-R006` | `RenderJob`, `RenderManifest` measurements | Full-production qualification | 4, 10, 13 | `R001`, `I001` |
+| `PR-Q001` | `ValidationReport`, structured errors | Deterministic gates 1–7 | 7–13 | `F001` and each technical spike |
+| `PR-Q002` | `ValidationReport`, `ReviewReport` | Preview and final visible review | 13, 14 | `W001`, `F001`, `R001` |
+| `PR-Q003` | `ReviewReport`, approval state | Red-Team and delivery gates | 11, 13, 14 | agent evaluation in Phase 11 |
+| `PR-Q004` | Source maps, dependency graph, new artifact versions | Correction and isolated rerender | 9, 10, 12 | `F001`, `A001`, `R001` |
+| `PR-P001` | Application operations, jobs, artifact repository | Local operational qualification | 12, 13 | `I001` |
+| `PR-P002` | Application API, CLI operations, MCP adapter | Automation and integration qualification | 11, 12, 15 | `I001`, `M001` |
+| `PR-P003` | Provider adapters, provenance, run records | Agent and offline-render gates | 11 | `M001`, provider evaluation in Phase 11 |
+| `PR-P004` | Jobs, manifests, migrations, archives | Recovery and operational qualification | 10, 13 | `F001`, `R001`, `I001` |
+
+The matrix is updated whenever an artifact, phase, evidence owner, or accepted decision changes. A requirement with no contract, gate, phase, or evidence owner blocks baseline validation.
+
+## 13. Baseline Review Criteria
+
+This v1 draft is ready to authorize evidence work when:
 
 - every charter objective and release-scope item maps to at least one requirement;
 - every technical assumption is labeled and linked to evidence work;
 - the reference production has a traceable acceptance requirement;
 - contradictions with the charter and other documentation are removed; and
-- the Project Owner approves the requirement structure before downstream contract drafts are written.
+- the Project Owner confirms that the complete v1 documentation set captures the intended product and evidence sequence.
+
+Downstream architecture drafts may already exist during baseline review. They remain provisional and must be revised when research changes an upstream requirement.

@@ -1,6 +1,6 @@
 # RigTale Production Contracts
 
-**Status:** v1 draft; evidence-pending.
+**Status:** v1 draft.
 
 ## Purpose
 
@@ -55,7 +55,7 @@ Every versioned artifact must expose the logical equivalent of:
 | `provenance` | Origin, license, attribution, and transformation history where applicable. |
 | `extensions` | Namespaced optional data that cannot redefine core semantics. |
 
-The storage encoding, ID format, schema language, and digest algorithm are decision-pending.
+The storage encoding, ID format, schema language, and digest algorithm are decision-pending under `RGT-D012`, using contract fixtures plus the accepted language, migration, and storage evidence.
 
 ## Lifecycle
 
@@ -73,6 +73,10 @@ working -> review -> approved -> published -> superseded
 
 ## Creative and Timing Contracts
 
+### `Production`
+
+Owns the durable project boundary: selected brief and creative artifacts, episode versions, working and published asset references, review state, delivery history, project configuration, collaborators or local operator identity where applicable, and audit events. A production may contain several episode versions and deliveries without conflating them with one mutable timeline.
+
 ### `CreativeBrief`
 
 Owns audience, intent, subject, educational or creative goals, target duration, tone, safety constraints, platform requirements, language, and supplied source material.
@@ -84,6 +88,10 @@ Owns narration, dialogue, lyrics when applicable, structural beats, factual cita
 ### `AudioTimeline`
 
 Represents optional but authoritative synchronized media. It may contain audio assets, stems, sections, beats, bars, word intervals, phonemes, visemes, cues, and silence regions. It never replaces semantic scene direction.
+
+### `Sequence`
+
+Groups an ordered set of shots that share narrative, educational, musical, spatial, or continuity context. It owns ordering, intended duration range, transition expectations, continuity constraints, and references to its current shot-plan versions. It does not own character or scene assets directly; those resolve through the episode asset lock.
 
 ### Time Model
 
@@ -123,6 +131,10 @@ Declares supported semantic actions, parameters, constraints, required companion
 ### `Episode`
 
 Owns production-wide configuration, references to approved creative artifacts, sequences, asset lock, aspect and timing profiles, delivery profiles, and current review state.
+
+### `AssetLock`
+
+Owns the exact published versions and content digests of every character, scene, prop, motion, font, and synchronized media asset selected for an episode build. It also records compatibility results and any approved backend-specific derived conversions. A new asset version creates a new lock; an existing lock is immutable.
 
 ### `ShotPlan`
 
@@ -203,9 +215,12 @@ Errors are either validation failures, incompatibilities, resource failures, tra
 ## Evidence Required for Validation
 
 - `SPIKE-C001`: established patterns and failure modes from comparable systems.
-- `SPIKE-A001`: rig, action, motion composition, interaction, compiled timeline, and deterministic evaluation.
-- `SPIKE-R001`: renderer boundary, supported features, headless operation, and reproducibility.
-- `RGT-S005`: preview and final parity.
+- `SPIKE-W001`: real workflow gates, artifact handoffs, and manual baseline.
+- `SPIKE-F001`: contract, failure, quality, recovery, and invalidation fixtures.
+- `SPIKE-A002`: source assets, layered ingestion, rig publication, capability, and versioning.
+- `SPIKE-A001`: provisional action, motion composition, interaction, compiled timeline, and invalidation models.
+- `SPIKE-R001`: visible execution, renderer boundary, supported features, headless operation, recovery, and reproducibility.
+- `SPIKE-R002`: preview and final parity.
 - Production fixtures: schema evolution, isolated correction, cache invalidation, and full-duration behavior.
 
 ## v1 Draft Exit Criteria
@@ -215,3 +230,5 @@ Errors are either validation failures, incompatibilities, resource failures, tra
 - Renderer-specific and provider-specific data cannot redefine core semantics.
 - Unknown representation choices are linked to evidence work.
 - Product requirement IDs can be traced to the contracts that satisfy them.
+
+The canonical traceability matrix lives in `docs/requirements/product-requirements.md`; contract changes must update that matrix in the same review.

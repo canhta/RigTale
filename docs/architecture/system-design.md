@@ -1,6 +1,6 @@
 # RigTale System Design
 
-**Status:** v1 draft; evidence-pending.
+**Status:** v1 draft.
 
 ## Design Goal
 
@@ -141,7 +141,7 @@ Local mode must support:
 - explicit CPU, GPU, disk, and concurrency limits; and
 - exportable, restorable project archives.
 
-Exact process, IPC, sandbox, signing, and packaging choices require `RGT-S006` and renderer evidence.
+Exact process, IPC, sandbox, signing, and packaging choices require `SPIKE-I001` and renderer evidence.
 
 ## Cloud Evolution
 
@@ -182,14 +182,15 @@ Telemetry is local-first and inspectable. Remote telemetry is opt-in unless requ
 
 | Decision | Required evidence |
 |---|---|
-| Rig, motion, interaction, and compiled timeline model | `SPIKE-A001` |
-| Primary renderer and adapter boundary | `SPIKE-R001` and parity spike |
-| Server and core implementation languages | Repository reviews plus workload and integration spikes |
-| macOS process and engine integration | `RGT-S006` |
-| Preview implementation | Renderer and parity evidence |
+| Source asset, layered ingestion, rig publication, and derived conversion | `SPIKE-A002` |
+| Orchestration, motion, interaction, and compiled timeline model | `SPIKE-A001` and joint execution in `SPIKE-R001` |
+| Primary renderer and adapter boundary | `SPIKE-R001` and `SPIKE-R002` |
+| Server and core implementation languages, schema tooling, and local storage baseline | `RGT-D012`, informed by repository reviews, `SPIKE-R001`, and `SPIKE-I001` |
+| macOS process and engine integration | `SPIKE-I001` |
+| Preview implementation | `SPIKE-R002` |
 | Serialization, schema, and migration technology | Contract fixture and language decision |
 | Local metadata store and cloud database | query, migration, backup, and scale evidence |
-| MCP host behavior and embedded agent framework | `RGT-S007` |
+| MCP host behavior and embedded agent framework | `SPIKE-M001`; it does not block the core local animation path |
 | Queue, object storage, and cloud deployment providers | operational workload evidence |
 
 ## v1 Draft Exit Criteria

@@ -1,56 +1,89 @@
-# SPIKE-R001: Production Renderer Backends
+# SPIKE-R001: Production Engine and Renderer Execution
+
+**Tracker:** `RGT-S004`
+
+**Status:** Queued. This is the joint executable evaluation of shortlisted orchestration models and renderer backends.
 
 ## Question
 
-Which existing engine, DCC backend, runtime, or custom library can compile RigTale's structured production contracts into the highest-quality reproducible video while remaining practical for a solo-maintained macOS and future cloud product?
+Which orchestration-model and backend pairing can compile RigTale's structured production into the highest-quality reproducible video while preserving editability, explicit failure behavior, and practical local and future headless operation?
 
 ## Preconditions
 
 - `SPIKE-C001` has screened the candidate landscape.
-- The representative animation fixture is versioned and approved.
-- `SPIKE-A001` has defined and exercised the renderer-independent orchestration and frame-compilation requirements.
-- Required visual features and expected frames are defined before adapter work begins.
+- `SPIKE-F001` has published the fixture suite and expected evidence.
+- `SPIKE-A002` has produced viable asset-ingestion and rig-publication inputs.
+- `SPIKE-A001` has produced provisional contracts and at least two qualified model/backend pairings.
+- Exact source revisions, licenses, visual features, failure cases, and measurement procedures are fixed before adapter execution.
 
-## Initial Candidate Families
+## Candidate Families
 
-- Godot as a programmable 2D/3D production runtime.
-- Blender as a Python-controlled 2D/3D DCC and rendering backend.
-- Rive or another pre-rigged vector runtime where authoring and format constraints permit.
-- Web/Node rendering using PixiJS, Skia, or a code-driven video framework.
-- A Rust or native renderer only if existing backends fail a material requirement.
+- Existing programmable 2D or 2D/3D engines with headless control.
+- DCC systems with scriptable scene, animation, compositing, and background rendering.
+- Skeletal or vector runtimes where authoring and redistribution constraints permit.
+- Web or native 2D render stacks combined with a code-driven timeline.
+- A custom native renderer only if existing backends fail a material requirement and the maintenance case is evidenced.
 
-Candidate inclusion is provisional until competitive screening verifies its license, control surface, and relevance.
+Candidate inclusion and pairing are provisional until screening and `SPIKE-A001` justify them.
 
-## Shared Fixture
+## Fixture Suite
 
-The fixture must contain a ten-second 1920x1080 shot at 30 frames per second with:
+Use the approved `SPIKE-F001` suite rather than one overloaded showcase shot:
 
-- At least three simultaneous character instances.
-- One quadruped and one vehicle.
-- Hierarchical transforms and reusable motion clips.
-- Sprite or expression swapping.
-- Mesh deformation, masks, and explicit layer ordering.
-- Camera movement and parallax.
-- Audio-timed action cues.
-- Exact frame stepping and isolated rerendering.
+1. Contract and invalid-input fixtures for capability and failure behavior.
+2. Short diagnostic shots isolating rig deformation, motion composition, group choreography, interaction, masks, draw order, camera, and parallax.
+3. Representative multi-character shots combining the features likely to interact.
+4. The complete 150–210 second production for repetition, continuity, cache, recovery, throughput, memory, storage, and operational conclusions.
+
+Short cases diagnose failures; only the complete production supports workload and production-readiness conclusions.
+
+## Method
+
+1. Implement the smallest isolated adapter for every qualified orchestration/backend pairing.
+2. Compile and render identical fixture versions with exact commands and environments.
+3. Compare semantic plan, compiled state, rendered evidence, diagnostics, and manifests.
+4. Apply the approved single-shot correction and verify dependency invalidation plus isolated rerender.
+5. Repeat renders on the same and clean environments.
+6. Inject invalid capabilities, process termination, corrupt output, missing assets, incompatible versions, and resource exhaustion.
+7. Render the full production and measure visible continuity, operational behavior, and maintenance surface.
+8. Classify each requirement as demonstrated, rejected, deferred, or still evidence-pending.
 
 ## Measurements
 
-- Visual quality against approved reference frames.
-- Ability to express the production without backend-specific episode logic.
-- Deterministic frame output and explicit failure behavior.
-- Preview and final-render parity.
-- Preview latency, render time, peak memory, startup time, and output size.
-- macOS packaging and Swift integration complexity.
-- Linux/cloud/headless deployment complexity.
-- Web preview or playback capability.
-- License and redistribution obligations.
-- Adapter size, custom code, test burden, and long-term maintenance risk.
+- visual motion and deformation quality against approved references;
+- interaction contact, foot stability, occlusion, draw order, framing, and continuity;
+- ability to express the episode without backend-specific authoring logic;
+- deterministic semantic and frame behavior under the accepted policy;
+- structured correction size, invalidation accuracy, and isolated-rerender result;
+- startup, preview support, render throughput, memory, storage, and cache behavior;
+- crash isolation, resumability, diagnostics, and artifact traceability;
+- macOS packaging and future Linux or headless feasibility;
+- license and redistribution obligations; and
+- adapter size, custom code, automated-test burden, and solo-maintenance risk.
+
+Preview/final parity and Swift process integration receive dedicated follow-up spikes; this spike records prerequisite observations without claiming those later decisions.
+
+## Required Outputs
+
+- Exact source revisions, adapter code, commands, environments, manifests, and rendered artifacts.
+- Structural, visual, failure, performance, recovery, licensing, and maintenance comparison.
+- Catalogue of unsupported features and reproducible blockers.
+- Recommended production-engine architecture or a documented reason to defer.
+- Proposed final contracts, adapter boundary, quality thresholds, and platform constraints.
+- Updates to requirements, architecture, quality, operations, implementation plan, and tracker.
+- Decision records for accepted orchestration model, primary renderer, and any binding implementation-language constraint.
 
 ## Exit Criteria
 
-- Every qualified backend renders the same versioned fixture or has a documented blocking failure.
-- Results include artifacts, commands, versions, measurements, and visual comparisons.
-- Unsupported requirements are explicit and reproducible.
-- The recommendation identifies a primary backend, optional adapters, and rejected alternatives, or records that more evidence is required.
-- No renderer decision is accepted until an architecture decision record is approved.
+- At least two qualified orchestration/backend pairings execute the shared fixture suite, or blocking failures are reproduced.
+- Diagnostic and complete-duration evidence are both evaluated.
+- The structured correction and isolated rerender behave as declared.
+- Repeatability, failure recovery, headless behavior, packaging implications, and maintenance cost are recorded.
+- Every material conclusion cites artifacts, commands, exact versions, and environment details.
+- No selection is accepted until the corresponding decision records are approved.
+
+## Rejection Conditions
+
+- Reject a pairing that requires episode-specific engine scripts in authoring artifacts.
+- Reject silent feature drops or visually incorrect fallback behavior.
+- Reject a conclusion based only on documentation, popularity, screenshots, or a successful short clip.

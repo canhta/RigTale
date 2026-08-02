@@ -1,6 +1,6 @@
 # RigTale Agent System
 
-**Status:** v1 draft; evidence-pending.
+**Status:** v1 draft.
 
 ## Purpose
 
@@ -89,7 +89,7 @@ Two execution modes must remain distinct:
 - **Host-operated:** an external agent host invokes RigTale MCP tools under the user's interactive session and approval model.
 - **Embedded or unattended:** RigTale runs its own agent loop and requires configured provider credentials or another explicitly supported provider mechanism.
 
-Both modes must use the same typed production tools and artifacts. Subscription availability, host limits, long-running job behavior, and approval UX are evidence-pending under `RGT-S007`.
+Both modes must use the same typed production tools and artifacts. Subscription availability, host limits, long-running job behavior, and approval UX are evidence-pending under `SPIKE-M001`.
 
 ## Provider Adapters
 
@@ -133,9 +133,10 @@ Evaluation uses versioned production fixtures, not subjective chat transcripts. 
 
 ## Evidence Required
 
-- `SPIKE-C001` and repository reviews for proven agent-production patterns.
+- `SPIKE-W001` for real workflow gates, user interventions, and value priorities.
+- `SPIKE-C001` and fixture-based repository reviews for proven agent-production patterns.
 - `SPIKE-A001` for the correct semantic control boundary.
-- `RGT-S007` for MCP host-operated behavior and subscription constraints.
+- `SPIKE-M001` for MCP host-operated behavior, embedded execution, and subscription constraints.
 - Full-production evaluations for context, retry, cost, and review effectiveness.
 
 Accepted model providers, agent frameworks, context limits, and orchestration libraries require separate decisions after evidence.

@@ -1,6 +1,6 @@
 # RigTale Production Pipeline
 
-**Status:** v1 draft; evidence-pending.
+**Status:** v1 draft.
 
 ## Purpose
 
@@ -43,7 +43,7 @@ The earliest required input is a creative prompt or brief. Script, lyrics, audio
 | Assembly and delivery | Shot masters and media | Final video, captions, QC and delivery manifest | delivery approval |
 | Archive | Approved delivery and all source locks | Restorable production archive | restore verification |
 
-Exact gate names and which gates can be automated remain subject to workflow research. Every bypass must be explicit, versioned, and visible downstream.
+`SPIKE-W001` validates exact gate names, mandatory versus optional handoffs, and which steps are practical to automate. Every bypass must be explicit, versioned, and visible downstream.
 
 ## Entry Modes
 
@@ -149,9 +149,11 @@ A production is deliverable only when:
 
 ## Evidence and Revision
 
-- Studio pipeline research validates stage boundaries, artifact handoffs, and gate practicality.
-- `SPIKE-A001` validates orchestration, compilation, correction, and full-duration behavior.
-- `SPIKE-R001` validates rendering, frame addressing, headless execution, and packaging.
+- `SPIKE-W001` validates stage boundaries, artifact handoffs, user value, and the manual comparison baseline.
+- `SPIKE-A002` validates asset ingestion, rig preparation, authoring effort, and publication.
+- `SPIKE-F001` defines quality, recovery, invalidation, and full-duration assertions.
+- `SPIKE-A001` validates provisional orchestration and compilation contracts without claiming rendered quality.
+- `SPIKE-R001` validates visible orchestration, rendering, frame addressing, recovery, headless execution, and packaging.
 - Quality and recovery fixtures establish measurable thresholds.
 
 Findings must update this document and linked requirements; a spike report alone is not considered integration of evidence.

@@ -2,7 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` or `superpowers:executing-plans` only after the Project Owner authorizes execution. This v1 plan is evidence-gated and must be revised after each accepted spike or architecture decision.
 
-**Status:** v1 draft; not authorized for implementation.
+**Status:** v1 draft.
+
+**Execution authorization:** Not authorized. Evidence work begins only after the documentation baseline is approved; implementation begins only after the relevant evidence and decision gates pass.
 
 **Goal:** Build a production-ready, local-first system that directs reusable 2D cutout rigs through structured agent-authored productions and deterministically delivers editable, publication-ready multi-character videos.
 
@@ -66,30 +68,32 @@ The names below define ownership boundaries, not selected languages or build too
 
 - approved charter;
 - draft product requirements, production contracts, production pipeline, agent system, system design, quality system, operations, and this plan;
-- research plan, candidate index, executable spike definitions, and canonical tracker; and
+- research plan, candidate index, bounded evidence specifications, and canonical tracker; and
 - traceable links from every material unknown to evidence work.
 
 **Exit gate:** Project Owner accepts the v1 set as a research baseline. Acceptance authorizes evidence collection, not product implementation.
 
-## Phase 1 — Competitive and Production Research
+## Phase 1 — Workflow, Business, and Competitive Screening
 
-**Tracker:** `RGT-S001`, followed by `RGT-S002`.
+**Tracker:** `RGT-S009` and `RGT-S001`.
 
 **Actions:**
 
-1. Verify canonical repositories, licenses, releases, and exact inspected commits.
-2. Review real small-studio artifact handoffs, approval gates, asset publication, shot work, review media, rendering, and recovery.
-3. Inspect relevant source for rig models, animation graphs, timelines, scene graphs, render boundaries, headless operation, tests, packaging, and agent workflows.
-4. Record adoptable patterns, visible weaknesses, maintenance burden, and claims requiring execution.
-5. Update the candidate landscape and create bounded repository-specific reviews.
+1. Conduct at least five problem interviews with target creators or small studios.
+2. Validate real artifact handoffs, approval gates, rework loops, asset publication, review, rendering, and recovery.
+3. Define the comparable manual cutout workflow and hands-on time-capture protocol before product evaluation.
+4. Verify canonical repositories, licenses, releases, and exact inspected commits.
+5. Perform read-only source screening for production models, rig systems, timelines, render boundaries, tests, packaging, and agent workflows.
+6. Route executable claims to later fixture-based reviews or technical spikes.
+7. Update workflow requirements, fixture priorities, candidate landscape, and bounded repository-review plans.
 
-**Tests of completion:** Every conclusion cites primary evidence and exact source revisions; shortlisted systems cover engines, skeletal runtimes, code-driven video, and agentic production; affected requirement IDs are listed.
+**Tests of completion:** Five qualifying interviews and a privacy-safe synthesis exist; workflow claims distinguish facts from hypotheses; the manual baseline protocol is approved; every competitive claim cites primary evidence and exact source revisions; no candidate code was executed during screening.
 
-**Exit gate:** Approved competitive report and prioritized executable candidates. No technology is selected solely by this phase.
+**Exit gate:** Workflow/business and competitive reports are approved. User-value evidence and the manual baseline exist before major technical selection. No technology is selected solely by this phase.
 
-## Phase 2 — Representative Fixture Definition
+## Phase 2 — Fixture, Repository Deep Reviews, and Asset Evidence
 
-**Tracker:** `RGT-S003`.
+**Tracker:** `RGT-S003`, followed by `RGT-S002` and `RGT-S010`.
 
 **Actions:**
 
@@ -98,44 +102,47 @@ The names below define ownership boundaries, not selected languages or build too
 3. Define the complete 150–210 second episode needed to expose repetition, continuity, cache, recovery, and performance behavior.
 4. Produce approved expected poses, contact frames, compositions, timing, delivery profiles, and quality assertions.
 5. Version all source assets, licenses, expected artifacts, and measurement procedures.
+6. Deep-review shortlisted repositories and execute code only through bounded fixture-based scopes.
+7. Compare layered-asset ingestion, source-of-truth, rig preparation, capability authoring, derived conversion, and immutable publication workflows.
+8. Measure preparation effort and failure behavior across biped, quadruped, vehicle, prop, and scene assets.
 
-**Tests of completion:** A candidate implementation can receive identical inputs and objective assertions; the fixture contains no protected imitation or unknown-license asset; short tests and the full production share the same contracts.
+**Tests of completion:** Candidate implementations receive identical inputs and objective assertions; the fixture contains no protected imitation or unknown-license asset; short tests and the full production share contracts; repository executions cite exact revisions; required asset archetypes complete a measured publish flow or have reproduced blockers.
 
-**Exit gate:** Project Owner approves the fixture and visual references before adapter experiments begin.
+**Exit gate:** The Project Owner approves the fixture, visual references, repository shortlist, and provisional asset-publication inputs before orchestration or renderer adapter experiments begin.
 
-## Phase 3 — Animation Orchestration Spike
+## Phase 3 — Orchestration Model Research
 
 **Tracker:** `RGT-S008`; specification: `SPIKE-A001`.
 
 **Actions:**
 
 1. Compare semantic compilation, direct typed timeline control, and engine-native graphs or scripts from primary evidence.
-2. Exercise at least two qualified implementations against the same rig, motion-layer, group-choreography, and interaction cases.
-3. Test capability rejection, conflict resolution, contact timing, source mapping, exact frame evaluation, corrections, and isolated recompilation.
-4. Extend the exercise to the full-duration production and measure visible and operational failures.
-5. Classify every hypothesized contract as demonstrated, rejected, deferred, or still evidence-pending.
+2. Express identical fixture semantics and invalid cases through competing provisional contracts.
+3. Compare capability rejection, conflict representation, source mapping, state-trace determinism, correction size, and invalidation behavior without claiming rendered quality.
+4. Identify backend assumptions and hand visible, performance, recovery, and packaging claims to Phase 4.
+5. Shortlist at least two orchestration/backend pairings for joint execution.
 
-**Tests of completion:** Commands, exact revisions, artifacts, screenshots or frames, measurements, and failures are reproducible; a short successful clip alone cannot pass the phase.
+**Tests of completion:** Exact sources, competing contract examples, invalid cases, deterministic state traces, and correction/invalidation evidence are reproducible; renderer-dependent claims remain explicitly unresolved.
 
-**Exit gate:** Accept, revise, or defer the orchestration model through a decision record. Update product requirements and contracts before proceeding.
+**Exit gate:** Provisional contract candidates and pairings are approved for executable comparison. No orchestration or renderer decision is accepted in this phase.
 
-## Phase 4 — Renderer and Preview Spikes
+## Phase 4 — Joint Production-Engine and Preview Spikes
 
 **Tracker:** `RGT-S004` and `RGT-S005`; renderer specification: `SPIKE-R001`.
 
 **Actions:**
 
-1. Implement the smallest isolated adapter required to render the approved fixture in each qualified backend.
-2. Compare visual quality, deterministic frame access, diagnostics, masks, deformation, camera, headless operation, packaging, and licensing.
+1. Implement the smallest isolated adapter required for every qualified orchestration/backend pairing.
+2. Compare visible orchestration, renderer quality, deterministic frame access, diagnostics, masks, deformation, interactions, camera, headless operation, packaging, and licensing.
 3. Render repeat attempts and isolated ranges on clean environments.
 4. Measure preview latency and final throughput, memory, storage, startup, and cache behavior.
 5. Compare preview and final timing, scene state, interaction, composition, and permitted raster differences.
 
 **Tests of completion:** Every candidate either produces complete artifacts with manifests or has a documented reproducible blocking failure; visual comparisons use approved references; measurements identify hardware and versions.
 
-**Exit gate:** `RGT-D001` records the primary renderer, optional adapter policy, integration language constraints, and rejected alternatives.
+**Exit gate:** `RGT-D001` records the accepted orchestration model, primary renderer, optional adapter policy, and rejected alternatives. `SPIKE-R002` then records parity evidence needed by the macOS integration decision.
 
-## Phase 5 — Platform and Agent Integration Spikes
+## Phase 5 — Platform Integration and Independent Agent-Host Evidence
 
 **Tracker:** `RGT-S006` and `RGT-S007`.
 
@@ -143,15 +150,17 @@ The names below define ownership boundaries, not selected languages or build too
 
 Compare supervised process, local service, and native library integration where relevant. Measure packaging, signing, startup, cancellation, crash isolation, progress transport, media preview, and upgrade impact.
 
-### MCP and provider execution
+### MCP and provider execution — non-blocking for core animation
 
 Validate host-operated MCP behavior, approval boundaries, long-running jobs, media references, subscription constraints, and resume behavior. Separately validate embedded execution requirements and provider credential handling.
 
-**Exit gate:** Decision records select the local process boundary, application transport, MCP surface, and embedded-provider strategy. Update security and operations requirements.
+**Core exit gate:** `RGT-D010` selects the local process, application transport, and preview integration boundaries required by Phases 6–10.
+
+**Independent agent-host gate:** `RGT-D011` selects the MCP surface and embedded-provider strategy before the MCP and embedded portions of Phase 11. Failure or delay of `SPIKE-M001` does not block contracts, assets, animation compilation, rendering, CLI, or the local macOS studio.
 
 ## Phase 6 — Architecture Consolidation
 
-**Tracker:** `RGT-D009` and the accepted decisions.
+**Tracker:** `RGT-D009`, `RGT-D001`, `RGT-D010`, and `RGT-D012`. `RGT-D011` is required only for its Phase 11 scope.
 
 **Actions:**
 
@@ -278,11 +287,12 @@ Validate host-operated MCP behavior, approval boundaries, long-running jobs, med
 
 **Actions:**
 
-1. Document the equivalent manual cutout workflow using the same published assets.
-2. Complete at least five problem interviews and two hands-on evaluations with target creators or small studios.
-3. Measure hands-on layout and animation time, correction effort, failure recovery, learning cost, and visible quality.
-4. Resolve blocking findings and add regression fixtures for every product defect.
-5. Re-run clean installation, full production, second production, archive restore, and isolated rerender qualification.
+1. Instantiate the manual comparison protocol approved in Phase 1 with the exact published assets and reference-production brief.
+2. Complete at least two hands-on evaluations with target creators or small studios using the manual protocol approved in Phase 1.
+3. Conduct focused follow-up interviews only where evaluation exposes new workflow uncertainty.
+4. Measure hands-on layout and animation time, correction effort, failure recovery, learning cost, and visible quality.
+5. Resolve blocking findings and add regression fixtures for every product defect.
+6. Re-run clean installation, full production, second production, archive restore, and isolated rerender qualification.
 
 **Exit gate:** Charter success and go/no-go criteria pass with recorded evidence. Failure triggers product-scope reconsideration rather than metric redefinition.
 

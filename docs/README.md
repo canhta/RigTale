@@ -4,25 +4,25 @@ This map defines the minimum non-overlapping documentation set required before r
 
 ## Document Lifecycle
 
-`planned` -> `draft` -> `evidence-pending` -> `validated`
+`planned` -> `v1 draft` -> `validated`
 
-- `draft` means the document is coherent enough to expose assumptions and dependencies.
-- `evidence-pending` means its material unknowns are linked to queued research or spikes.
-- `validated` means relevant evidence has been incorporated and any accepted choices are recorded in decision records.
+- `v1 draft` means the document is coherent enough to expose assumptions, dependencies, and evidence gaps before research begins.
+- `validated` means the relevant research and spike evidence has been incorporated and accepted choices are recorded in decision records.
+- `charter-backed`, `hypothesis`, and `decision-pending` classify individual requirements inside a document; they are not document lifecycle states.
 
 ## Documentation Order
 
 | Order | Document | Owns | State |
 |---:|---|---|---|
 | 1 | `requirements/charter.md` | Business justification, vision, scope, constraints, and go/no-go criteria | approved |
-| 2 | `requirements/product-requirements.md` | User workflows, product capabilities, non-functional requirements, and acceptance criteria | draft |
-| 3 | `architecture/production-contracts.md` | Canonical production objects, schemas, lifecycle, versioning, and compatibility | draft |
-| 4 | `architecture/production-pipeline.md` | Asset ingestion, rig preparation, scripting, animation, audio, preview, and final rendering | draft |
-| 5 | `architecture/agent-system.md` | Development, Studio, and Red-Team agent responsibilities, tools, MCP, context, and failure boundaries | draft |
-| 6 | `architecture/system-design.md` | Component topology, execution modes, integration seams, storage, jobs, and deferred technical decisions | draft |
-| 7 | `quality/quality-system.md` | Automated validation, red-team review, visual and temporal quality, and production gates | draft |
-| 8 | `operations/deployment-and-operations.md` | macOS operation, CLI, future cloud service, security, observability, recovery, and upgrades | draft |
-| 9 | `plans/implementation-plan.md` | Build order, test strategy, dependencies, research gates, and production-readiness milestones | draft |
+| 2 | `requirements/product-requirements.md` | User workflows, product capabilities, non-functional requirements, and acceptance criteria | v1 draft |
+| 3 | `architecture/production-contracts.md` | Canonical production objects, schemas, lifecycle, versioning, and compatibility | v1 draft |
+| 4 | `architecture/production-pipeline.md` | Asset ingestion, rig preparation, scripting, animation, audio, preview, and final rendering | v1 draft |
+| 5 | `architecture/agent-system.md` | Development, Studio, and Red-Team agent responsibilities, tools, MCP, context, and failure boundaries | v1 draft |
+| 6 | `architecture/system-design.md` | Component topology, execution modes, integration seams, storage, jobs, and deferred technical decisions | v1 draft |
+| 7 | `quality/quality-system.md` | Automated validation, red-team review, visual and temporal quality, and production gates | v1 draft |
+| 8 | `operations/deployment-and-operations.md` | macOS operation, CLI, future cloud service, security, observability, recovery, and upgrades | v1 draft |
+| 9 | `plans/implementation-plan.md` | Build order, test strategy, dependencies, research gates, and production-readiness milestones | v1 draft |
 
 ## Supporting Records
 

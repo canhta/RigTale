@@ -1,6 +1,6 @@
 # RigTale Quality System
 
-**Status:** v1 draft; evidence-pending.
+**Status:** v1 draft.
 
 ## Purpose
 
@@ -96,7 +96,7 @@ The test corpus must include:
 - approved golden frames or short sequences for visual comparison; and
 - the complete 150–210 second reference production for repetition, continuity, performance, and recovery.
 
-Golden media is versioned with the engine, renderer profile, platform tolerance, and approval record. Pixel identity may be inappropriate across different raster backends; the accepted comparison model is decision-pending.
+Golden media is versioned with the engine, renderer profile, platform tolerance, and approval record. Pixel identity may be inappropriate across different raster backends; `SPIKE-R002` owns evidence for the accepted structural and visual comparison model.
 
 ## Release Qualification
 
@@ -122,7 +122,9 @@ A candidate build qualifies only when:
 - hands-on production and revision time versus the manual baseline; and
 - Red-Team finding escape rate into human review.
 
-Numerical thresholds must come from `SPIKE-A001`, `SPIKE-R001`, platform spikes, and full-production evaluation. This draft must not invent them.
+Numerical thresholds must come from `SPIKE-W001`, `SPIKE-F001`, `SPIKE-A002`, `SPIKE-R001`, `SPIKE-R002`, `SPIKE-I001`, and full-production evaluation. This draft must not invent them.
+
+`SPIKE-W001` owns early human-workflow and manual-baseline evidence. `SPIKE-F001` owns the fixture assertions and calibration plan. `SPIKE-A002`, `SPIKE-R001`, `SPIKE-R002`, and `SPIKE-I001` provide the asset, visible-quality, parity, performance, and recovery measurements from which thresholds may be proposed.
 
 ## Regression Policy
 

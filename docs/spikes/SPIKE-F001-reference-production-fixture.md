@@ -16,6 +16,7 @@ A convenient demo scene can make weak architectures look successful. The test fi
 
 - The v1 charter and documentation baseline are approved for evidence work.
 - `SPIKE-C001` has identified relevant production patterns and common failure modes.
+- `SPIKE-W001` has established target-user workflow, gate, and value evidence.
 - Reference assets may be created, commissioned, or adapted only from sources with compatible, documented licenses.
 
 ## Fixture Structure
@@ -101,6 +102,7 @@ Thresholds that cannot be justified before execution remain explicitly evidence-
 - Versioned complete-production brief, source assets, timeline, and acceptance rubric.
 - Asset provenance, license, attribution, and redistribution report.
 - Fixture authoring and execution instructions.
+- Quality, recovery, cache-invalidation, and human-rubric calibration plan.
 - A decision record approving the fixture version used for comparative spikes.
 - Updates to product requirements, quality rules, and downstream spike preconditions.
 

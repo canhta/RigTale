@@ -68,7 +68,7 @@ A small studio or creator will adopt RigTale if it can produce an approximately 
 
 ## Vision
 
-RigTale enables small creative teams to turn locked audio and a reusable cast into editable, publication-ready animated videos by directing structured assets with AI instead of generating pixels.
+RigTale enables small creative teams to turn creative intent and a reusable cast into editable, publication-ready animated videos by directing structured assets with AI instead of generating pixels. A production may begin from a prompt, brief, script, lyrics, locked audio, or an existing structured project; synchronized media becomes an authoritative timing input only when the content requires it.
 
 RigTale should operate like an agent-controlled animation studio: artists retain authority over character design, rigs, visual style, and reusable motion assets, while the system automates production planning, shot construction, choreography, timing, compositing, validation, and rendering.
 

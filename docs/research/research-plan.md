@@ -13,15 +13,15 @@ RigTale will choose its production architecture from reproducible evidence rathe
 
 Search results, marketing pages, and generated summaries may identify candidates but are not sufficient evidence for a technical decision.
 
-## Competitive Spike Workflow
+## Competitive Evidence Workflow
 
 1. Discover candidates through official sites, GitHub, Product Hunt, papers, and targeted web search.
 2. Verify the canonical repository, license, release history, recent activity, and documentation.
 3. Screen candidates against RigTale's actual production model before spending time on a deep review.
-4. Create a dedicated spike result for every shortlisted repository.
+4. Create a dedicated review record for every shortlisted repository.
 5. Clone the exact revision into `.research/clones/<repository>` and record its commit SHA. The ignored research workspace is local-only and external clones are never committed into RigTale.
 6. Inspect source layout, contracts, renderer boundaries, asset model, agent instructions, tests, examples, packaging, and failure handling.
-7. Run code only when static inspection cannot answer a material question. Treat third-party setup scripts as untrusted and run them without project secrets.
+7. Keep `SPIKE-C001` read-only. Execute candidate code only in a later fixture-based repository review or technical spike after its preconditions are approved. Treat third-party setup scripts as untrusted and run them without project secrets.
 8. Record strengths, weaknesses, reusable patterns, rejected patterns, and unresolved questions with file-level evidence.
 
 ## Production-Backend Spike Workflow
