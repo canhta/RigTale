@@ -34,6 +34,10 @@ After the required assets, rigs, and reusable motions are published, the referen
 
 The production must retain versioned creative inputs, assets, capabilities, shots, actions, timing, dependencies, validation, and review state. A user must be able to modify and rerender one shot without regenerating unaffected shots.
 
+**Evidence raises this requirement's priority.** `RGT-S009` documented that the dominant cutout tool's library templates are copies rather than links — "Dragging a template into your scene copies the content in your Timeline and does not link it to the original" — so fixing a rig in the library does not propagate to shots already built, and reusable action templates break when layer order or connections change. `RGT-S001` found the same limitation independently in two open-source systems: OpenToonz embeds the skeleton in the scene with copy-import as the only reuse path, and Synfig's bone identifiers are XORed with the runtime root-canvas identifier so they cannot resolve across files at all.
+
+**Automating shot production amplifies this failure mode**, because it increases the number of shots a later rig change invalidates. Version pinning per shot and a dependency graph that identifies exactly what a rig change invalidates are therefore not optional conveniences; they are the requirement that prevents RigTale from making a documented industry problem worse. See `docs/research/small-studio-workflow.md` section 5.
+
 ### PR-O04 — Deliver publication-ready output (`charter-backed`)
 
 The complete workflow must produce reviewable animatics and shot previews plus final video, audio, captions, manifests, and quality reports. Delivery must pass deterministic validation, independent Red-Team review, and the approved human quality rubric.
@@ -47,6 +51,10 @@ The system must accept a creative prompt or brief as the earliest input. A user 
 ### PR-F002 — Structured artifact progression (`hypothesis`)
 
 The product should preserve explicit artifacts and approval gates for creative intent, script or lyrics, audio when applicable, scene plan, storyboard or animatic, published assets, compiled shots, review output, and delivery output. `SPIKE-W001` determines which gates are mandatory, optional, or impractical in real small-studio work.
+
+**Evidence status after `RGT-S009` Part A: unchanged, and the gap is now measured.** Desk research found two gates documented in published cutout workflow material — storyboard locked before animatic, and animation approved before compositing — plus formal approval models in three production-tracking tools. **But every one of those sources describes a supervisor role distinct from the artist, and no primary source or first-hand account was found documenting the gate model of a two-to-five-person team.** The best-documented published pipeline states it targets ten to twenty people.
+
+This requirement therefore stays `hypothesis` and cannot be promoted by desk research. It is the largest single evidence gap in the spike and it sits directly on a core design decision: where the human approves. See `docs/research/small-studio-workflow.md` section 4. Resolution requires `RGT-S009B`.
 
 ### PR-F003 — Audio is conditional production data (`charter-backed`)
 
@@ -65,6 +73,10 @@ Each published character or asset must declare the actions, expressions, attachm
 ### PR-A003 — Layered artwork ingestion (`charter-backed`)
 
 The system must import at least one documented layered-artwork format and preserve the structure required for rigging, masks, draw order, deformation, expression changes, and animation. The source format, authoring workflow, preparation effort, and rig-publication model are `decision-pending` under `SPIKE-A002`; orchestration and backend compatibility follow under `SPIKE-A001` and `SPIKE-R001`.
+
+**New constraint from `RGT-S001`, added to the decision inputs.** Screening established that **a permissively licensed runtime does not imply an open authoring path**, and that the second property is what determines fit. Rive has no file writer anywhere in its repository and its editor is a paid service; Spine requires every downstream user to hold a paid editor licence; Live2D's core is a closed binary absent from its repository; Lottie's default authoring path is a proprietary host application.
+
+Any format selected under `SPIKE-A002` must satisfy: **a program can produce valid content without a graphical interface and without a proprietary tool.** This is now an explicit screening criterion, not an assumption. See `docs/research/landscape.md`.
 
 ### PR-A004 — Archetype support (`charter-backed`)
 
@@ -113,6 +125,10 @@ The engine must render deterministic frames or time ranges, resume interrupted w
 ### PR-R005 — Backend independence (`hypothesis`)
 
 The core production contracts should not expose episode-specific renderer code. The viable adapter boundary and whether one runtime can serve preview and final output must be established through `SPIKE-A001` and `SPIKE-R001`.
+
+**Evidence strengthens the case for this hypothesis rather than weakening it.** `RGT-S001` found **no candidate that supplies both a reusable character rig system and a deterministic frame-addressable renderer.** The systems with the strongest rig models — OpenToonz, Blender Grease Pencil, DragonBones — differ from the systems with the strongest determinism evidence — resvg and tiny-skia, rlottie, MLT. The one format with a published machine validator, Lottie, **cannot express a bone hierarchy at all**: no bone, joint, skin, weight, inverse-kinematics, or deformer concept exists in its schema.
+
+**Working hypothesis, not a decision:** RigTale should expect to own its rig representation and compile it down to whatever renderer is selected, rather than obtaining a rig by choosing a renderer. This must be tested by `SPIKE-A001` and `SPIKE-R001` and settled by `RGT-D010`, not here.
 
 ### PR-R006 — Production workload (`decision-pending`)
 

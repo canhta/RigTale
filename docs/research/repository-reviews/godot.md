@@ -56,8 +56,29 @@ These are architectural, not configuration issues.
 3. **No time-range or start-frame rendering.** Output is a zero-indexed sequence from process start plus one monolithic WAV (`servers/movie_writer/movie_writer_pngwav.cpp:66-86`); no range argument exists in `main/main.cpp`. Isolated shot rerendering — a charter requirement — must be built outside the engine.
 4. **No pixel-level regression testing.** The 234-file suite under `tests/` runs against the dummy rasterizer (`tests/display_server_mock.cpp:37-39`). There are no golden-image tests. `tests/data/images/*` are decoder fixtures.
 5. **Zero 2D-skeletal test coverage.** No `test_skeleton_2d.cpp` and no `test_polygon_2d.cpp` exist, though `test_skeleton_3d.cpp` does. The subsystem RigTale would depend on most is the one with no upstream tests.
-6. **Weight painting is editor-only** (`editor/scene/2d/polygon_2d_editor_plugin.h:62-171`). Agent-driven weight authoring would write the `bones` array directly with no upstream validator.
+6. ~~**Weight painting is editor-only.**~~ **Corrected — this claim was wrong.** See the correction below.
 7. Audio/video sync is best-effort and warns when `mix_rate % fps != 0` (`servers/movie_writer/movie_writer.cpp:128-130`).
+
+## Correction: Rig Authoring Is Fully Scriptable
+
+An earlier draft of this review recorded weight painting as editor-only, on the basis that a weight-painting mode exists in `editor/scene/2d/polygon_2d_editor_plugin.h:62-171`. **That inference was wrong, and the disposition below is revised because of it.**
+
+Verified directly at the pinned commit, `doc/classes/Polygon2D.xml` exposes to script:
+
+| Method | Signature |
+|---|---|
+| `add_bone` | `(path: NodePath, weights: PackedFloat32Array)` — "Adds a bone with the specified path and weights" (`:12-17`) |
+| `set_bone_weights` | `(index, weights: PackedFloat32Array)` (`:61-64`) |
+| `set_bone_path` | (`:53`) |
+| `get_bone_weights`, `get_bone_count`, `clear_bones` | (`:46`, `:33`, `:20`) |
+
+`doc/classes/Bone2D.xml:10` confirms the intent explicitly: "If in the editor, you can set the rest pose of an entire skeleton using a menu option, **from the code, you need to iterate over the bones to set their individual rest poses**." The documentation treats code-driven rig construction as a supported path, with the editor menu as the convenience.
+
+Combined with `PackedScene.pack(node)` and saving, a rig — bone hierarchy, rest poses, per-vertex weights, and the containing scene — is **constructible and serialisable entirely from code**.
+
+**Consequence.** Godot is a fully programmatic 2D cutout rig path: scriptable bone creation, scriptable per-vertex weights, scriptable scene serialisation, and a diffable text scene format. That is a rare combination and it materially strengthens the case for the embedding path below.
+
+**The remaining gap is different from what this review first recorded.** It is not authoring; it is portability. **The rig is a Godot scene, not a portable format.** RigTale would be committing its rig representation to one engine's scene graph unless it keeps its own canonical rig data and generates scenes as build artifacts — the same shape recommended for Blender.
 
 ## The Finding That Could Change the Disposition
 
@@ -82,7 +103,6 @@ There is also a stable C ABI for GDExtension (`core/extension/gdextension_interf
 - Coupling frame capture to a display window.
 - Recording as a side effect of a game loop rather than a render job over an explicit frame interval. This is the structural reason Godot has no isolated shot rerender.
 - Sequence output keyed to process-start index instead of absolute timeline frame numbers.
-- Shipping authoring capability only inside a GUI editor with no headless equivalent or validator.
 - Testing an animation and rendering system entirely through a null rasterizer.
 
 ## Questions Requiring Executable Evidence
@@ -95,12 +115,16 @@ There is also a stable C ABI for GDExtension (`core/extension/gdextension_interf
 | Is `ResourceFormatSaverText` round-trip byte-stable (load then save an unmodified `.tscn` and diff)? | `SPIKE-CS001` |
 | Clean-build wall time and disk footprint on Apple silicon for `library_type=shared_library`; are MoltenVK/ANGLE SDKs required for a 2D-only build? | `SPIKE-I001` |
 | Does `CanvasGroup` plus `clip_children` composite correctly through an offscreen `SubViewport` chain at 1080p with 6–10 character layers, and at what per-frame cost? | `SPIKE-R001` |
-| Can `Polygon2D.bones` and `Skeleton2D` rigs be constructed and validated entirely from generated `.tscn` text with no editor session? | `SPIKE-A002` |
+| Does a rig built entirely through `add_bone` and `PackedScene.pack` round-trip and render identically to an editor-authored equivalent? | `SPIKE-A002` |
 
 ## Conclusion
 
-`reference`, with `adapt` open for the embedding path.
+**`adapt`**, revised upward from `reference` after the authoring correction above.
 
-Godot is source-verified strong on the authoring half of RigTale's problem — the 2D cutout rig data model, layered compositing, camera and parallax, and a diffable text IR with a real parser — under MIT with a copyleft-free dependency graph and first-class macOS support. It is source-verified weak on the rendering-as-a-job half: headless builds have no rasterizer, the movie writer captures the main OS window, output has no time-range control, and there is no pixel-level regression test anywhere in a suite that itself runs against a dummy renderer.
+Godot is the **only candidate where every link in the authoring chain is verified from primary source**: scriptable bone creation, scriptable per-vertex bone weights, scriptable scene serialisation, a diffable text intermediate representation with a real parser, an explicit deterministic-blending flag, and a single-step embedding API — all under MIT with a copyleft-free dependency graph and first-class macOS support.
 
-No claim in this review rests on a demo or a feature list. The disposition is provisional until the `libgodot` windowless-capture and bit-reproducibility questions are answered by execution under `SPIKE-R001`.
+It remains source-verified weak on the rendering-as-a-job half: headless builds have no rasteriser, the movie writer captures the main OS window, output has no time-range control, and there is no pixel-level regression test anywhere in a suite that itself runs against a dummy renderer. Its 2D-skeletal subsystem has **no upstream tests at all**.
+
+Two gaps define the remaining risk, and they are different from what this review first recorded. **Portability**: the rig is a Godot scene, not a portable format, so RigTale must keep canonical rig data of its own and generate scenes as build artifacts. **Rendering**: the `libgodot` windowless-capture question is unanswered and is the gate.
+
+No claim here rests on a demo or a feature list, and the one claim that rested on an inference rather than a citation has been corrected against source.

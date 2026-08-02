@@ -71,6 +71,7 @@ An item may be marked `completed` only when its linked exit criteria are satisfi
 | MLT Framework | Only verified timeline-scope frame-exact range render; LGPL-2.1-only build retains 2D compositing | Does a GPL-free build work on Apple Silicon? |
 | resvg + tiny-skia | Only candidate with CI-enforced zero-pixel-difference golden tests; CPU-only | `RGT-S013` — does determinism hold with unpinned fonts? |
 | DragonBones | Only MIT skeletal format recoverable from source; skin overlay matches the fixed-cast premise | Does multi-skin work? No shipped sample exercises it. |
+| Godot 2D skeleton stack | Only candidate with every authoring link verified: scriptable bones, scriptable per-vertex weights, scriptable scene serialisation, diffable text IR | Does `libgodot` capture windowless on macOS? Rig is a scene, not a portable format. |
 | Blender Grease Pencil | Only purpose-built 2D cutout layer model with per-layer render-target routing | Does it render headless on macOS given the unconditional GPU dependency? |
 | Lottie specification | Only animation format with a published machine validator | Can a strict RigTale profile close the permissive unknown-type holes? |
 | OpenTimelineIO | Most mature open per-type schema versioning and migration implementation | Design reference only; no gating question |

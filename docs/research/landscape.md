@@ -28,7 +28,7 @@ Each has a review record under `docs/research/repository-reviews/`.
 | OpenToonz | `5f6beab3` | BSD-3-Clause core | `reference`, trending `adapt` |
 | MLT Framework | `8c092fd1` | LGPL-2.1 core, GPL modules optional | `adapt`, leaning `adopt` for compositing |
 | Blender | `a3afe632` | GPL, no linking exception | `defer` |
-| Godot | `eda2a482` | MIT | `reference`, `adapt` open for embedding |
+| Godot | `eda2a482` | MIT | `adapt` — revised up after a self-correction on scriptable rig authoring |
 | DragonBones | `64b6c69a` | MIT | `adapt`, with a decision gate |
 | OpenTimelineIO | `0eebd211` | Apache-2.0 | `reference` (strong), `adapt` for versioning |
 | Inochi2D runtime | `ec702261` | BSD-2-Clause | `reference`, leaning `adapt` |
