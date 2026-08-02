@@ -218,3 +218,15 @@ RigTale is successful when:
 - Final output passes deterministic validation, Red-Team review, and the defined human quality threshold.
 - The workflow reduces hands-on layout and animation time by at least 50% against the documented manual baseline.
 - Every distributed or imported asset has traceable provenance and license metadata.
+
+## Key Risks
+
+| Risk | Response |
+|---|---|
+| Structured animation cannot reach the required visual quality | Evaluate complete rendered shots early and expand reusable rigs, motions, expressions, and compositions based on visible gaps. |
+| The product becomes too broad for solo development | Keep 2D cutout as the primary renderer and build complete vertical workflows before adding alternative renderers or advanced authoring. |
+| Agents produce invalid or visually weak instructions | Restrict agents to typed contracts, declared asset capabilities, deterministic validators, and independent Red-Team review. |
+| Asset preparation becomes the main production bottleneck | Define a strict import and rigging workflow, provide reusable reference packs, and automate only the repeated steps proven expensive. |
+| Assets introduce copyright or redistribution problems | Require provenance and license metadata, audit bundled assets, and reject unknown or incompatible licenses. |
+| The system depends too heavily on one AI provider | Keep provider adapters replaceable and ensure approved productions can be edited and rendered without an AI connection. |
+| Technical success does not create sufficient user value | Validate the workflow with independent creators and compare hands-on production time against a documented manual baseline. |
