@@ -8,6 +8,7 @@ Which existing engine, DCC backend, runtime, or custom library can compile RigTa
 
 - `SPIKE-C001` has screened the candidate landscape.
 - The representative animation fixture is versioned and approved.
+- `SPIKE-A001` has defined and exercised the renderer-independent orchestration and frame-compilation requirements.
 - Required visual features and expected frames are defined before adapter work begins.
 
 ## Initial Candidate Families
@@ -53,4 +54,3 @@ The fixture must contain a ten-second 1920x1080 shot at 30 frames per second wit
 - Unsupported requirements are explicit and reproducible.
 - The recommendation identifies a primary backend, optional adapters, and rejected alternatives, or records that more evidence is required.
 - No renderer decision is accepted until an architecture decision record is approved.
-

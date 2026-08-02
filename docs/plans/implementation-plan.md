@@ -1,0 +1,310 @@
+# RigTale Production System Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` or `superpowers:executing-plans` only after the Project Owner authorizes execution. This v1 plan is evidence-gated and must be revised after each accepted spike or architecture decision.
+
+**Status:** v1 draft; not authorized for implementation.
+
+**Goal:** Build a production-ready, local-first system that directs reusable 2D cutout rigs through structured agent-authored productions and deterministically delivers editable, publication-ready multi-character videos.
+
+**Architecture:** Product surfaces call use-case APIs over versioned production contracts. The Studio and Red-Team agents use typed tools, while deterministic services validate assets and plans, compile semantic direction into animation state, render through an adapter, and preserve manifests and review evidence. Local macOS operation is primary; CLI, MCP, future web, cloud, and renderer alternatives reuse the same contracts.
+
+**Technology baseline:** Swift and SwiftUI/AppKit for the macOS product surface; TypeScript and Vite for the future web surface; Vitest for applicable TypeScript tests. Renderer, server/core languages, schema tooling, IPC, storage, queue, media stack, and agent framework remain blocked on evidence and decision records.
+
+## Global Constraints
+
+- Do not implement a renderer, server, or rig model before its required evidence and decision gate passes.
+- Do not use black-box text-to-video as the core rendering path.
+- Keep agent output structured, capability-aware, bounded, and independently reviewable.
+- Keep predictable validation, compilation, rendering, caching, and media work deterministic.
+- Preserve asset identity, provenance, licensing, production editability, and isolated shot rerendering.
+- Existing approved productions must render without an AI provider.
+- Every change must include focused automated tests, fixture evidence, documentation updates, and a reviewable commit.
+- Build complete vertical behavior against the reference production before adding optional platforms or generalized features.
+
+## Plan Lifecycle
+
+This document owns build order and evidence gates. It does not duplicate detailed spike methods or accepted architecture decisions.
+
+After each spike or decision:
+
+1. update affected requirement classifications and thresholds;
+2. update contracts, system design, quality rules, and operational constraints;
+3. replace the affected phase below with an executable subsystem plan containing exact files, interfaces, tests, commands, and commits;
+4. review contradictions and dependency order; and
+5. obtain approval before implementation begins.
+
+## Proposed Repository Responsibility Map
+
+The names below define ownership boundaries, not selected languages or build tools. An accepted monorepo decision may refine them without merging responsibilities.
+
+| Path | Responsibility |
+|---|---|
+| `apps/macos/` | Native local studio UI and macOS integration. |
+| `apps/web/` | Future browser studio using remote application APIs. |
+| `apps/cli/` | Automation and operator commands. |
+| `adapters/mcp/` | MCP exposure of scoped application tools. |
+| `contracts/` | Versioned schemas, examples, compatibility, and migrations. |
+| `core/artifacts/` | Artifact repository, dependency graph, publication, and provenance. |
+| `core/assets/` | Asset pack inspection, registry, capability, compatibility, and publication. |
+| `core/production/` | Pipeline gates, application use cases, and orchestration. |
+| `core/animation/` | Renderer-neutral validation and animation compilation. |
+| `core/quality/` | Deterministic validators, findings, rubrics, and quality reports. |
+| `adapters/renderers/` | One isolated adapter per renderer backend. |
+| `adapters/providers/` | Language, speech, music, alignment, and future provider integrations. |
+| `workers/` | Resumable compile, render, media, validation, and migration job execution. |
+| `fixtures/` | Contract, asset, animation, failure, migration, and production fixtures. |
+| `reference-assets/` | Redistributable, provenance-audited example packs. |
+| `docs/decisions/` | Evidence-backed accepted technical choices. |
+| `docs/research/` | Primary evidence and repository reviews. |
+| `docs/spikes/` | Reproducible experiment definitions and results. |
+
+## Phase 0 — Documentation Baseline
+
+**Purpose:** Establish coherent v1 drafts without treating hypotheses as facts.
+
+**Required outputs:**
+
+- approved charter;
+- draft product requirements, production contracts, production pipeline, agent system, system design, quality system, operations, and this plan;
+- research plan, candidate index, executable spike definitions, and canonical tracker; and
+- traceable links from every material unknown to evidence work.
+
+**Exit gate:** Project Owner accepts the v1 set as a research baseline. Acceptance authorizes evidence collection, not product implementation.
+
+## Phase 1 — Competitive and Production Research
+
+**Tracker:** `RGT-S001`, followed by `RGT-S002`.
+
+**Actions:**
+
+1. Verify canonical repositories, licenses, releases, and exact inspected commits.
+2. Review real small-studio artifact handoffs, approval gates, asset publication, shot work, review media, rendering, and recovery.
+3. Inspect relevant source for rig models, animation graphs, timelines, scene graphs, render boundaries, headless operation, tests, packaging, and agent workflows.
+4. Record adoptable patterns, visible weaknesses, maintenance burden, and claims requiring execution.
+5. Update the candidate landscape and create bounded repository-specific reviews.
+
+**Tests of completion:** Every conclusion cites primary evidence and exact source revisions; shortlisted systems cover engines, skeletal runtimes, code-driven video, and agentic production; affected requirement IDs are listed.
+
+**Exit gate:** Approved competitive report and prioritized executable candidates. No technology is selected solely by this phase.
+
+## Phase 2 — Representative Fixture Definition
+
+**Tracker:** `RGT-S003`.
+
+**Actions:**
+
+1. Specify a legal, redistributable reference cast with biped, quadruped, vehicle, props, and layered scenes.
+2. Define short diagnostic shots for motion composition, interaction, masks, draw order, camera, parallax, and failure handling.
+3. Define the complete 150–210 second episode needed to expose repetition, continuity, cache, recovery, and performance behavior.
+4. Produce approved expected poses, contact frames, compositions, timing, delivery profiles, and quality assertions.
+5. Version all source assets, licenses, expected artifacts, and measurement procedures.
+
+**Tests of completion:** A candidate implementation can receive identical inputs and objective assertions; the fixture contains no protected imitation or unknown-license asset; short tests and the full production share the same contracts.
+
+**Exit gate:** Project Owner approves the fixture and visual references before adapter experiments begin.
+
+## Phase 3 — Animation Orchestration Spike
+
+**Tracker:** `RGT-S008`; specification: `SPIKE-A001`.
+
+**Actions:**
+
+1. Compare semantic compilation, direct typed timeline control, and engine-native graphs or scripts from primary evidence.
+2. Exercise at least two qualified implementations against the same rig, motion-layer, group-choreography, and interaction cases.
+3. Test capability rejection, conflict resolution, contact timing, source mapping, exact frame evaluation, corrections, and isolated recompilation.
+4. Extend the exercise to the full-duration production and measure visible and operational failures.
+5. Classify every hypothesized contract as demonstrated, rejected, deferred, or still evidence-pending.
+
+**Tests of completion:** Commands, exact revisions, artifacts, screenshots or frames, measurements, and failures are reproducible; a short successful clip alone cannot pass the phase.
+
+**Exit gate:** Accept, revise, or defer the orchestration model through a decision record. Update product requirements and contracts before proceeding.
+
+## Phase 4 — Renderer and Preview Spikes
+
+**Tracker:** `RGT-S004` and `RGT-S005`; renderer specification: `SPIKE-R001`.
+
+**Actions:**
+
+1. Implement the smallest isolated adapter required to render the approved fixture in each qualified backend.
+2. Compare visual quality, deterministic frame access, diagnostics, masks, deformation, camera, headless operation, packaging, and licensing.
+3. Render repeat attempts and isolated ranges on clean environments.
+4. Measure preview latency and final throughput, memory, storage, startup, and cache behavior.
+5. Compare preview and final timing, scene state, interaction, composition, and permitted raster differences.
+
+**Tests of completion:** Every candidate either produces complete artifacts with manifests or has a documented reproducible blocking failure; visual comparisons use approved references; measurements identify hardware and versions.
+
+**Exit gate:** `RGT-D001` records the primary renderer, optional adapter policy, integration language constraints, and rejected alternatives.
+
+## Phase 5 — Platform and Agent Integration Spikes
+
+**Tracker:** `RGT-S006` and `RGT-S007`.
+
+### macOS integration
+
+Compare supervised process, local service, and native library integration where relevant. Measure packaging, signing, startup, cancellation, crash isolation, progress transport, media preview, and upgrade impact.
+
+### MCP and provider execution
+
+Validate host-operated MCP behavior, approval boundaries, long-running jobs, media references, subscription constraints, and resume behavior. Separately validate embedded execution requirements and provider credential handling.
+
+**Exit gate:** Decision records select the local process boundary, application transport, MCP surface, and embedded-provider strategy. Update security and operations requirements.
+
+## Phase 6 — Architecture Consolidation
+
+**Tracker:** `RGT-D009` and the accepted decisions.
+
+**Actions:**
+
+1. Replace all demonstrated hypotheses in product requirements with measurable requirements.
+2. Finalize contract schemas, time representation, compatibility, migrations, error codes, job states, and adapter capability negotiation.
+3. Select the monorepo layout, implementation languages, build orchestration, schema tooling, local metadata strategy, media dependencies, and test runners.
+4. Update system topology, security boundaries, deployment profiles, and resource floors.
+5. Split Phases 7–13 into executable subsystem plans with exact files, APIs, tests, commands, and commit checkpoints.
+
+**Exit gate:** No build task depends on an unrecorded material choice. Contract fixtures and decision records are approved.
+
+## Phase 7 — Contract and Artifact Foundation
+
+**Deliverable:** A versioned contract package and local artifact repository that can create, validate, publish, migrate, export, restore, and trace a production without any renderer or AI dependency.
+
+**Required behavior:**
+
+- common envelope and canonical production objects;
+- schema validation and structured errors;
+- immutable publication and dependency locks;
+- content digests and stale-artifact explanation;
+- provenance and license metadata;
+- compatible-read and migration fixtures;
+- atomic storage, export, restore, and audit events; and
+- CLI inspection for every canonical artifact.
+
+**Test gate:** Valid, invalid, migration, corruption, atomicity, and archive round-trip fixtures pass on a clean machine.
+
+## Phase 8 — Asset Publication Vertical
+
+**Deliverable:** Import and publish the reference asset library through the same documented workflow intended for user assets.
+
+**Required behavior:**
+
+- one supported layered-artwork importer;
+- source provenance and license capture;
+- layer mapping, pivots, drawable and rig bindings;
+- expression, mouth shape, attachment, interaction, and capability metadata;
+- motion compatibility and deformation tests;
+- immutable pack publication and version update flow; and
+- asset inspection through CLI and macOS UI.
+
+**Test gate:** Biped, quadruped, vehicle, prop, and scene packs validate, preview, version, migrate, and reject incompatible usage deterministically.
+
+## Phase 9 — Animation Compilation Vertical
+
+**Deliverable:** Compile semantic shots into the accepted renderer-neutral or adapter-bound compiled contract selected by evidence.
+
+**Required behavior:**
+
+- multi-instance placement and roles;
+- solo motion and selected motion composition;
+- synchronized group choreography;
+- the approved bounded interaction set;
+- expression, gaze, viseme, prop, camera, mask, layer, and parallax tracks;
+- capability and conflict errors;
+- exact time and frame behavior;
+- source mapping, deterministic seeds, diagnostics, and digests; and
+- incremental invalidation and isolated shot recompilation.
+
+**Test gate:** Diagnostic fixtures and the full episode compile repeatedly with identical accepted semantics and no hidden fallback.
+
+## Phase 10 — Rendering and Media Vertical
+
+**Deliverable:** Render compiled shots through the selected adapter and assemble validated deliveries.
+
+**Required behavior:**
+
+- adapter capability negotiation and health diagnostics;
+- preview, frame-range, shot, and episode jobs;
+- supervised execution, cancellation, attempt isolation, resume, and manifests;
+- exact frame completeness and cache identity;
+- audio and caption assembly when applicable;
+- delivery profiles, checksums, QC, and archive metadata; and
+- clean-machine installation and renderer verification.
+
+**Test gate:** Repeat renders, interrupted jobs, isolated corrections, corrupt output, insufficient resources, and archive restore pass the accepted policies.
+
+## Phase 11 — Studio and Red-Team Agent Vertical
+
+**Deliverable:** Typed production tools that allow a Studio Agent to author and repair a complete episode and a separate Red-Team Agent to block visible or semantic defects.
+
+**Required behavior:**
+
+- artifact-driven resume and bounded context retrieval;
+- capability-aware asset and action selection;
+- schema repair with bounded retries;
+- structured findings and correction links;
+- provider-neutral embedded adapters;
+- MCP host-operated tools;
+- cost, time, call, and retry limits;
+- prompt-injection and untrusted-input defenses; and
+- deterministic rendering without provider access.
+
+**Test gate:** Agent fixtures measure valid-artifact rate, unsupported requests, repair loops, context and cost, independent findings, interruption recovery, and full-production completion.
+
+## Phase 12 — macOS Studio and Automation Surfaces
+
+**Deliverable:** A native macOS application plus CLI/API workflow capable of completing the reference production.
+
+**macOS workflow:** Create/open project, inspect assets, review gate state, inspect shots and media, apply structured corrections, approve artifacts, monitor jobs, diagnose failures, render delivery, export, and restore.
+
+**Automation workflow:** Perform equivalent bounded operations through stable CLI and API commands with machine-readable output and idempotency.
+
+**Test gate:** Unit and integration tests cover view models and application operations; UI automation covers the critical reference-production path; CLI contract tests match application behavior; a clean supported Mac completes the documented operator journey.
+
+## Phase 13 — Quality and Production Qualification
+
+**Deliverable:** Automated validators, Red-Team rubric, human review rubric, operational diagnostics, and reproducible release qualification.
+
+**Required behavior:**
+
+- all quality gates and structured finding severities;
+- golden and tolerance-based visual fixtures selected by evidence;
+- continuity, interaction, composition, timing, media, legal, and recovery checks;
+- performance and resource baselines on supported hardware;
+- install, upgrade, migration, backup, restore, and rollback procedures;
+- license and dependency inventory; and
+- signed release artifacts and operator documentation where applicable.
+
+**Test gate:** The reference production and a materially different second production pass without episode-specific engine changes or manual per-frame correction.
+
+## Phase 14 — Production Evaluation and Hardening
+
+**Actions:**
+
+1. Document the equivalent manual cutout workflow using the same published assets.
+2. Complete at least five problem interviews and two hands-on evaluations with target creators or small studios.
+3. Measure hands-on layout and animation time, correction effort, failure recovery, learning cost, and visible quality.
+4. Resolve blocking findings and add regression fixtures for every product defect.
+5. Re-run clean installation, full production, second production, archive restore, and isolated rerender qualification.
+
+**Exit gate:** Charter success and go/no-go criteria pass with recorded evidence. Failure triggers product-scope reconsideration rather than metric redefinition.
+
+## Phase 15 — Web and Cloud Evolution
+
+This phase begins only after local qualification and a separate approved plan.
+
+Potential work includes a TypeScript/Vite web studio, remote application API, portable worker images, object and metadata storage adapters, hosted job orchestration, upload isolation, and measured cost controls. Tenancy, billing, marketplace, and organization administration require separate business justification and are not implied by remote rendering.
+
+## Tracking and Commit Discipline
+
+- `TODO.md` is the canonical status index.
+- Each research, spike, decision, subsystem plan, and implementation task has one evidence location.
+- Each implementation task begins with a failing focused test or fixture assertion, implements the minimum accepted behavior, runs relevant and broader verification, updates docs, and ends in one reviewable commit.
+- No task is marked complete from code presence alone; its stated test gate and evidence must pass.
+- Scope changes update the charter or product requirements before implementation changes follow.
+
+## v1 Plan Exit Criteria
+
+- Every charter objective and product requirement area maps to a phase.
+- Research and decisions precede dependent implementation.
+- Local production qualification precedes web or cloud expansion.
+- Full-duration, multi-character output is the final evidence, not a short showcase.
+- Deferred choices are explicit and have owners, inputs, outputs, and exit gates.
+- The plan can be converted into executable subsystem plans without changing the system's core boundaries.

@@ -13,12 +13,12 @@ An item may be marked `completed` only when its linked exit criteria are satisfi
 | ID | Type | Item | Evidence | Status |
 |---|---|---|---|---|
 | RGT-D000 | Documentation | Complete and approve the production documentation baseline | `docs/README.md` | active |
+| RGT-D003 | Requirements | Draft product workflows, capabilities, evidence gaps, and acceptance criteria | `docs/requirements/product-requirements.md` | active |
 
 ## Queue
 
 | ID | Type | Item | Depends on | Evidence |
 |---|---|---|---|---|
-| RGT-D003 | Requirements | Define product workflows, capabilities, and acceptance criteria | RGT-D000 | `docs/requirements/product-requirements.md` |
 | RGT-D004 | Contracts | Define the canonical production model and versioned contracts | RGT-D003 | `docs/architecture/production-contracts.md` |
 | RGT-D005 | Pipeline design | Define asset ingestion, rigging, animation, audio, and rendering flow | RGT-D004 | `docs/architecture/production-pipeline.md` |
 | RGT-D006 | Agent design | Define Development, Studio, and Red-Team agents plus MCP boundaries | RGT-D004 | `docs/architecture/agent-system.md` |
@@ -29,11 +29,13 @@ An item may be marked `completed` only when its linked exit criteria are satisfi
 | RGT-S001 | Competitive spike | Discover and screen comparable open-source systems | RGT-P001 | `docs/spikes/SPIKE-C001-competitive-landscape.md` |
 | RGT-S002 | Competitive spikes | Deep-review shortlisted repositories; create one spike result per repository | RGT-S001 | `docs/research/repository-reviews/` |
 | RGT-S003 | Spike | Define the representative multi-character animation fixture | RGT-P001 | Planned spike document |
-| RGT-S004 | Renderer spike | Compare qualified production backends with the same fixture | RGT-S003 | `docs/spikes/SPIKE-R001-renderer-backends.md` |
+| RGT-S008 | Animation spike | Validate production-grade fixed-cast character orchestration and deterministic frame compilation | RGT-S001, RGT-S003 | `docs/spikes/SPIKE-A001-animation-orchestration.md` |
+| RGT-S004 | Renderer spike | Compare qualified production backends with the same fixture | RGT-S008 | `docs/spikes/SPIKE-R001-renderer-backends.md` |
 | RGT-S005 | Spike | Measure web-preview and final-render parity | RGT-S004 | Planned spike document |
 | RGT-S006 | Spike | Compare Swift-to-engine process and native-library integration | RGT-S004 | Planned spike document |
 | RGT-S007 | Agent spike | Validate subscription-hosted operation through MCP | RGT-P001 | Planned spike document |
 | RGT-D001 | Decision | Select the primary renderer and integration language | RGT-S004, RGT-S005, RGT-S006 | Planned architecture decision record |
+| RGT-D009 | Requirements | Incorporate animation and renderer evidence into validated product requirements | RGT-S008, RGT-D001 | `docs/requirements/product-requirements.md` |
 
 ## Completed
 

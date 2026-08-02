@@ -2,7 +2,7 @@
 
 **Project slug:** `rigtale`
 
-**Document status:** Business justification approved. The remaining charter sections will be added only after review and approval.
+**Document status:** Approved project charter.
 
 ## Business Justification
 

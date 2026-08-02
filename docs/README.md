@@ -1,20 +1,28 @@
 # RigTale Documentation Map
 
-This map defines the minimum non-overlapping documentation set required before research spikes or product implementation begin. Documents describe durable product intent, contracts, and boundaries. Unknown technology choices remain explicit spike or decision items.
+This map defines the minimum non-overlapping documentation set required before research spikes or product implementation begin. Documents first establish a coherent draft of product intent, contracts, and boundaries. Research and spikes then replace working hypotheses with evidence-backed requirements and decisions.
+
+## Document Lifecycle
+
+`planned` -> `draft` -> `evidence-pending` -> `validated`
+
+- `draft` means the document is coherent enough to expose assumptions and dependencies.
+- `evidence-pending` means its material unknowns are linked to queued research or spikes.
+- `validated` means relevant evidence has been incorporated and any accepted choices are recorded in decision records.
 
 ## Documentation Order
 
 | Order | Document | Owns | State |
 |---:|---|---|---|
 | 1 | `requirements/charter.md` | Business justification, vision, scope, constraints, and go/no-go criteria | approved |
-| 2 | `requirements/product-requirements.md` | User workflows, product capabilities, non-functional requirements, and acceptance criteria | planned |
-| 3 | `architecture/production-contracts.md` | Canonical production objects, schemas, lifecycle, versioning, and compatibility | planned |
-| 4 | `architecture/production-pipeline.md` | Asset ingestion, rig preparation, scripting, animation, audio, preview, and final rendering | planned |
-| 5 | `architecture/agent-system.md` | Development, Studio, and Red-Team agent responsibilities, tools, MCP, context, and failure boundaries | planned |
-| 6 | `architecture/system-design.md` | Component topology, execution modes, integration seams, storage, jobs, and deferred technical decisions | planned |
-| 7 | `quality/quality-system.md` | Automated validation, red-team review, visual and temporal quality, and production gates | planned |
-| 8 | `operations/deployment-and-operations.md` | macOS operation, CLI, future cloud service, security, observability, recovery, and upgrades | planned |
-| 9 | `plans/implementation-plan.md` | Build order, test strategy, dependencies, research gates, and production-readiness milestones | planned |
+| 2 | `requirements/product-requirements.md` | User workflows, product capabilities, non-functional requirements, and acceptance criteria | draft |
+| 3 | `architecture/production-contracts.md` | Canonical production objects, schemas, lifecycle, versioning, and compatibility | draft |
+| 4 | `architecture/production-pipeline.md` | Asset ingestion, rig preparation, scripting, animation, audio, preview, and final rendering | draft |
+| 5 | `architecture/agent-system.md` | Development, Studio, and Red-Team agent responsibilities, tools, MCP, context, and failure boundaries | draft |
+| 6 | `architecture/system-design.md` | Component topology, execution modes, integration seams, storage, jobs, and deferred technical decisions | draft |
+| 7 | `quality/quality-system.md` | Automated validation, red-team review, visual and temporal quality, and production gates | draft |
+| 8 | `operations/deployment-and-operations.md` | macOS operation, CLI, future cloud service, security, observability, recovery, and upgrades | draft |
+| 9 | `plans/implementation-plan.md` | Build order, test strategy, dependencies, research gates, and production-readiness milestones | draft |
 
 ## Supporting Records
 
@@ -26,12 +34,14 @@ This map defines the minimum non-overlapping documentation set required before r
 
 ## Completion Rule
 
-The documentation baseline is complete when every planned document above:
+The pre-research documentation baseline is complete when every planned document above:
 
-1. has no silent assumptions or unresolved contradictions;
-2. routes material unknowns to a named spike or decision item;
-3. defines testable interfaces, requirements, or exit criteria;
-4. agrees with the charter and the other documents; and
-5. is approved before its dependent document is written.
+1. is at least a coherent draft;
+2. labels assumptions instead of presenting them as established architecture;
+3. routes material unknowns to a named research, spike, or decision item;
+4. defines the evidence required to validate uncertain requirements; and
+5. agrees with the charter and the other draft documents.
+
+Documents are drafted in dependency order, but downstream drafts may reference explicitly unresolved upstream decisions. After research begins, findings must update the affected requirements, contracts, designs, tests, and plans rather than living only in a spike report.
 
 Renderer, server language, cloud infrastructure, and hosted model-provider choices are intentionally not selected during documentation. The design must preserve their integration boundaries, while the implementation plan must block dependent work on the relevant evidence and decision records.
