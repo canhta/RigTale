@@ -12,7 +12,7 @@ An item may be marked `completed` only when its linked exit criteria are satisfi
 
 | ID | Type | Item | Evidence | Status |
 |---|---|---|---|---|
-| RGT-S003 | Fixture spike | Define the representative multi-character production fixture | `docs/spikes/SPIKE-F001-reference-production-fixture.md` | `active` since 2026-08-03 |
+| RGT-S003 | Fixture spike | Define the representative multi-character production fixture | `docs/spikes/SPIKE-F001-reference-production-fixture.md`, `docs/quality/fixture-risk-matrix.md`, `fixtures/` | `active` since 2026-08-03. Method steps 1–3 done: 31-risk matrix, and the cast. Outstanding: production brief, contract and failure corpus, diagnostic-shot manifests, calibration plan, approving decision record |
 
 ## Blocked
 

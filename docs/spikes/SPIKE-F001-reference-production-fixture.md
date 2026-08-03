@@ -114,7 +114,7 @@ Thresholds that cannot be justified before execution remain explicitly evidence-
 
 1. Derive a risk catalogue from the charter, v1 requirements, quality system, competitive research, and repository reviews. **Done — `docs/quality/fixture-risk-matrix.md`, 31 risks.**
 2. Map each material risk to at least one isolated fixture assertion. **Done in the same document, with three unassertable risks recorded and every requirement either covered or explicitly out of fixture scope.**
-3. Design an original production brief and cast sufficient to exercise the required archetypes.
+3. Design an original production brief and cast sufficient to exercise the required archetypes. **Cast done — `fixtures/`, 132 parts covering biped ×3, quadruped, vehicle, prop and environment. Brief outstanding.**
 4. Record provenance and license compatibility before asset work begins, and decide per asset whether it is originated, commissioned, or adapted from a compatibly licensed source. `RGT-O001` fixed the constraint — official assets must be redistributable — and left the route per asset to this step.
 5. Produce engine-neutral source assets, expected references, semantic descriptions, and invalid cases.
 6. Review the fixture for accidental backend bias and missing full-duration risks.

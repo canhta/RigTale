@@ -1,0 +1,2004 @@
+{
+  "fixture": "rigtale-reference-cast",
+  "version": "0.1.0-draft",
+  "status": "draft, not approved; RGT-S003 is active and RGT-D-fixture has not been recorded",
+  "generator": "fixtures/tools/build_cast.py",
+  "sources": [
+    {
+      "name": "Kenney Shape Characters",
+      "licence": "CC0 1.0",
+      "url": "https://kenney.nl/assets/shape-characters",
+      "used_for": "body, hand, eyebrow and environment tile bases"
+    },
+    {
+      "name": "ambientCG Fabric034",
+      "licence": "CC0 1.0",
+      "url": "https://ambientcg.com/view?id=Fabric034",
+      "used_for": "felt weave overlay"
+    }
+  ],
+  "originality": "Characters are original compositions: new palette, new hair, new clothing patterns, generated limbs, eyes and visemes. No visual identity is copied from any reference channel, and no reference video supplied any asset.",
+  "coordinate_note": "Pivot is in pixels from each part's own top-left. Placement in character space is the rig's responsibility and is deliberately not baked in.",
+  "parts": [
+    {
+      "character": "bo",
+      "layer": "shadow",
+      "file": "bo/shadow.png",
+      "z": 0,
+      "size": [
+        137,
+        35
+      ],
+      "pivot": [
+        68,
+        17
+      ],
+      "note": "ground contact, follows body x only"
+    },
+    {
+      "character": "bo",
+      "layer": "arm_left",
+      "file": "bo/arm_left.png",
+      "z": 1,
+      "size": [
+        20,
+        99
+      ],
+      "pivot": [
+        10,
+        10
+      ],
+      "note": "pivot at shoulder"
+    },
+    {
+      "character": "bo",
+      "layer": "leg_left",
+      "file": "bo/leg_left.png",
+      "z": 1,
+      "size": [
+        27,
+        70
+      ],
+      "pivot": [
+        13,
+        13
+      ],
+      "note": "pivot at hip"
+    },
+    {
+      "character": "bo",
+      "layer": "arm_right",
+      "file": "bo/arm_right.png",
+      "z": 2,
+      "size": [
+        20,
+        99
+      ],
+      "pivot": [
+        10,
+        10
+      ],
+      "note": "pivot at shoulder"
+    },
+    {
+      "character": "bo",
+      "layer": "leg_right",
+      "file": "bo/leg_right.png",
+      "z": 2,
+      "size": [
+        27,
+        70
+      ],
+      "pivot": [
+        13,
+        13
+      ],
+      "note": "pivot at hip"
+    },
+    {
+      "character": "bo",
+      "layer": "body",
+      "file": "bo/body.png",
+      "z": 10,
+      "size": [
+        160,
+        160
+      ],
+      "pivot": [
+        80,
+        80
+      ],
+      "note": "Kenney circle base, recoloured"
+    },
+    {
+      "character": "bo",
+      "layer": "clothing",
+      "file": "bo/clothing.png",
+      "z": 11,
+      "size": [
+        147,
+        54
+      ],
+      "pivot": [
+        73,
+        0
+      ],
+      "note": "checks, original pattern"
+    },
+    {
+      "character": "bo",
+      "layer": "hand_left_closed",
+      "file": "bo/hand_left_closed.png",
+      "z": 12,
+      "size": [
+        38,
+        37
+      ],
+      "pivot": [
+        19,
+        4
+      ],
+      "note": "attaches at arm tip; anchor for props"
+    },
+    {
+      "character": "bo",
+      "layer": "hand_left_open",
+      "file": "bo/hand_left_open.png",
+      "z": 12,
+      "size": [
+        37,
+        41
+      ],
+      "pivot": [
+        18,
+        4
+      ],
+      "note": "attaches at arm tip; anchor for props"
+    },
+    {
+      "character": "bo",
+      "layer": "hand_left_point",
+      "file": "bo/hand_left_point.png",
+      "z": 12,
+      "size": [
+        37,
+        39
+      ],
+      "pivot": [
+        18,
+        4
+      ],
+      "note": "attaches at arm tip; anchor for props"
+    },
+    {
+      "character": "bo",
+      "layer": "hand_right_closed",
+      "file": "bo/hand_right_closed.png",
+      "z": 12,
+      "size": [
+        38,
+        37
+      ],
+      "pivot": [
+        19,
+        4
+      ],
+      "note": "attaches at arm tip; anchor for props"
+    },
+    {
+      "character": "bo",
+      "layer": "hand_right_open",
+      "file": "bo/hand_right_open.png",
+      "z": 12,
+      "size": [
+        37,
+        41
+      ],
+      "pivot": [
+        18,
+        4
+      ],
+      "note": "attaches at arm tip; anchor for props"
+    },
+    {
+      "character": "bo",
+      "layer": "hand_right_point",
+      "file": "bo/hand_right_point.png",
+      "z": 12,
+      "size": [
+        37,
+        39
+      ],
+      "pivot": [
+        18,
+        4
+      ],
+      "note": "attaches at arm tip; anchor for props"
+    },
+    {
+      "character": "bo",
+      "layer": "eye_left",
+      "file": "bo/eye_left.png",
+      "z": 20,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        20
+      ],
+      "note": "sclera, pupil, highlight"
+    },
+    {
+      "character": "bo",
+      "layer": "eye_left_look_left",
+      "file": "bo/eye_left_look_left.png",
+      "z": 20,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        20
+      ],
+      "note": "gaze target"
+    },
+    {
+      "character": "bo",
+      "layer": "eye_left_look_right",
+      "file": "bo/eye_left_look_right.png",
+      "z": 20,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        20
+      ],
+      "note": "gaze target"
+    },
+    {
+      "character": "bo",
+      "layer": "eye_right",
+      "file": "bo/eye_right.png",
+      "z": 20,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        20
+      ],
+      "note": "sclera, pupil, highlight"
+    },
+    {
+      "character": "bo",
+      "layer": "eye_right_look_left",
+      "file": "bo/eye_right_look_left.png",
+      "z": 20,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        20
+      ],
+      "note": "gaze target"
+    },
+    {
+      "character": "bo",
+      "layer": "eye_right_look_right",
+      "file": "bo/eye_right_look_right.png",
+      "z": 20,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        20
+      ],
+      "note": "gaze target"
+    },
+    {
+      "character": "bo",
+      "layer": "eyebrow_left",
+      "file": "bo/eyebrow_left.png",
+      "z": 21,
+      "size": [
+        40,
+        10
+      ],
+      "pivot": [
+        20,
+        5
+      ],
+      "note": ""
+    },
+    {
+      "character": "bo",
+      "layer": "eyebrow_right",
+      "file": "bo/eyebrow_right.png",
+      "z": 21,
+      "size": [
+        40,
+        10
+      ],
+      "pivot": [
+        20,
+        5
+      ],
+      "note": ""
+    },
+    {
+      "character": "bo",
+      "layer": "mouth_neutral",
+      "file": "bo/mouth_neutral.png",
+      "z": 22,
+      "size": [
+        33,
+        9
+      ],
+      "pivot": [
+        16,
+        0
+      ],
+      "note": "expression"
+    },
+    {
+      "character": "bo",
+      "layer": "mouth_open",
+      "file": "bo/mouth_open.png",
+      "z": 22,
+      "size": [
+        31,
+        37
+      ],
+      "pivot": [
+        15,
+        0
+      ],
+      "note": "expression"
+    },
+    {
+      "character": "bo",
+      "layer": "mouth_smile",
+      "file": "bo/mouth_smile.png",
+      "z": 22,
+      "size": [
+        43,
+        22
+      ],
+      "pivot": [
+        21,
+        0
+      ],
+      "note": "expression"
+    },
+    {
+      "character": "bo",
+      "layer": "mouth_viseme_ai",
+      "file": "bo/mouth_viseme_ai.png",
+      "z": 22,
+      "size": [
+        35,
+        33
+      ],
+      "pivot": [
+        17,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "bo",
+      "layer": "mouth_viseme_e",
+      "file": "bo/mouth_viseme_e.png",
+      "z": 22,
+      "size": [
+        39,
+        19
+      ],
+      "pivot": [
+        19,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "bo",
+      "layer": "mouth_viseme_fv",
+      "file": "bo/mouth_viseme_fv.png",
+      "z": 22,
+      "size": [
+        32,
+        14
+      ],
+      "pivot": [
+        16,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "bo",
+      "layer": "mouth_viseme_l",
+      "file": "bo/mouth_viseme_l.png",
+      "z": 22,
+      "size": [
+        30,
+        27
+      ],
+      "pivot": [
+        15,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "bo",
+      "layer": "mouth_viseme_mbp",
+      "file": "bo/mouth_viseme_mbp.png",
+      "z": 22,
+      "size": [
+        33,
+        8
+      ],
+      "pivot": [
+        16,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "bo",
+      "layer": "mouth_viseme_o",
+      "file": "bo/mouth_viseme_o.png",
+      "z": 22,
+      "size": [
+        23,
+        34
+      ],
+      "pivot": [
+        11,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "bo",
+      "layer": "mouth_viseme_u",
+      "file": "bo/mouth_viseme_u.png",
+      "z": 22,
+      "size": [
+        18,
+        26
+      ],
+      "pivot": [
+        9,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "bo",
+      "layer": "mouth_viseme_ws",
+      "file": "bo/mouth_viseme_ws.png",
+      "z": 22,
+      "size": [
+        25,
+        20
+      ],
+      "pivot": [
+        12,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "bo",
+      "layer": "mouth_wide",
+      "file": "bo/mouth_wide.png",
+      "z": 22,
+      "size": [
+        46,
+        28
+      ],
+      "pivot": [
+        23,
+        0
+      ],
+      "note": "expression"
+    },
+    {
+      "character": "bo",
+      "layer": "hair",
+      "file": "bo/hair.png",
+      "z": 30,
+      "size": [
+        137,
+        41
+      ],
+      "pivot": [
+        68,
+        38
+      ],
+      "note": ""
+    },
+    {
+      "character": "cart",
+      "layer": "shadow",
+      "file": "cart/shadow.png",
+      "z": 0,
+      "size": [
+        239,
+        30
+      ],
+      "pivot": [
+        119,
+        15
+      ],
+      "note": ""
+    },
+    {
+      "character": "cart",
+      "layer": "handle",
+      "file": "cart/handle.png",
+      "z": 9,
+      "size": [
+        22,
+        120
+      ],
+      "pivot": [
+        11,
+        11
+      ],
+      "note": "pivot at hitch"
+    },
+    {
+      "character": "cart",
+      "layer": "body",
+      "file": "cart/body.png",
+      "z": 10,
+      "size": [
+        260,
+        120
+      ],
+      "pivot": [
+        130,
+        60
+      ],
+      "note": "prop and character attachment surface"
+    },
+    {
+      "character": "cart",
+      "layer": "wheel_front",
+      "file": "cart/wheel_front.png",
+      "z": 12,
+      "size": [
+        76,
+        76
+      ],
+      "pivot": [
+        38,
+        38
+      ],
+      "note": "pivot at axle centre, rotation cycle must match ground travel"
+    },
+    {
+      "character": "cart",
+      "layer": "wheel_rear",
+      "file": "cart/wheel_rear.png",
+      "z": 12,
+      "size": [
+        76,
+        76
+      ],
+      "pivot": [
+        38,
+        38
+      ],
+      "note": "pivot at axle centre, rotation cycle must match ground travel"
+    },
+    {
+      "character": "mochi",
+      "layer": "shadow",
+      "file": "mochi/shadow.png",
+      "z": 0,
+      "size": [
+        198,
+        34
+      ],
+      "pivot": [
+        99,
+        17
+      ],
+      "note": "four-point contact, locomotion critical"
+    },
+    {
+      "character": "mochi",
+      "layer": "leg_fore_left",
+      "file": "mochi/leg_fore_left.png",
+      "z": 1,
+      "size": [
+        26,
+        84
+      ],
+      "pivot": [
+        13,
+        13
+      ],
+      "note": "pivot at hip or shoulder, ground contact at tip"
+    },
+    {
+      "character": "mochi",
+      "layer": "leg_hind_left",
+      "file": "mochi/leg_hind_left.png",
+      "z": 1,
+      "size": [
+        26,
+        84
+      ],
+      "pivot": [
+        13,
+        13
+      ],
+      "note": "pivot at hip or shoulder, ground contact at tip"
+    },
+    {
+      "character": "mochi",
+      "layer": "leg_fore_right",
+      "file": "mochi/leg_fore_right.png",
+      "z": 2,
+      "size": [
+        26,
+        84
+      ],
+      "pivot": [
+        13,
+        13
+      ],
+      "note": "pivot at hip or shoulder, ground contact at tip"
+    },
+    {
+      "character": "mochi",
+      "layer": "leg_hind_right",
+      "file": "mochi/leg_hind_right.png",
+      "z": 2,
+      "size": [
+        26,
+        84
+      ],
+      "pivot": [
+        13,
+        13
+      ],
+      "note": "pivot at hip or shoulder, ground contact at tip"
+    },
+    {
+      "character": "mochi",
+      "layer": "tail",
+      "file": "mochi/tail.png",
+      "z": 9,
+      "size": [
+        20,
+        70
+      ],
+      "pivot": [
+        10,
+        10
+      ],
+      "note": "pivot at rump, secondary motion"
+    },
+    {
+      "character": "mochi",
+      "layer": "body",
+      "file": "mochi/body.png",
+      "z": 10,
+      "size": [
+        220,
+        140
+      ],
+      "pivot": [
+        110,
+        70
+      ],
+      "note": ""
+    },
+    {
+      "character": "mochi",
+      "layer": "ear_left",
+      "file": "mochi/ear_left.png",
+      "z": 19,
+      "size": [
+        52,
+        66
+      ],
+      "pivot": [
+        26,
+        8
+      ],
+      "note": "pivot at skull, secondary motion"
+    },
+    {
+      "character": "mochi",
+      "layer": "ear_right",
+      "file": "mochi/ear_right.png",
+      "z": 19,
+      "size": [
+        52,
+        66
+      ],
+      "pivot": [
+        26,
+        8
+      ],
+      "note": "pivot at skull, secondary motion"
+    },
+    {
+      "character": "mochi",
+      "layer": "head",
+      "file": "mochi/head.png",
+      "z": 20,
+      "size": [
+        118,
+        118
+      ],
+      "pivot": [
+        59,
+        59
+      ],
+      "note": "pivot at neck"
+    },
+    {
+      "character": "mochi",
+      "layer": "eye_left",
+      "file": "mochi/eye_left.png",
+      "z": 22,
+      "size": [
+        34,
+        34
+      ],
+      "pivot": [
+        17,
+        17
+      ],
+      "note": ""
+    },
+    {
+      "character": "mochi",
+      "layer": "eye_right",
+      "file": "mochi/eye_right.png",
+      "z": 22,
+      "size": [
+        34,
+        34
+      ],
+      "pivot": [
+        17,
+        17
+      ],
+      "note": ""
+    },
+    {
+      "character": "mochi",
+      "layer": "mouth_neutral",
+      "file": "mochi/mouth_neutral.png",
+      "z": 23,
+      "size": [
+        28,
+        8
+      ],
+      "pivot": [
+        14,
+        0
+      ],
+      "note": "expression"
+    },
+    {
+      "character": "mochi",
+      "layer": "mouth_open",
+      "file": "mochi/mouth_open.png",
+      "z": 23,
+      "size": [
+        26,
+        32
+      ],
+      "pivot": [
+        13,
+        0
+      ],
+      "note": "expression"
+    },
+    {
+      "character": "mochi",
+      "layer": "mouth_smile",
+      "file": "mochi/mouth_smile.png",
+      "z": 23,
+      "size": [
+        36,
+        19
+      ],
+      "pivot": [
+        18,
+        0
+      ],
+      "note": "expression"
+    },
+    {
+      "character": "mochi",
+      "layer": "nose",
+      "file": "mochi/nose.png",
+      "z": 23,
+      "size": [
+        34,
+        26
+      ],
+      "pivot": [
+        17,
+        13
+      ],
+      "note": ""
+    },
+    {
+      "character": "nu",
+      "layer": "shadow",
+      "file": "nu/shadow.png",
+      "z": 0,
+      "size": [
+        137,
+        35
+      ],
+      "pivot": [
+        68,
+        17
+      ],
+      "note": "ground contact, follows body x only"
+    },
+    {
+      "character": "nu",
+      "layer": "arm_left",
+      "file": "nu/arm_left.png",
+      "z": 1,
+      "size": [
+        20,
+        99
+      ],
+      "pivot": [
+        10,
+        10
+      ],
+      "note": "pivot at shoulder"
+    },
+    {
+      "character": "nu",
+      "layer": "leg_left",
+      "file": "nu/leg_left.png",
+      "z": 1,
+      "size": [
+        27,
+        70
+      ],
+      "pivot": [
+        13,
+        13
+      ],
+      "note": "pivot at hip"
+    },
+    {
+      "character": "nu",
+      "layer": "arm_right",
+      "file": "nu/arm_right.png",
+      "z": 2,
+      "size": [
+        20,
+        99
+      ],
+      "pivot": [
+        10,
+        10
+      ],
+      "note": "pivot at shoulder"
+    },
+    {
+      "character": "nu",
+      "layer": "leg_right",
+      "file": "nu/leg_right.png",
+      "z": 2,
+      "size": [
+        27,
+        70
+      ],
+      "pivot": [
+        13,
+        13
+      ],
+      "note": "pivot at hip"
+    },
+    {
+      "character": "nu",
+      "layer": "body",
+      "file": "nu/body.png",
+      "z": 10,
+      "size": [
+        160,
+        160
+      ],
+      "pivot": [
+        80,
+        80
+      ],
+      "note": "Kenney squircle base, recoloured"
+    },
+    {
+      "character": "nu",
+      "layer": "clothing",
+      "file": "nu/clothing.png",
+      "z": 11,
+      "size": [
+        147,
+        54
+      ],
+      "pivot": [
+        73,
+        0
+      ],
+      "note": "dots, original pattern"
+    },
+    {
+      "character": "nu",
+      "layer": "hand_left_closed",
+      "file": "nu/hand_left_closed.png",
+      "z": 12,
+      "size": [
+        38,
+        37
+      ],
+      "pivot": [
+        19,
+        4
+      ],
+      "note": "attaches at arm tip; anchor for props"
+    },
+    {
+      "character": "nu",
+      "layer": "hand_left_open",
+      "file": "nu/hand_left_open.png",
+      "z": 12,
+      "size": [
+        37,
+        41
+      ],
+      "pivot": [
+        18,
+        4
+      ],
+      "note": "attaches at arm tip; anchor for props"
+    },
+    {
+      "character": "nu",
+      "layer": "hand_left_point",
+      "file": "nu/hand_left_point.png",
+      "z": 12,
+      "size": [
+        37,
+        39
+      ],
+      "pivot": [
+        18,
+        4
+      ],
+      "note": "attaches at arm tip; anchor for props"
+    },
+    {
+      "character": "nu",
+      "layer": "hand_right_closed",
+      "file": "nu/hand_right_closed.png",
+      "z": 12,
+      "size": [
+        38,
+        37
+      ],
+      "pivot": [
+        19,
+        4
+      ],
+      "note": "attaches at arm tip; anchor for props"
+    },
+    {
+      "character": "nu",
+      "layer": "hand_right_open",
+      "file": "nu/hand_right_open.png",
+      "z": 12,
+      "size": [
+        37,
+        41
+      ],
+      "pivot": [
+        18,
+        4
+      ],
+      "note": "attaches at arm tip; anchor for props"
+    },
+    {
+      "character": "nu",
+      "layer": "hand_right_point",
+      "file": "nu/hand_right_point.png",
+      "z": 12,
+      "size": [
+        37,
+        39
+      ],
+      "pivot": [
+        18,
+        4
+      ],
+      "note": "attaches at arm tip; anchor for props"
+    },
+    {
+      "character": "nu",
+      "layer": "eye_left",
+      "file": "nu/eye_left.png",
+      "z": 20,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        20
+      ],
+      "note": "sclera, pupil, highlight"
+    },
+    {
+      "character": "nu",
+      "layer": "eye_left_look_left",
+      "file": "nu/eye_left_look_left.png",
+      "z": 20,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        20
+      ],
+      "note": "gaze target"
+    },
+    {
+      "character": "nu",
+      "layer": "eye_left_look_right",
+      "file": "nu/eye_left_look_right.png",
+      "z": 20,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        20
+      ],
+      "note": "gaze target"
+    },
+    {
+      "character": "nu",
+      "layer": "eye_right",
+      "file": "nu/eye_right.png",
+      "z": 20,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        20
+      ],
+      "note": "sclera, pupil, highlight"
+    },
+    {
+      "character": "nu",
+      "layer": "eye_right_look_left",
+      "file": "nu/eye_right_look_left.png",
+      "z": 20,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        20
+      ],
+      "note": "gaze target"
+    },
+    {
+      "character": "nu",
+      "layer": "eye_right_look_right",
+      "file": "nu/eye_right_look_right.png",
+      "z": 20,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        20
+      ],
+      "note": "gaze target"
+    },
+    {
+      "character": "nu",
+      "layer": "eyebrow_left",
+      "file": "nu/eyebrow_left.png",
+      "z": 21,
+      "size": [
+        40,
+        10
+      ],
+      "pivot": [
+        20,
+        5
+      ],
+      "note": ""
+    },
+    {
+      "character": "nu",
+      "layer": "eyebrow_right",
+      "file": "nu/eyebrow_right.png",
+      "z": 21,
+      "size": [
+        40,
+        10
+      ],
+      "pivot": [
+        20,
+        5
+      ],
+      "note": ""
+    },
+    {
+      "character": "nu",
+      "layer": "mouth_neutral",
+      "file": "nu/mouth_neutral.png",
+      "z": 22,
+      "size": [
+        33,
+        9
+      ],
+      "pivot": [
+        16,
+        0
+      ],
+      "note": "expression"
+    },
+    {
+      "character": "nu",
+      "layer": "mouth_open",
+      "file": "nu/mouth_open.png",
+      "z": 22,
+      "size": [
+        31,
+        37
+      ],
+      "pivot": [
+        15,
+        0
+      ],
+      "note": "expression"
+    },
+    {
+      "character": "nu",
+      "layer": "mouth_smile",
+      "file": "nu/mouth_smile.png",
+      "z": 22,
+      "size": [
+        43,
+        22
+      ],
+      "pivot": [
+        21,
+        0
+      ],
+      "note": "expression"
+    },
+    {
+      "character": "nu",
+      "layer": "mouth_viseme_ai",
+      "file": "nu/mouth_viseme_ai.png",
+      "z": 22,
+      "size": [
+        35,
+        33
+      ],
+      "pivot": [
+        17,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "nu",
+      "layer": "mouth_viseme_e",
+      "file": "nu/mouth_viseme_e.png",
+      "z": 22,
+      "size": [
+        39,
+        19
+      ],
+      "pivot": [
+        19,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "nu",
+      "layer": "mouth_viseme_fv",
+      "file": "nu/mouth_viseme_fv.png",
+      "z": 22,
+      "size": [
+        32,
+        14
+      ],
+      "pivot": [
+        16,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "nu",
+      "layer": "mouth_viseme_l",
+      "file": "nu/mouth_viseme_l.png",
+      "z": 22,
+      "size": [
+        30,
+        27
+      ],
+      "pivot": [
+        15,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "nu",
+      "layer": "mouth_viseme_mbp",
+      "file": "nu/mouth_viseme_mbp.png",
+      "z": 22,
+      "size": [
+        33,
+        8
+      ],
+      "pivot": [
+        16,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "nu",
+      "layer": "mouth_viseme_o",
+      "file": "nu/mouth_viseme_o.png",
+      "z": 22,
+      "size": [
+        23,
+        34
+      ],
+      "pivot": [
+        11,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "nu",
+      "layer": "mouth_viseme_u",
+      "file": "nu/mouth_viseme_u.png",
+      "z": 22,
+      "size": [
+        18,
+        26
+      ],
+      "pivot": [
+        9,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "nu",
+      "layer": "mouth_viseme_ws",
+      "file": "nu/mouth_viseme_ws.png",
+      "z": 22,
+      "size": [
+        25,
+        20
+      ],
+      "pivot": [
+        12,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "nu",
+      "layer": "mouth_wide",
+      "file": "nu/mouth_wide.png",
+      "z": 22,
+      "size": [
+        46,
+        28
+      ],
+      "pivot": [
+        23,
+        0
+      ],
+      "note": "expression"
+    },
+    {
+      "character": "nu",
+      "layer": "pigtail_left",
+      "file": "nu/pigtail_left.png",
+      "z": 29,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        7
+      ],
+      "note": "pivot near the skull, secondary motion candidate"
+    },
+    {
+      "character": "nu",
+      "layer": "pigtail_right",
+      "file": "nu/pigtail_right.png",
+      "z": 29,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        7
+      ],
+      "note": "pivot near the skull, secondary motion candidate"
+    },
+    {
+      "character": "nu",
+      "layer": "hair",
+      "file": "nu/hair.png",
+      "z": 30,
+      "size": [
+        83,
+        25
+      ],
+      "pivot": [
+        41,
+        22
+      ],
+      "note": "fringe, narrower so the pigtails read"
+    },
+    {
+      "character": "pim",
+      "layer": "shadow",
+      "file": "pim/shadow.png",
+      "z": 0,
+      "size": [
+        137,
+        35
+      ],
+      "pivot": [
+        68,
+        17
+      ],
+      "note": "ground contact, follows body x only"
+    },
+    {
+      "character": "pim",
+      "layer": "arm_left",
+      "file": "pim/arm_left.png",
+      "z": 1,
+      "size": [
+        20,
+        99
+      ],
+      "pivot": [
+        10,
+        10
+      ],
+      "note": "pivot at shoulder"
+    },
+    {
+      "character": "pim",
+      "layer": "leg_left",
+      "file": "pim/leg_left.png",
+      "z": 1,
+      "size": [
+        27,
+        70
+      ],
+      "pivot": [
+        13,
+        13
+      ],
+      "note": "pivot at hip"
+    },
+    {
+      "character": "pim",
+      "layer": "arm_right",
+      "file": "pim/arm_right.png",
+      "z": 2,
+      "size": [
+        20,
+        99
+      ],
+      "pivot": [
+        10,
+        10
+      ],
+      "note": "pivot at shoulder"
+    },
+    {
+      "character": "pim",
+      "layer": "leg_right",
+      "file": "pim/leg_right.png",
+      "z": 2,
+      "size": [
+        27,
+        70
+      ],
+      "pivot": [
+        13,
+        13
+      ],
+      "note": "pivot at hip"
+    },
+    {
+      "character": "pim",
+      "layer": "body",
+      "file": "pim/body.png",
+      "z": 10,
+      "size": [
+        160,
+        160
+      ],
+      "pivot": [
+        80,
+        80
+      ],
+      "note": "Kenney squircle base, recoloured"
+    },
+    {
+      "character": "pim",
+      "layer": "clothing",
+      "file": "pim/clothing.png",
+      "z": 11,
+      "size": [
+        147,
+        54
+      ],
+      "pivot": [
+        73,
+        0
+      ],
+      "note": "stripes, original pattern"
+    },
+    {
+      "character": "pim",
+      "layer": "hand_left_closed",
+      "file": "pim/hand_left_closed.png",
+      "z": 12,
+      "size": [
+        38,
+        37
+      ],
+      "pivot": [
+        19,
+        4
+      ],
+      "note": "attaches at arm tip; anchor for props"
+    },
+    {
+      "character": "pim",
+      "layer": "hand_left_open",
+      "file": "pim/hand_left_open.png",
+      "z": 12,
+      "size": [
+        37,
+        41
+      ],
+      "pivot": [
+        18,
+        4
+      ],
+      "note": "attaches at arm tip; anchor for props"
+    },
+    {
+      "character": "pim",
+      "layer": "hand_left_point",
+      "file": "pim/hand_left_point.png",
+      "z": 12,
+      "size": [
+        37,
+        39
+      ],
+      "pivot": [
+        18,
+        4
+      ],
+      "note": "attaches at arm tip; anchor for props"
+    },
+    {
+      "character": "pim",
+      "layer": "hand_right_closed",
+      "file": "pim/hand_right_closed.png",
+      "z": 12,
+      "size": [
+        38,
+        37
+      ],
+      "pivot": [
+        19,
+        4
+      ],
+      "note": "attaches at arm tip; anchor for props"
+    },
+    {
+      "character": "pim",
+      "layer": "hand_right_open",
+      "file": "pim/hand_right_open.png",
+      "z": 12,
+      "size": [
+        37,
+        41
+      ],
+      "pivot": [
+        18,
+        4
+      ],
+      "note": "attaches at arm tip; anchor for props"
+    },
+    {
+      "character": "pim",
+      "layer": "hand_right_point",
+      "file": "pim/hand_right_point.png",
+      "z": 12,
+      "size": [
+        37,
+        39
+      ],
+      "pivot": [
+        18,
+        4
+      ],
+      "note": "attaches at arm tip; anchor for props"
+    },
+    {
+      "character": "pim",
+      "layer": "eye_left",
+      "file": "pim/eye_left.png",
+      "z": 20,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        20
+      ],
+      "note": "sclera, pupil, highlight"
+    },
+    {
+      "character": "pim",
+      "layer": "eye_left_look_left",
+      "file": "pim/eye_left_look_left.png",
+      "z": 20,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        20
+      ],
+      "note": "gaze target"
+    },
+    {
+      "character": "pim",
+      "layer": "eye_left_look_right",
+      "file": "pim/eye_left_look_right.png",
+      "z": 20,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        20
+      ],
+      "note": "gaze target"
+    },
+    {
+      "character": "pim",
+      "layer": "eye_right",
+      "file": "pim/eye_right.png",
+      "z": 20,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        20
+      ],
+      "note": "sclera, pupil, highlight"
+    },
+    {
+      "character": "pim",
+      "layer": "eye_right_look_left",
+      "file": "pim/eye_right_look_left.png",
+      "z": 20,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        20
+      ],
+      "note": "gaze target"
+    },
+    {
+      "character": "pim",
+      "layer": "eye_right_look_right",
+      "file": "pim/eye_right_look_right.png",
+      "z": 20,
+      "size": [
+        40,
+        40
+      ],
+      "pivot": [
+        20,
+        20
+      ],
+      "note": "gaze target"
+    },
+    {
+      "character": "pim",
+      "layer": "eyebrow_left",
+      "file": "pim/eyebrow_left.png",
+      "z": 21,
+      "size": [
+        40,
+        10
+      ],
+      "pivot": [
+        20,
+        5
+      ],
+      "note": ""
+    },
+    {
+      "character": "pim",
+      "layer": "eyebrow_right",
+      "file": "pim/eyebrow_right.png",
+      "z": 21,
+      "size": [
+        40,
+        10
+      ],
+      "pivot": [
+        20,
+        5
+      ],
+      "note": ""
+    },
+    {
+      "character": "pim",
+      "layer": "mouth_neutral",
+      "file": "pim/mouth_neutral.png",
+      "z": 22,
+      "size": [
+        33,
+        9
+      ],
+      "pivot": [
+        16,
+        0
+      ],
+      "note": "expression"
+    },
+    {
+      "character": "pim",
+      "layer": "mouth_open",
+      "file": "pim/mouth_open.png",
+      "z": 22,
+      "size": [
+        31,
+        37
+      ],
+      "pivot": [
+        15,
+        0
+      ],
+      "note": "expression"
+    },
+    {
+      "character": "pim",
+      "layer": "mouth_smile",
+      "file": "pim/mouth_smile.png",
+      "z": 22,
+      "size": [
+        43,
+        22
+      ],
+      "pivot": [
+        21,
+        0
+      ],
+      "note": "expression"
+    },
+    {
+      "character": "pim",
+      "layer": "mouth_viseme_ai",
+      "file": "pim/mouth_viseme_ai.png",
+      "z": 22,
+      "size": [
+        35,
+        33
+      ],
+      "pivot": [
+        17,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "pim",
+      "layer": "mouth_viseme_e",
+      "file": "pim/mouth_viseme_e.png",
+      "z": 22,
+      "size": [
+        39,
+        19
+      ],
+      "pivot": [
+        19,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "pim",
+      "layer": "mouth_viseme_fv",
+      "file": "pim/mouth_viseme_fv.png",
+      "z": 22,
+      "size": [
+        32,
+        14
+      ],
+      "pivot": [
+        16,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "pim",
+      "layer": "mouth_viseme_l",
+      "file": "pim/mouth_viseme_l.png",
+      "z": 22,
+      "size": [
+        30,
+        27
+      ],
+      "pivot": [
+        15,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "pim",
+      "layer": "mouth_viseme_mbp",
+      "file": "pim/mouth_viseme_mbp.png",
+      "z": 22,
+      "size": [
+        33,
+        8
+      ],
+      "pivot": [
+        16,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "pim",
+      "layer": "mouth_viseme_o",
+      "file": "pim/mouth_viseme_o.png",
+      "z": 22,
+      "size": [
+        23,
+        34
+      ],
+      "pivot": [
+        11,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "pim",
+      "layer": "mouth_viseme_u",
+      "file": "pim/mouth_viseme_u.png",
+      "z": 22,
+      "size": [
+        18,
+        26
+      ],
+      "pivot": [
+        9,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "pim",
+      "layer": "mouth_viseme_ws",
+      "file": "pim/mouth_viseme_ws.png",
+      "z": 22,
+      "size": [
+        25,
+        20
+      ],
+      "pivot": [
+        12,
+        0
+      ],
+      "note": "viseme"
+    },
+    {
+      "character": "pim",
+      "layer": "mouth_wide",
+      "file": "pim/mouth_wide.png",
+      "z": 22,
+      "size": [
+        46,
+        28
+      ],
+      "pivot": [
+        23,
+        0
+      ],
+      "note": "expression"
+    },
+    {
+      "character": "pim",
+      "layer": "hair",
+      "file": "pim/hair.png",
+      "z": 30,
+      "size": [
+        83,
+        48
+      ],
+      "pivot": [
+        41,
+        44
+      ],
+      "note": ""
+    },
+    {
+      "character": "props",
+      "layer": "shadow_small",
+      "file": "props/shadow_small.png",
+      "z": 0,
+      "size": [
+        72,
+        22
+      ],
+      "pivot": [
+        36,
+        11
+      ],
+      "note": "shared prop shadow"
+    },
+    {
+      "character": "props",
+      "layer": "ball",
+      "file": "props/ball.png",
+      "z": 10,
+      "size": [
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        48
+      ],
+      "note": "handoff and attachment prop"
+    },
+    {
+      "character": "props",
+      "layer": "drum",
+      "file": "props/drum.png",
+      "z": 10,
+      "size": [
+        120,
+        84
+      ],
+      "pivot": [
+        60,
+        42
+      ],
+      "note": "beat-synchronised prop"
+    },
+    {
+      "character": "scene",
+      "layer": "cloud",
+      "file": "scene/cloud.png",
+      "z": 0,
+      "size": [
+        80,
+        80
+      ],
+      "pivot": [
+        40,
+        80
+      ],
+      "note": "far parallax band"
+    },
+    {
+      "character": "scene",
+      "layer": "grass",
+      "file": "scene/grass.png",
+      "z": 0,
+      "size": [
+        64,
+        36
+      ],
+      "pivot": [
+        32,
+        36
+      ],
+      "note": "near parallax band"
+    },
+    {
+      "character": "scene",
+      "layer": "tree_large",
+      "file": "scene/tree_large.png",
+      "z": 0,
+      "size": [
+        192,
+        294
+      ],
+      "pivot": [
+        96,
+        294
+      ],
+      "note": "far parallax band"
+    },
+    {
+      "character": "scene",
+      "layer": "tree_small",
+      "file": "scene/tree_small.png",
+      "z": 0,
+      "size": [
+        144,
+        220
+      ],
+      "pivot": [
+        72,
+        220
+      ],
+      "note": "mid parallax band"
+    }
+  ]
+}
