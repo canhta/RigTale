@@ -6,6 +6,43 @@
   "provenance_record": "fixtures/PROVENANCE.json",
   "originality": "Characters are original compositions: new palette, new hair, new clothing patterns, generated limbs, eyes and visemes. No visual identity is copied from any reference channel, and no reference video supplied any asset.",
   "coordinate_note": "A part's `pivot` and its `joints` are pixels from that part's own top-left. `rig` places parts in character space: a character's space is its root part's pivot, +x right, +y down, in pixels. A part is attached by putting its own pivot on the named joint of its parent, then rotating by `rest_angle` degrees counter-clockwise about that point. A part's pivot is always its anchor, so no separate anchor field is needed.",
+  "draw_order": {
+    "scope": "character group",
+    "note": "`z` orders parts within one character group and says nothing across groups: `pim/body` and `cart/body` both sit at z 10 and never compete, because a shot decides which group is in front. Inside a group, `z` is unique per part except where two parts can never be composited over each other \u2014 alternates in one slot, of which exactly one is posed, and parts whose opaque pixels do not meet in character space. `build_cast.py` proves the exception rather than asserting it: every pair sharing a `z` is rasterised in character space and refused if it overlaps by a single pixel."
+  },
+  "constraints": {
+    "note": "`attach.constraint` is null when a part inherits its parent's transform whole. A non-null constraint restricts that inheritance, and a consumer that ignores it renders the part wrongly.",
+    "kinds": {
+      "ground_projected": "The part takes the parent's x translation only. Its y stays on the character's ground plane and its angle stays fixed in character space, so a body that leans, turns or leaves the floor neither rotates nor lifts its shadow."
+    }
+  },
+  "ground": {
+    "note": "`rig.<group>.ground` lists, per root, the joint that is that root's floor plane and the contact joints standing on it. Place a group by putting that joint on the shot's floor line and every character in the cast stands on the same floor. The joint is derived from the contacts, never from the silhouette.",
+    "tolerance_px": 0.5,
+    "tolerance_reason": "Joints are written as whole pixels, so a contact solved in floating point can miss its plane by up to half a pixel. The build refuses any larger deviation."
+  },
+  "deformation": {
+    "space": "A mesh's `vertices` are in the part's own pixels, the same space as `pivot` and `joints`. The part's image occupies [0, size[0]] x [0, size[1]], and `uv` is the vertex divided by `size`.",
+    "triangles": "Indices into `vertices`, wound v(r,c) -> v(r,c+1) -> v(r+1,c+1) and then v(r,c) -> v(r+1,c+1) -> v(r+1,c). With +y down that is clockwise on screen. No backface culling is implied.",
+    "bones": "`rig.<group>.bones` is the deform skeleton. A bone is a rotation about its `head`, which is always an existing rig joint named `part/joint`, resolved to character space through the attachment tree. Rest is the identity: with every angle at 0 a skinned vertex sits exactly where the rigid rest pose puts it, and the build refuses if it does not.",
+    "weights": "One rule covers every weight in this cast: a bone's weight ramps linearly from 0 at the previous bone's head to 1 at its own head, and stays 1 beyond it; the previous bone takes the remainder. `heads` on each mesh records those head positions along the strip, so a reviewer can recompute every weight from two numbers.",
+    "skinning": "Linear blend skinning in character space. Solve the rest pose from `attach`, map each mesh vertex into character space with its part's rest transform, then take the weighted sum of the bone transforms applied to that rest position. A bone's transform is its parent's composed with a rotation about its own rest head.",
+    "joints_on_meshes": "A joint on a meshed part is a point on the mesh, not a rigid offset from the pivot. Find the triangle that contains it in rest part space, take its barycentric coordinates there, and apply them to that triangle's deformed vertices. This is how a contact point on a deformed limb is computed, and how a rigid child \u2014 a hand on an arm's `tip` \u2014 finds its anchor: the anchor comes from the deformed mesh, and its rotation is the bone angles blended by the weights interpolated at that same point. At rest the rule reproduces the rigid position exactly, so the ground plane declared in `rig.<group>.ground` is unaffected; under a pose the contact moves with the geometry, and `poses.reference.joints` records where to.",
+    "topology": "Limbs are two-rail strips, 6 to 14 triangles each. The three bipeds have identical body dimensions, so their arms and legs are not merely the same topology but the same vertices, and the build checks that the reference pose deforms them identically.",
+    "seam": "leg_<side>_upper and leg_<side>_lower meet along the knee: the thigh's flat bottom edge and the shin's flat top edge are the same two points in character space, carried by both meshes. A consumer that places the shin from the undeformed joint, or interpolates the two sides differently, opens a visible gap. The build measures the gap under the reference pose and refuses anything but zero."
+  },
+  "colour": {
+    "working_space": "sRGB IEC 61966-2-1, D65 white point",
+    "transfer": "sRGB transfer function. Every value in every part is non-linear, gamma-encoded sRGB; nothing here is linear light.",
+    "embedded_profile": "none. No part PNG carries an iCCP, sRGB, gAMA or cHRM chunk, so the files themselves declare no space and this manifest is the declaration. Checked against the emitted bytes on every build.",
+    "alpha": "straight (unassociated)",
+    "alpha_evidence": "bo/shadow.png at (0, 0) is RGBA (40, 44, 66, 2); a premultiplied pixel cannot carry a channel above its alpha",
+    "blend_space": "sRGB non-linear, the same encoding the parts are stored in. The generator composites its own decorations in that space, so a consumer that blends in linear light will not reproduce this cast.",
+    "bit_depth": 8,
+    "channels": "RGBA, PNG colour type 6, 8 bits per channel, no palette",
+    "boundary": "This cast is a published pack, and production-contracts.md requires alpha association to be fixed at that boundary. It is fixed here as straight. A consumer that premultiplies for compositing does so after reading and must not write premultiplied values back into this pack: an 8-bit premultiply is lossy under low alpha, which is exactly where the shadows and the horizon haze live.",
+    "part_override": "A part record may carry its own `colour` object overriding any field here. No part does; every part matches this header, and the build refuses if the emitted bytes disagree."
+  },
   "blend_profile": {
     "default": "normal",
     "supported": [
@@ -13,7 +50,21 @@
       "multiply",
       "screen"
     ],
-    "note": "Every part carries an explicit `blend_mode` and `opacity`. A consumer that cannot honour a part's declared mode must fail rather than silently substitute `normal`."
+    "formulas": "W3C Compositing and Blending Level 1, separable blend functions, over unpremultiplied colour: normal B(Cb,Cs)=Cs, multiply B(Cb,Cs)=Cb*Cs, screen B(Cb,Cs)=Cb+Cs-Cb*Cs. A mode name is not a formula, so the profile names both.",
+    "composite_order": "Opacity first, then blend. A part's alpha is multiplied by its `opacity`, and only then is the part blended with `blend_mode` and composited over the backdrop. This is the OpenRaster rule \u2014 a layer's alpha is multiplied by its opacity before blending, and a non-isolated group multiplies its opacity into its children \u2014 and it is what the shadows test: they carry multiply at opacity 0.8, so a consumer that blends first and attenuates afterwards lands on a different pixel.",
+    "note": "Every part carries an explicit `blend_mode` and `opacity`. A consumer that cannot honour a part's declared mode must fail rather than silently substitute `normal`.",
+    "in_profile": {
+      "multiply": "every ground shadow at opacity 0.8, and mochi/belly_shade, a deformed mesh, at 0.7",
+      "screen": "props/ball_highlight",
+      "normal": "everything else"
+    },
+    "out_of_profile": {
+      "parts": [
+        "scene/haze"
+      ],
+      "mode": "linear_light",
+      "note": "Photoshop defines Linear Light and publishes no formula for it, and no general-purpose 2D library screened implements it. The part exists so the refusal path has an artifact: a consumer honouring this profile must refuse scene/haze by name. preview_cast.py excludes it from the contact sheet and names it when it does; `--all` asks for it and the harness refuses."
+    }
   },
   "rig": {
     "pim": {
@@ -25,172 +76,225 @@
         "body": {
           "parent": null,
           "joint": null,
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "shadow": {
           "parent": "body",
           "joint": "ground",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": {
+            "kind": "ground_projected",
+            "inherit_rotation": false,
+            "inherit_translation": [
+              "x"
+            ],
+            "pin": "character ground plane"
+          }
         },
-        "leg_left": {
+        "leg_left_upper": {
           "parent": "body",
           "joint": "hip_left",
-          "rest_angle": -14.0
+          "rest_angle": -14.0,
+          "constraint": null
+        },
+        "leg_left_lower": {
+          "parent": "leg_left_upper",
+          "joint": "knee",
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "arm_left": {
           "parent": "body",
           "joint": "shoulder_left",
-          "rest_angle": -32.0
+          "rest_angle": -32.0,
+          "constraint": null
         },
-        "leg_right": {
+        "leg_right_upper": {
           "parent": "body",
           "joint": "hip_right",
-          "rest_angle": 14.0
+          "rest_angle": 14.0,
+          "constraint": null
+        },
+        "leg_right_lower": {
+          "parent": "leg_right_upper",
+          "joint": "knee",
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "arm_right": {
           "parent": "body",
           "joint": "shoulder_right",
-          "rest_angle": 32.0
+          "rest_angle": 32.0,
+          "constraint": null
         },
         "clothing": {
           "parent": "body",
           "joint": "clothing",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hand_left_open": {
           "parent": "arm_left",
           "joint": "tip",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hand_left_closed": {
           "parent": "arm_left",
           "joint": "tip",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hand_left_point": {
           "parent": "arm_left",
           "joint": "tip",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hand_right_open": {
           "parent": "arm_right",
           "joint": "tip",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hand_right_closed": {
           "parent": "arm_right",
           "joint": "tip",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hand_right_point": {
           "parent": "arm_right",
           "joint": "tip",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_left": {
           "parent": "body",
           "joint": "eye_left",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_left_look_left": {
           "parent": "body",
           "joint": "eye_left",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_left_look_right": {
           "parent": "body",
           "joint": "eye_left",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_right": {
           "parent": "body",
           "joint": "eye_right",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_right_look_left": {
           "parent": "body",
           "joint": "eye_right",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_right_look_right": {
           "parent": "body",
           "joint": "eye_right",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eyebrow_left": {
           "parent": "body",
           "joint": "brow_left",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eyebrow_right": {
           "parent": "body",
           "joint": "brow_right",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_neutral": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_smile": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_open": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_wide": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_ai": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_e": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_o": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_u": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_mbp": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_fv": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_l": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_ws": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hair": {
           "parent": "body",
           "joint": "crown",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         }
       },
       "slots": {
@@ -243,7 +347,59 @@
           ],
           "default": "mouth_smile"
         }
-      }
+      },
+      "bones": [
+        {
+          "name": "hip_left",
+          "parent": null,
+          "head": "body/hip_left"
+        },
+        {
+          "name": "knee_left",
+          "parent": "hip_left",
+          "head": "leg_left_upper/knee"
+        },
+        {
+          "name": "shoulder_left",
+          "parent": null,
+          "head": "body/shoulder_left"
+        },
+        {
+          "name": "elbow_left",
+          "parent": "shoulder_left",
+          "head": "arm_left/elbow"
+        },
+        {
+          "name": "hip_right",
+          "parent": null,
+          "head": "body/hip_right"
+        },
+        {
+          "name": "knee_right",
+          "parent": "hip_right",
+          "head": "leg_right_upper/knee"
+        },
+        {
+          "name": "shoulder_right",
+          "parent": null,
+          "head": "body/shoulder_right"
+        },
+        {
+          "name": "elbow_right",
+          "parent": "shoulder_right",
+          "head": "arm_right/elbow"
+        }
+      ],
+      "ground": [
+        {
+          "part": "body",
+          "joint": "ground",
+          "contacts": [
+            "leg_left_lower/contact",
+            "leg_right_lower/contact"
+          ]
+        }
+      ]
     },
     "bo": {
       "roots": [
@@ -254,172 +410,225 @@
         "body": {
           "parent": null,
           "joint": null,
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "shadow": {
           "parent": "body",
           "joint": "ground",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": {
+            "kind": "ground_projected",
+            "inherit_rotation": false,
+            "inherit_translation": [
+              "x"
+            ],
+            "pin": "character ground plane"
+          }
         },
-        "leg_left": {
+        "leg_left_upper": {
           "parent": "body",
           "joint": "hip_left",
-          "rest_angle": -14.0
+          "rest_angle": -14.0,
+          "constraint": null
+        },
+        "leg_left_lower": {
+          "parent": "leg_left_upper",
+          "joint": "knee",
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "arm_left": {
           "parent": "body",
           "joint": "shoulder_left",
-          "rest_angle": -32.0
+          "rest_angle": -32.0,
+          "constraint": null
         },
-        "leg_right": {
+        "leg_right_upper": {
           "parent": "body",
           "joint": "hip_right",
-          "rest_angle": 14.0
+          "rest_angle": 14.0,
+          "constraint": null
+        },
+        "leg_right_lower": {
+          "parent": "leg_right_upper",
+          "joint": "knee",
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "arm_right": {
           "parent": "body",
           "joint": "shoulder_right",
-          "rest_angle": 32.0
+          "rest_angle": 32.0,
+          "constraint": null
         },
         "clothing": {
           "parent": "body",
           "joint": "clothing",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hand_left_open": {
           "parent": "arm_left",
           "joint": "tip",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hand_left_closed": {
           "parent": "arm_left",
           "joint": "tip",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hand_left_point": {
           "parent": "arm_left",
           "joint": "tip",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hand_right_open": {
           "parent": "arm_right",
           "joint": "tip",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hand_right_closed": {
           "parent": "arm_right",
           "joint": "tip",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hand_right_point": {
           "parent": "arm_right",
           "joint": "tip",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_left": {
           "parent": "body",
           "joint": "eye_left",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_left_look_left": {
           "parent": "body",
           "joint": "eye_left",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_left_look_right": {
           "parent": "body",
           "joint": "eye_left",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_right": {
           "parent": "body",
           "joint": "eye_right",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_right_look_left": {
           "parent": "body",
           "joint": "eye_right",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_right_look_right": {
           "parent": "body",
           "joint": "eye_right",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eyebrow_left": {
           "parent": "body",
           "joint": "brow_left",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eyebrow_right": {
           "parent": "body",
           "joint": "brow_right",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_neutral": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_smile": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_open": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_wide": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_ai": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_e": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_o": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_u": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_mbp": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_fv": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_l": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_ws": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hair": {
           "parent": "body",
           "joint": "crown",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         }
       },
       "slots": {
@@ -472,7 +681,59 @@
           ],
           "default": "mouth_smile"
         }
-      }
+      },
+      "bones": [
+        {
+          "name": "hip_left",
+          "parent": null,
+          "head": "body/hip_left"
+        },
+        {
+          "name": "knee_left",
+          "parent": "hip_left",
+          "head": "leg_left_upper/knee"
+        },
+        {
+          "name": "shoulder_left",
+          "parent": null,
+          "head": "body/shoulder_left"
+        },
+        {
+          "name": "elbow_left",
+          "parent": "shoulder_left",
+          "head": "arm_left/elbow"
+        },
+        {
+          "name": "hip_right",
+          "parent": null,
+          "head": "body/hip_right"
+        },
+        {
+          "name": "knee_right",
+          "parent": "hip_right",
+          "head": "leg_right_upper/knee"
+        },
+        {
+          "name": "shoulder_right",
+          "parent": null,
+          "head": "body/shoulder_right"
+        },
+        {
+          "name": "elbow_right",
+          "parent": "shoulder_right",
+          "head": "arm_right/elbow"
+        }
+      ],
+      "ground": [
+        {
+          "part": "body",
+          "joint": "ground",
+          "contacts": [
+            "leg_left_lower/contact",
+            "leg_right_lower/contact"
+          ]
+        }
+      ]
     },
     "nu": {
       "roots": [
@@ -483,182 +744,237 @@
         "body": {
           "parent": null,
           "joint": null,
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "shadow": {
           "parent": "body",
           "joint": "ground",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": {
+            "kind": "ground_projected",
+            "inherit_rotation": false,
+            "inherit_translation": [
+              "x"
+            ],
+            "pin": "character ground plane"
+          }
         },
-        "leg_left": {
+        "leg_left_upper": {
           "parent": "body",
           "joint": "hip_left",
-          "rest_angle": -14.0
+          "rest_angle": -14.0,
+          "constraint": null
+        },
+        "leg_left_lower": {
+          "parent": "leg_left_upper",
+          "joint": "knee",
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "arm_left": {
           "parent": "body",
           "joint": "shoulder_left",
-          "rest_angle": -32.0
+          "rest_angle": -32.0,
+          "constraint": null
         },
-        "leg_right": {
+        "leg_right_upper": {
           "parent": "body",
           "joint": "hip_right",
-          "rest_angle": 14.0
+          "rest_angle": 14.0,
+          "constraint": null
+        },
+        "leg_right_lower": {
+          "parent": "leg_right_upper",
+          "joint": "knee",
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "arm_right": {
           "parent": "body",
           "joint": "shoulder_right",
-          "rest_angle": 32.0
+          "rest_angle": 32.0,
+          "constraint": null
         },
         "clothing": {
           "parent": "body",
           "joint": "clothing",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hand_left_open": {
           "parent": "arm_left",
           "joint": "tip",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hand_left_closed": {
           "parent": "arm_left",
           "joint": "tip",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hand_left_point": {
           "parent": "arm_left",
           "joint": "tip",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hand_right_open": {
           "parent": "arm_right",
           "joint": "tip",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hand_right_closed": {
           "parent": "arm_right",
           "joint": "tip",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hand_right_point": {
           "parent": "arm_right",
           "joint": "tip",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_left": {
           "parent": "body",
           "joint": "eye_left",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_left_look_left": {
           "parent": "body",
           "joint": "eye_left",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_left_look_right": {
           "parent": "body",
           "joint": "eye_left",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_right": {
           "parent": "body",
           "joint": "eye_right",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_right_look_left": {
           "parent": "body",
           "joint": "eye_right",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_right_look_right": {
           "parent": "body",
           "joint": "eye_right",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eyebrow_left": {
           "parent": "body",
           "joint": "brow_left",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eyebrow_right": {
           "parent": "body",
           "joint": "brow_right",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_neutral": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_smile": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_open": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_wide": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_ai": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_e": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_o": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_u": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_mbp": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_fv": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_l": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_viseme_ws": {
           "parent": "body",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "hair": {
           "parent": "body",
           "joint": "crown",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "pigtail_left": {
           "parent": "body",
           "joint": "pigtail_left",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "pigtail_right": {
           "parent": "body",
           "joint": "pigtail_right",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         }
       },
       "slots": {
@@ -711,7 +1027,59 @@
           ],
           "default": "mouth_smile"
         }
-      }
+      },
+      "bones": [
+        {
+          "name": "hip_left",
+          "parent": null,
+          "head": "body/hip_left"
+        },
+        {
+          "name": "knee_left",
+          "parent": "hip_left",
+          "head": "leg_left_upper/knee"
+        },
+        {
+          "name": "shoulder_left",
+          "parent": null,
+          "head": "body/shoulder_left"
+        },
+        {
+          "name": "elbow_left",
+          "parent": "shoulder_left",
+          "head": "arm_left/elbow"
+        },
+        {
+          "name": "hip_right",
+          "parent": null,
+          "head": "body/hip_right"
+        },
+        {
+          "name": "knee_right",
+          "parent": "hip_right",
+          "head": "leg_right_upper/knee"
+        },
+        {
+          "name": "shoulder_right",
+          "parent": null,
+          "head": "body/shoulder_right"
+        },
+        {
+          "name": "elbow_right",
+          "parent": "shoulder_right",
+          "head": "arm_right/elbow"
+        }
+      ],
+      "ground": [
+        {
+          "part": "body",
+          "joint": "ground",
+          "contacts": [
+            "leg_left_lower/contact",
+            "leg_right_lower/contact"
+          ]
+        }
+      ]
     },
     "mochi": {
       "roots": [
@@ -722,82 +1090,111 @@
         "body": {
           "parent": null,
           "joint": null,
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "shadow": {
           "parent": "body",
           "joint": "ground",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": {
+            "kind": "ground_projected",
+            "inherit_rotation": false,
+            "inherit_translation": [
+              "x"
+            ],
+            "pin": "character ground plane"
+          }
         },
         "leg_fore_left": {
           "parent": "body",
           "joint": "shoulder_fore_left",
-          "rest_angle": -10.0
+          "rest_angle": -8.0,
+          "constraint": null
         },
         "leg_fore_right": {
           "parent": "body",
           "joint": "shoulder_fore_right",
-          "rest_angle": -6.0
+          "rest_angle": -8.0,
+          "constraint": null
         },
         "leg_hind_left": {
           "parent": "body",
           "joint": "hip_hind_left",
-          "rest_angle": 10.0
+          "rest_angle": 8.0,
+          "constraint": null
         },
         "leg_hind_right": {
           "parent": "body",
           "joint": "hip_hind_right",
-          "rest_angle": 6.0
+          "rest_angle": 8.0,
+          "constraint": null
         },
         "tail": {
           "parent": "body",
           "joint": "rump",
-          "rest_angle": 130.0
+          "rest_angle": 130.0,
+          "constraint": null
+        },
+        "belly_shade": {
+          "parent": "body",
+          "joint": "belly",
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "head": {
           "parent": "body",
           "joint": "neck",
-          "rest_angle": 0.0
-        },
-        "ear_left": {
-          "parent": "head",
-          "joint": "ear_left",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "ear_right": {
           "parent": "head",
           "joint": "ear_right",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
+        },
+        "ear_left": {
+          "parent": "head",
+          "joint": "ear_left",
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_left": {
           "parent": "head",
           "joint": "eye_left",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "eye_right": {
           "parent": "head",
           "joint": "eye_right",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "nose": {
           "parent": "head",
           "joint": "nose",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_neutral": {
           "parent": "head",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_open": {
           "parent": "head",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "mouth_smile": {
           "parent": "head",
           "joint": "mouth",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         }
       },
       "slots": {
@@ -809,7 +1206,76 @@
           ],
           "default": "mouth_smile"
         }
-      }
+      },
+      "bones": [
+        {
+          "name": "shoulder_fore_left",
+          "parent": null,
+          "head": "body/shoulder_fore_left"
+        },
+        {
+          "name": "knee_fore_left",
+          "parent": "shoulder_fore_left",
+          "head": "leg_fore_left/knee"
+        },
+        {
+          "name": "shoulder_fore_right",
+          "parent": null,
+          "head": "body/shoulder_fore_right"
+        },
+        {
+          "name": "knee_fore_right",
+          "parent": "shoulder_fore_right",
+          "head": "leg_fore_right/knee"
+        },
+        {
+          "name": "hip_hind_left",
+          "parent": null,
+          "head": "body/hip_hind_left"
+        },
+        {
+          "name": "knee_hind_left",
+          "parent": "hip_hind_left",
+          "head": "leg_hind_left/knee"
+        },
+        {
+          "name": "hip_hind_right",
+          "parent": null,
+          "head": "body/hip_hind_right"
+        },
+        {
+          "name": "knee_hind_right",
+          "parent": "hip_hind_right",
+          "head": "leg_hind_right/knee"
+        },
+        {
+          "name": "rump",
+          "parent": null,
+          "head": "body/rump"
+        },
+        {
+          "name": "tail_mid",
+          "parent": "rump",
+          "head": "tail/knuckle_1"
+        },
+        {
+          "name": "tail_end",
+          "parent": "tail_mid",
+          "head": "tail/knuckle_2"
+        }
+      ],
+      "ground": [
+        {
+          "part": "body",
+          "joint": "ground",
+          "contacts": [
+            "leg_fore_left/contact",
+            "leg_fore_right/contact",
+            "leg_hind_left/contact",
+            "leg_hind_right/contact"
+          ]
+        }
+      ]
     },
     "cart": {
       "roots": [
@@ -820,30 +1286,53 @@
         "body": {
           "parent": null,
           "joint": null,
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "shadow": {
           "parent": "body",
           "joint": "ground",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": {
+            "kind": "ground_projected",
+            "inherit_rotation": false,
+            "inherit_translation": [
+              "x"
+            ],
+            "pin": "character ground plane"
+          }
         },
         "wheel_rear": {
           "parent": "body",
           "joint": "axle_rear",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "wheel_front": {
           "parent": "body",
           "joint": "axle_front",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "handle": {
           "parent": "body",
           "joint": "hitch",
-          "rest_angle": -118.0
+          "rest_angle": -118.0,
+          "constraint": null
         }
       },
-      "slots": {}
+      "slots": {},
+      "bones": [],
+      "ground": [
+        {
+          "part": "body",
+          "joint": "ground",
+          "contacts": [
+            "wheel_front/contact",
+            "wheel_rear/contact"
+          ]
+        }
+      ]
     },
     "props": {
       "roots": [
@@ -855,23 +1344,65 @@
         "ball": {
           "parent": null,
           "joint": null,
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
+        },
+        "ball_highlight": {
+          "parent": "ball",
+          "joint": "highlight",
+          "rest_angle": 0.0,
+          "constraint": {
+            "kind": "light_locked",
+            "inherit_rotation": false,
+            "inherit_translation": [
+              "x",
+              "y"
+            ],
+            "pin": "the key light's direction in character space"
+          }
         },
         "drum": {
           "parent": null,
           "joint": null,
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "shadow_small": {
           "parent": "ball",
           "joint": "ground",
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": {
+            "kind": "ground_projected",
+            "inherit_rotation": false,
+            "inherit_translation": [
+              "x"
+            ],
+            "pin": "character ground plane"
+          }
         }
       },
-      "slots": {}
+      "slots": {},
+      "bones": [],
+      "ground": [
+        {
+          "part": "ball",
+          "joint": "ground",
+          "contacts": [
+            "ball/ground"
+          ]
+        },
+        {
+          "part": "drum",
+          "joint": "ground",
+          "contacts": [
+            "drum/ground"
+          ]
+        }
+      ]
     },
     "scene": {
       "roots": [
+        "haze",
         "cloud",
         "tree_large",
         "tree_small",
@@ -879,29 +1410,78 @@
       ],
       "space": "each band's own pivot at the ground line, +x right, +y down, pixels",
       "attach": {
+        "haze": {
+          "parent": null,
+          "joint": null,
+          "rest_angle": 0.0,
+          "constraint": null
+        },
         "cloud": {
           "parent": null,
           "joint": null,
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "tree_large": {
           "parent": null,
           "joint": null,
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "tree_small": {
           "parent": null,
           "joint": null,
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         },
         "grass": {
           "parent": null,
           "joint": null,
-          "rest_angle": 0.0
+          "rest_angle": 0.0,
+          "constraint": null
         }
       },
       "slots": {},
+      "bones": [],
+      "ground": [
+        {
+          "part": "haze",
+          "joint": "ground",
+          "contacts": [
+            "haze/ground"
+          ]
+        },
+        {
+          "part": "cloud",
+          "joint": "ground",
+          "contacts": [
+            "cloud/ground"
+          ]
+        },
+        {
+          "part": "tree_large",
+          "joint": "ground",
+          "contacts": [
+            "tree_large/ground"
+          ]
+        },
+        {
+          "part": "tree_small",
+          "joint": "ground",
+          "contacts": [
+            "tree_small/ground"
+          ]
+        },
+        {
+          "part": "grass",
+          "joint": "ground",
+          "contacts": [
+            "grass/ground"
+          ]
+        }
+      ],
       "parallax": {
+        "haze": 0.05,
         "cloud": 0.1,
         "tree_large": 0.3,
         "tree_small": 0.55,
@@ -915,192 +1495,443 @@
       "layer": "shadow",
       "file": "bo/shadow.png",
       "z": 0,
-      "size": [
-        137,
-        35
-      ],
-      "pivot": [
-        68,
-        18
-      ],
+      "size": [137, 35],
+      "pivot": [68, 18],
       "joints": {},
-      "blend_mode": "normal",
-      "opacity": 1.0,
-      "note": "ground contact, follows body x only"
+      "sources": [],
+      "blend_mode": "multiply",
+      "opacity": 0.8,
+      "mesh": null,
+      "note": "ground shadow; its centre is the ground plane the feet stand on"
     },
     {
       "character": "bo",
-      "layer": "leg_left",
-      "file": "bo/leg_left.png",
+      "layer": "leg_left_upper",
+      "file": "bo/leg_left_upper.png",
       "z": 1,
-      "size": [
-        27,
-        70
-      ],
-      "pivot": [
-        13,
-        13
-      ],
+      "size": [27, 49],
+      "pivot": [13, 13],
       "joints": {
-        "tip": [
-          13,
-          57
-        ],
-        "contact": [
-          13,
-          69
-        ]
+        "knee": [13, 49]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
-      "note": "pivot at hip; contact joint is the foot on the ground"
+      "mesh": {
+        "bones": [
+          "hip_left",
+          "knee_left"
+        ],
+        "heads": [13.5, 49.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [27.0, 0.0],
+          [0.0, 16.33],
+          [27.0, 16.33],
+          [0.0, 32.67],
+          [27.0, 32.67],
+          [0.0, 49.0],
+          [27.0, 49.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.33327],
+          [1.0, 0.33327],
+          [0.0, 0.66673],
+          [1.0, 0.66673],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6]
+        ],
+        "weights": [
+          [1.0, 0.0],
+          [1.0, 0.0],
+          [0.9203, 0.0797],
+          [0.9203, 0.0797],
+          [0.46, 0.54],
+          [0.46, 0.54],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "thigh; pivot at the hip, knee joint on its flat bottom edge, which is the seam it shares with leg_left_lower"
     },
     {
       "character": "bo",
-      "layer": "leg_right",
-      "file": "bo/leg_right.png",
+      "layer": "leg_left_lower",
+      "file": "bo/leg_left_lower.png",
       "z": 2,
-      "size": [
-        27,
-        70
-      ],
-      "pivot": [
-        13,
-        13
-      ],
+      "size": [27, 34],
+      "pivot": [13, 0],
       "joints": {
-        "tip": [
-          13,
-          57
-        ],
-        "contact": [
-          13,
-          69
-        ]
+        "tip": [13, 21],
+        "contact": [13, 33]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
-      "note": "pivot at hip; contact joint is the foot on the ground"
+      "mesh": {
+        "bones": [
+          "hip_left",
+          "knee_left"
+        ],
+        "heads": [-36, 0.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [27.0, 0.0],
+          [0.0, 11.33],
+          [27.0, 11.33],
+          [0.0, 22.67],
+          [27.0, 22.67],
+          [0.0, 34.0],
+          [27.0, 34.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.33324],
+          [1.0, 0.33324],
+          [0.0, 0.66676],
+          [1.0, 0.66676],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6]
+        ],
+        "weights": [
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "shin; pivot on its flat top edge, on the knee. The contact joint rides this part's mesh, so a bent knee moves the foot"
+    },
+    {
+      "character": "bo",
+      "layer": "leg_right_upper",
+      "file": "bo/leg_right_upper.png",
+      "z": 3,
+      "size": [27, 49],
+      "pivot": [13, 13],
+      "joints": {
+        "knee": [13, 49]
+      },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "mesh": {
+        "bones": [
+          "hip_right",
+          "knee_right"
+        ],
+        "heads": [13.5, 49.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [27.0, 0.0],
+          [0.0, 16.33],
+          [27.0, 16.33],
+          [0.0, 32.67],
+          [27.0, 32.67],
+          [0.0, 49.0],
+          [27.0, 49.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.33327],
+          [1.0, 0.33327],
+          [0.0, 0.66673],
+          [1.0, 0.66673],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6]
+        ],
+        "weights": [
+          [1.0, 0.0],
+          [1.0, 0.0],
+          [0.9203, 0.0797],
+          [0.9203, 0.0797],
+          [0.46, 0.54],
+          [0.46, 0.54],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "thigh; pivot at the hip, knee joint on its flat bottom edge, which is the seam it shares with leg_right_lower"
+    },
+    {
+      "character": "bo",
+      "layer": "leg_right_lower",
+      "file": "bo/leg_right_lower.png",
+      "z": 4,
+      "size": [27, 34],
+      "pivot": [13, 0],
+      "joints": {
+        "tip": [13, 21],
+        "contact": [13, 33]
+      },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "mesh": {
+        "bones": [
+          "hip_right",
+          "knee_right"
+        ],
+        "heads": [-36, 0.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [27.0, 0.0],
+          [0.0, 11.33],
+          [27.0, 11.33],
+          [0.0, 22.67],
+          [27.0, 22.67],
+          [0.0, 34.0],
+          [27.0, 34.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.33324],
+          [1.0, 0.33324],
+          [0.0, 0.66676],
+          [1.0, 0.66676],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6]
+        ],
+        "weights": [
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "shin; pivot on its flat top edge, on the knee. The contact joint rides this part's mesh, so a bent knee moves the foot"
     },
     {
       "character": "bo",
       "layer": "arm_left",
       "file": "bo/arm_left.png",
-      "z": 3,
-      "size": [
-        20,
-        99
-      ],
-      "pivot": [
-        10,
-        10
-      ],
+      "z": 5,
+      "size": [20, 99],
+      "pivot": [10, 10],
       "joints": {
-        "tip": [
-          10,
-          89
-        ],
-        "contact": [
-          10,
-          98
-        ]
+        "tip": [10, 89],
+        "contact": [10, 98],
+        "elbow": [10, 49]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
-      "note": "pivot at shoulder; tip joint is the wrist"
+      "mesh": {
+        "bones": [
+          "shoulder_left",
+          "elbow_left"
+        ],
+        "heads": [10.0, 49.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [20.0, 0.0],
+          [0.0, 24.75],
+          [20.0, 24.75],
+          [0.0, 49.5],
+          [20.0, 49.5],
+          [0.0, 74.25],
+          [20.0, 74.25],
+          [0.0, 99.0],
+          [20.0, 99.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.25],
+          [1.0, 0.25],
+          [0.0, 0.5],
+          [1.0, 0.5],
+          [0.0, 0.75],
+          [1.0, 0.75],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6],
+          [6, 7, 9],
+          [6, 9, 8]
+        ],
+        "weights": [
+          [1.0, 0.0],
+          [1.0, 0.0],
+          [0.6218, 0.3782],
+          [0.6218, 0.3782],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "pivot at shoulder; elbow joint bends it, tip joint is the wrist"
     },
     {
       "character": "bo",
       "layer": "arm_right",
       "file": "bo/arm_right.png",
-      "z": 4,
-      "size": [
-        20,
-        99
-      ],
-      "pivot": [
-        10,
-        10
-      ],
+      "z": 6,
+      "size": [20, 99],
+      "pivot": [10, 10],
       "joints": {
-        "tip": [
-          10,
-          89
-        ],
-        "contact": [
-          10,
-          98
-        ]
+        "tip": [10, 89],
+        "contact": [10, 98],
+        "elbow": [10, 49]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
-      "note": "pivot at shoulder; tip joint is the wrist"
+      "mesh": {
+        "bones": [
+          "shoulder_right",
+          "elbow_right"
+        ],
+        "heads": [10.0, 49.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [20.0, 0.0],
+          [0.0, 24.75],
+          [20.0, 24.75],
+          [0.0, 49.5],
+          [20.0, 49.5],
+          [0.0, 74.25],
+          [20.0, 74.25],
+          [0.0, 99.0],
+          [20.0, 99.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.25],
+          [1.0, 0.25],
+          [0.0, 0.5],
+          [1.0, 0.5],
+          [0.0, 0.75],
+          [1.0, 0.75],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6],
+          [6, 7, 9],
+          [6, 9, 8]
+        ],
+        "weights": [
+          [1.0, 0.0],
+          [1.0, 0.0],
+          [0.6218, 0.3782],
+          [0.6218, 0.3782],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "pivot at shoulder; elbow joint bends it, tip joint is the wrist"
     },
     {
       "character": "bo",
       "layer": "body",
       "file": "bo/body.png",
       "z": 10,
-      "size": [
-        160,
-        160
-      ],
-      "pivot": [
-        80,
-        80
-      ],
+      "size": [160, 160],
+      "pivot": [80, 80],
       "joints": {
-        "ground": [
-          80,
-          172
-        ],
-        "shoulder_left": [
-          22,
-          54
-        ],
-        "shoulder_right": [
-          138,
-          54
-        ],
-        "hip_left": [
-          42,
-          125
-        ],
-        "hip_right": [
-          118,
-          125
-        ],
-        "clothing": [
-          80,
-          90
-        ],
-        "eye_left": [
-          48,
-          48
-        ],
-        "eye_right": [
-          112,
-          48
-        ],
-        "brow_left": [
-          48,
-          17
-        ],
-        "brow_right": [
-          112,
-          17
-        ],
-        "mouth": [
-          80,
-          83
-        ],
-        "crown": [
-          80,
-          16
-        ]
+        "ground": [80, 192],
+        "shoulder_left": [22, 54],
+        "shoulder_right": [138, 54],
+        "hip_left": [42, 125],
+        "hip_right": [118, 125],
+        "clothing": [80, 90],
+        "eye_left": [48, 48],
+        "eye_right": [112, 48],
+        "brow_left": [48, 17],
+        "brow_right": [112, 17],
+        "mouth": [80, 83],
+        "crown": [80, 16]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_body_circle.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "Kenney circle base, recoloured"
     },
     {
@@ -1108,17 +1939,15 @@
       "layer": "clothing",
       "file": "bo/clothing.png",
       "z": 11,
-      "size": [
-        147,
-        54
-      ],
-      "pivot": [
-        74,
-        0
-      ],
+      "size": [147, 54],
+      "pivot": [74, 0],
       "joints": {},
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "checks, original pattern"
     },
     {
@@ -1126,22 +1955,18 @@
       "layer": "hand_left_closed",
       "file": "bo/hand_left_closed.png",
       "z": 12,
-      "size": [
-        38,
-        37
-      ],
-      "pivot": [
-        19,
-        4
-      ],
+      "size": [38, 37],
+      "pivot": [19, 4],
       "joints": {
-        "grip": [
-          19,
-          23
-        ]
+        "grip": [19, 23]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_hand_closed.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
@@ -1149,22 +1974,18 @@
       "layer": "hand_left_open",
       "file": "bo/hand_left_open.png",
       "z": 12,
-      "size": [
-        37,
-        41
-      ],
-      "pivot": [
-        18,
-        4
-      ],
+      "size": [37, 41],
+      "pivot": [18, 4],
       "joints": {
-        "grip": [
-          18,
-          25
-        ]
+        "grip": [18, 25]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_hand_open.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
@@ -1172,22 +1993,18 @@
       "layer": "hand_left_point",
       "file": "bo/hand_left_point.png",
       "z": 12,
-      "size": [
-        37,
-        39
-      ],
-      "pivot": [
-        18,
-        4
-      ],
+      "size": [37, 39],
+      "pivot": [18, 4],
       "joints": {
-        "grip": [
-          18,
-          24
-        ]
+        "grip": [18, 24]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_hand_point.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
@@ -1195,22 +2012,18 @@
       "layer": "hand_right_closed",
       "file": "bo/hand_right_closed.png",
       "z": 12,
-      "size": [
-        38,
-        37
-      ],
-      "pivot": [
-        19,
-        4
-      ],
+      "size": [38, 37],
+      "pivot": [19, 4],
       "joints": {
-        "grip": [
-          19,
-          23
-        ]
+        "grip": [19, 23]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_hand_closed.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
@@ -1218,22 +2031,18 @@
       "layer": "hand_right_open",
       "file": "bo/hand_right_open.png",
       "z": 12,
-      "size": [
-        37,
-        41
-      ],
-      "pivot": [
-        18,
-        4
-      ],
+      "size": [37, 41],
+      "pivot": [18, 4],
       "joints": {
-        "grip": [
-          18,
-          25
-        ]
+        "grip": [18, 25]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_hand_open.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
@@ -1241,22 +2050,18 @@
       "layer": "hand_right_point",
       "file": "bo/hand_right_point.png",
       "z": 12,
-      "size": [
-        37,
-        39
-      ],
-      "pivot": [
-        18,
-        4
-      ],
+      "size": [37, 39],
+      "pivot": [18, 4],
       "joints": {
-        "grip": [
-          18,
-          24
-        ]
+        "grip": [18, 24]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_hand_point.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
@@ -1264,22 +2069,15 @@
       "layer": "eye_left",
       "file": "bo/eye_left.png",
       "z": 20,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        20
-      ],
+      "size": [40, 40],
+      "pivot": [20, 20],
       "joints": {
-        "pupil": [
-          20,
-          20
-        ]
+        "pupil": [20, 20]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "sclera, pupil, highlight"
     },
     {
@@ -1287,22 +2085,15 @@
       "layer": "eye_left_look_left",
       "file": "bo/eye_left_look_left.png",
       "z": 20,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        20
-      ],
+      "size": [40, 40],
+      "pivot": [20, 20],
       "joints": {
-        "pupil": [
-          14,
-          20
-        ]
+        "pupil": [14, 20]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "gaze target"
     },
     {
@@ -1310,22 +2101,15 @@
       "layer": "eye_left_look_right",
       "file": "bo/eye_left_look_right.png",
       "z": 20,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        20
-      ],
+      "size": [40, 40],
+      "pivot": [20, 20],
       "joints": {
-        "pupil": [
-          26,
-          20
-        ]
+        "pupil": [26, 20]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "gaze target"
     },
     {
@@ -1333,22 +2117,15 @@
       "layer": "eye_right",
       "file": "bo/eye_right.png",
       "z": 20,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        20
-      ],
+      "size": [40, 40],
+      "pivot": [20, 20],
       "joints": {
-        "pupil": [
-          20,
-          20
-        ]
+        "pupil": [20, 20]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "sclera, pupil, highlight"
     },
     {
@@ -1356,22 +2133,15 @@
       "layer": "eye_right_look_left",
       "file": "bo/eye_right_look_left.png",
       "z": 20,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        20
-      ],
+      "size": [40, 40],
+      "pivot": [20, 20],
       "joints": {
-        "pupil": [
-          14,
-          20
-        ]
+        "pupil": [14, 20]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "gaze target"
     },
     {
@@ -1379,22 +2149,15 @@
       "layer": "eye_right_look_right",
       "file": "bo/eye_right_look_right.png",
       "z": 20,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        20
-      ],
+      "size": [40, 40],
+      "pivot": [20, 20],
       "joints": {
-        "pupil": [
-          26,
-          20
-        ]
+        "pupil": [26, 20]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "gaze target"
     },
     {
@@ -1402,17 +2165,16 @@
       "layer": "eyebrow_left",
       "file": "bo/eyebrow_left.png",
       "z": 21,
-      "size": [
-        40,
-        10
-      ],
-      "pivot": [
-        20,
-        5
-      ],
+      "size": [40, 10],
+      "pivot": [20, 5],
       "joints": {},
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/facial_part_eyebrow_a.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the brow centre"
     },
     {
@@ -1420,17 +2182,16 @@
       "layer": "eyebrow_right",
       "file": "bo/eyebrow_right.png",
       "z": 21,
-      "size": [
-        40,
-        10
-      ],
-      "pivot": [
-        20,
-        5
-      ],
+      "size": [40, 10],
+      "pivot": [20, 5],
       "joints": {},
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/facial_part_eyebrow_a.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the brow centre"
     },
     {
@@ -1438,17 +2199,13 @@
       "layer": "mouth_neutral",
       "file": "bo/mouth_neutral.png",
       "z": 22,
-      "size": [
-        33,
-        9
-      ],
-      "pivot": [
-        16,
-        0
-      ],
+      "size": [33, 9],
+      "pivot": [16, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "expression"
     },
     {
@@ -1456,17 +2213,13 @@
       "layer": "mouth_open",
       "file": "bo/mouth_open.png",
       "z": 22,
-      "size": [
-        31,
-        37
-      ],
-      "pivot": [
-        16,
-        0
-      ],
+      "size": [31, 37],
+      "pivot": [16, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "expression"
     },
     {
@@ -1474,17 +2227,13 @@
       "layer": "mouth_smile",
       "file": "bo/mouth_smile.png",
       "z": 22,
-      "size": [
-        43,
-        22
-      ],
-      "pivot": [
-        22,
-        0
-      ],
+      "size": [43, 22],
+      "pivot": [22, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "expression"
     },
     {
@@ -1492,17 +2241,13 @@
       "layer": "mouth_viseme_ai",
       "file": "bo/mouth_viseme_ai.png",
       "z": 22,
-      "size": [
-        35,
-        33
-      ],
-      "pivot": [
-        18,
-        0
-      ],
+      "size": [35, 33],
+      "pivot": [18, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -1510,17 +2255,13 @@
       "layer": "mouth_viseme_e",
       "file": "bo/mouth_viseme_e.png",
       "z": 22,
-      "size": [
-        39,
-        19
-      ],
-      "pivot": [
-        20,
-        0
-      ],
+      "size": [39, 19],
+      "pivot": [20, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -1528,17 +2269,13 @@
       "layer": "mouth_viseme_fv",
       "file": "bo/mouth_viseme_fv.png",
       "z": 22,
-      "size": [
-        32,
-        14
-      ],
-      "pivot": [
-        16,
-        0
-      ],
+      "size": [32, 14],
+      "pivot": [16, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -1546,17 +2283,13 @@
       "layer": "mouth_viseme_l",
       "file": "bo/mouth_viseme_l.png",
       "z": 22,
-      "size": [
-        30,
-        27
-      ],
-      "pivot": [
-        15,
-        0
-      ],
+      "size": [30, 27],
+      "pivot": [15, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -1564,17 +2297,13 @@
       "layer": "mouth_viseme_mbp",
       "file": "bo/mouth_viseme_mbp.png",
       "z": 22,
-      "size": [
-        33,
-        8
-      ],
-      "pivot": [
-        16,
-        0
-      ],
+      "size": [33, 8],
+      "pivot": [16, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -1582,17 +2311,13 @@
       "layer": "mouth_viseme_o",
       "file": "bo/mouth_viseme_o.png",
       "z": 22,
-      "size": [
-        23,
-        34
-      ],
-      "pivot": [
-        12,
-        0
-      ],
+      "size": [23, 34],
+      "pivot": [12, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -1600,17 +2325,13 @@
       "layer": "mouth_viseme_u",
       "file": "bo/mouth_viseme_u.png",
       "z": 22,
-      "size": [
-        18,
-        26
-      ],
-      "pivot": [
-        9,
-        0
-      ],
+      "size": [18, 26],
+      "pivot": [9, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -1618,17 +2339,13 @@
       "layer": "mouth_viseme_ws",
       "file": "bo/mouth_viseme_ws.png",
       "z": 22,
-      "size": [
-        25,
-        20
-      ],
-      "pivot": [
-        12,
-        0
-      ],
+      "size": [25, 20],
+      "pivot": [12, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -1636,17 +2353,13 @@
       "layer": "mouth_wide",
       "file": "bo/mouth_wide.png",
       "z": 22,
-      "size": [
-        46,
-        28
-      ],
-      "pivot": [
-        23,
-        0
-      ],
+      "size": [46, 28],
+      "pivot": [23, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "expression"
     },
     {
@@ -1654,17 +2367,15 @@
       "layer": "hair",
       "file": "bo/hair.png",
       "z": 30,
-      "size": [
-        137,
-        41
-      ],
-      "pivot": [
-        68,
-        29
-      ],
+      "size": [137, 41],
+      "pivot": [68, 29],
       "joints": {},
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot where the hair seats on the crown"
     },
     {
@@ -1672,44 +2383,32 @@
       "layer": "shadow",
       "file": "cart/shadow.png",
       "z": 0,
-      "size": [
-        239,
-        30
-      ],
-      "pivot": [
-        120,
-        15
-      ],
+      "size": [239, 30],
+      "pivot": [120, 15],
       "joints": {},
-      "blend_mode": "normal",
-      "opacity": 1.0,
-      "note": "ground contact, follows body x only"
+      "sources": [],
+      "blend_mode": "multiply",
+      "opacity": 0.8,
+      "mesh": null,
+      "note": "ground shadow; its centre is the plane the wheels roll on"
     },
     {
       "character": "cart",
       "layer": "handle",
       "file": "cart/handle.png",
       "z": 9,
-      "size": [
-        22,
-        120
-      ],
-      "pivot": [
-        11,
-        11
-      ],
+      "size": [22, 120],
+      "pivot": [11, 11],
       "joints": {
-        "tip": [
-          11,
-          109
-        ],
-        "contact": [
-          11,
-          119
-        ]
+        "tip": [11, 109],
+        "contact": [11, 119]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the hitch; tip is the pull point"
     },
     {
@@ -1717,38 +2416,21 @@
       "layer": "body",
       "file": "cart/body.png",
       "z": 10,
-      "size": [
-        260,
-        120
-      ],
-      "pivot": [
-        130,
-        60
-      ],
+      "size": [260, 120],
+      "pivot": [130, 60],
       "joints": {
-        "ground": [
-          130,
-          145
-        ],
-        "axle_front": [
-          52,
-          110
-        ],
-        "axle_rear": [
-          208,
-          110
-        ],
-        "hitch": [
-          10,
-          36
-        ],
-        "cargo": [
-          130,
-          0
-        ]
+        "ground": [130, 147],
+        "axle_front": [52, 110],
+        "axle_rear": [208, 110],
+        "hitch": [10, 36],
+        "cargo": [130, 0]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "prop and character attachment surface; cargo joint is the load point"
     },
     {
@@ -1756,22 +2438,17 @@
       "layer": "wheel_rear",
       "file": "cart/wheel_rear.png",
       "z": 11,
-      "size": [
-        76,
-        76
-      ],
-      "pivot": [
-        38,
-        38
-      ],
+      "size": [76, 76],
+      "pivot": [38, 38],
       "joints": {
-        "contact": [
-          38,
-          75
-        ]
+        "contact": [38, 75]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at axle centre, rotation cycle must match ground travel"
     },
     {
@@ -1779,22 +2456,17 @@
       "layer": "wheel_front",
       "file": "cart/wheel_front.png",
       "z": 12,
-      "size": [
-        76,
-        76
-      ],
-      "pivot": [
-        38,
-        38
-      ],
+      "size": [76, 76],
+      "pivot": [38, 38],
       "joints": {
-        "contact": [
-          38,
-          75
-        ]
+        "contact": [38, 75]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at axle centre, rotation cycle must match ground travel"
     },
     {
@@ -1802,44 +2474,86 @@
       "layer": "shadow",
       "file": "mochi/shadow.png",
       "z": 0,
-      "size": [
-        198,
-        34
-      ],
-      "pivot": [
-        99,
-        17
-      ],
+      "size": [198, 34],
+      "pivot": [99, 17],
       "joints": {},
-      "blend_mode": "normal",
-      "opacity": 1.0,
-      "note": "four-point contact, locomotion critical"
+      "sources": [],
+      "blend_mode": "multiply",
+      "opacity": 0.8,
+      "mesh": null,
+      "note": "four-point contact, locomotion critical; its centre is the ground plane"
     },
     {
       "character": "mochi",
       "layer": "leg_hind_right",
       "file": "mochi/leg_hind_right.png",
       "z": 1,
-      "size": [
-        26,
-        84
-      ],
-      "pivot": [
-        13,
-        13
-      ],
+      "size": [26, 84],
+      "pivot": [13, 13],
       "joints": {
-        "tip": [
-          13,
-          71
-        ],
-        "contact": [
-          13,
-          83
-        ]
+        "tip": [13, 71],
+        "contact": [13, 83],
+        "knee": [13, 42]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": {
+        "bones": [
+          "hip_hind_right",
+          "knee_hind_right"
+        ],
+        "heads": [13.0, 42.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [26.0, 0.0],
+          [0.0, 21.0],
+          [26.0, 21.0],
+          [0.0, 42.0],
+          [26.0, 42.0],
+          [0.0, 63.0],
+          [26.0, 63.0],
+          [0.0, 84.0],
+          [26.0, 84.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.25],
+          [1.0, 0.25],
+          [0.0, 0.5],
+          [1.0, 0.5],
+          [0.0, 0.75],
+          [1.0, 0.75],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6],
+          [6, 7, 9],
+          [6, 9, 8]
+        ],
+        "weights": [
+          [1.0, 0.0],
+          [1.0, 0.0],
+          [0.7241, 0.2759],
+          [0.7241, 0.2759],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
       "note": "pivot at the far hip; contact joint is the ground point"
     },
     {
@@ -1847,26 +2561,72 @@
       "layer": "leg_fore_right",
       "file": "mochi/leg_fore_right.png",
       "z": 2,
-      "size": [
-        26,
-        84
-      ],
-      "pivot": [
-        13,
-        13
-      ],
+      "size": [26, 84],
+      "pivot": [13, 13],
       "joints": {
-        "tip": [
-          13,
-          71
-        ],
-        "contact": [
-          13,
-          83
-        ]
+        "tip": [13, 71],
+        "contact": [13, 83],
+        "knee": [13, 42]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": {
+        "bones": [
+          "shoulder_fore_right",
+          "knee_fore_right"
+        ],
+        "heads": [13.0, 42.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [26.0, 0.0],
+          [0.0, 21.0],
+          [26.0, 21.0],
+          [0.0, 42.0],
+          [26.0, 42.0],
+          [0.0, 63.0],
+          [26.0, 63.0],
+          [0.0, 84.0],
+          [26.0, 84.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.25],
+          [1.0, 0.25],
+          [0.0, 0.5],
+          [1.0, 0.5],
+          [0.0, 0.75],
+          [1.0, 0.75],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6],
+          [6, 7, 9],
+          [6, 9, 8]
+        ],
+        "weights": [
+          [1.0, 0.0],
+          [1.0, 0.0],
+          [0.7241, 0.2759],
+          [0.7241, 0.2759],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
       "note": "pivot at the far shoulder; contact joint is the ground point"
     },
     {
@@ -1874,26 +2634,72 @@
       "layer": "leg_hind_left",
       "file": "mochi/leg_hind_left.png",
       "z": 3,
-      "size": [
-        26,
-        84
-      ],
-      "pivot": [
-        13,
-        13
-      ],
+      "size": [26, 84],
+      "pivot": [13, 13],
       "joints": {
-        "tip": [
-          13,
-          71
-        ],
-        "contact": [
-          13,
-          83
-        ]
+        "tip": [13, 71],
+        "contact": [13, 83],
+        "knee": [13, 42]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": {
+        "bones": [
+          "hip_hind_left",
+          "knee_hind_left"
+        ],
+        "heads": [13.0, 42.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [26.0, 0.0],
+          [0.0, 21.0],
+          [26.0, 21.0],
+          [0.0, 42.0],
+          [26.0, 42.0],
+          [0.0, 63.0],
+          [26.0, 63.0],
+          [0.0, 84.0],
+          [26.0, 84.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.25],
+          [1.0, 0.25],
+          [0.0, 0.5],
+          [1.0, 0.5],
+          [0.0, 0.75],
+          [1.0, 0.75],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6],
+          [6, 7, 9],
+          [6, 9, 8]
+        ],
+        "weights": [
+          [1.0, 0.0],
+          [1.0, 0.0],
+          [0.7241, 0.2759],
+          [0.7241, 0.2759],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
       "note": "pivot at the near hip; contact joint is the ground point"
     },
     {
@@ -1901,26 +2707,72 @@
       "layer": "leg_fore_left",
       "file": "mochi/leg_fore_left.png",
       "z": 4,
-      "size": [
-        26,
-        84
-      ],
-      "pivot": [
-        13,
-        13
-      ],
+      "size": [26, 84],
+      "pivot": [13, 13],
       "joints": {
-        "tip": [
-          13,
-          71
-        ],
-        "contact": [
-          13,
-          83
-        ]
+        "tip": [13, 71],
+        "contact": [13, 83],
+        "knee": [13, 42]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": {
+        "bones": [
+          "shoulder_fore_left",
+          "knee_fore_left"
+        ],
+        "heads": [13.0, 42.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [26.0, 0.0],
+          [0.0, 21.0],
+          [26.0, 21.0],
+          [0.0, 42.0],
+          [26.0, 42.0],
+          [0.0, 63.0],
+          [26.0, 63.0],
+          [0.0, 84.0],
+          [26.0, 84.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.25],
+          [1.0, 0.25],
+          [0.0, 0.5],
+          [1.0, 0.5],
+          [0.0, 0.75],
+          [1.0, 0.75],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6],
+          [6, 7, 9],
+          [6, 9, 8]
+        ],
+        "weights": [
+          [1.0, 0.0],
+          [1.0, 0.0],
+          [0.7241, 0.2759],
+          [0.7241, 0.2759],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
       "note": "pivot at the near shoulder; contact joint is the ground point"
     },
     {
@@ -1928,26 +2780,90 @@
       "layer": "tail",
       "file": "mochi/tail.png",
       "z": 9,
-      "size": [
-        20,
-        70
-      ],
-      "pivot": [
-        10,
-        10
-      ],
+      "size": [20, 70],
+      "pivot": [10, 10],
       "joints": {
-        "tip": [
-          10,
-          60
-        ],
-        "contact": [
-          10,
-          69
-        ]
+        "tip": [10, 60],
+        "contact": [10, 69],
+        "knuckle_1": [10, 26],
+        "knuckle_2": [10, 46]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": {
+        "bones": [
+          "rump",
+          "tail_mid",
+          "tail_end"
+        ],
+        "heads": [10.0, 26.0, 46.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [20.0, 0.0],
+          [0.0, 11.67],
+          [20.0, 11.67],
+          [0.0, 23.33],
+          [20.0, 23.33],
+          [0.0, 35.0],
+          [20.0, 35.0],
+          [0.0, 46.67],
+          [20.0, 46.67],
+          [0.0, 58.33],
+          [20.0, 58.33],
+          [0.0, 70.0],
+          [20.0, 70.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.16671],
+          [1.0, 0.16671],
+          [0.0, 0.33329],
+          [1.0, 0.33329],
+          [0.0, 0.5],
+          [1.0, 0.5],
+          [0.0, 0.66671],
+          [1.0, 0.66671],
+          [0.0, 0.83329],
+          [1.0, 0.83329],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6],
+          [6, 7, 9],
+          [6, 9, 8],
+          [8, 9, 11],
+          [8, 11, 10],
+          [10, 11, 13],
+          [10, 13, 12]
+        ],
+        "weights": [
+          [1.0, 0.0, 0.0],
+          [1.0, 0.0, 0.0],
+          [0.8956, 0.1044, 0.0],
+          [0.8956, 0.1044, 0.0],
+          [0.1669, 0.8331, 0.0],
+          [0.1669, 0.8331, 0.0],
+          [0.0, 0.55, 0.45],
+          [0.0, 0.55, 0.45],
+          [0.0, 0.0, 1.0],
+          [0.0, 0.0, 1.0],
+          [0.0, 0.0, 1.0],
+          [0.0, 0.0, 1.0],
+          [0.0, 0.0, 1.0],
+          [0.0, 0.0, 1.0]
+        ]
+      },
       "note": "pivot at the rump, secondary motion"
     },
     {
@@ -1955,92 +2871,130 @@
       "layer": "body",
       "file": "mochi/body.png",
       "z": 10,
-      "size": [
-        220,
-        140
-      ],
-      "pivot": [
-        110,
-        70
-      ],
+      "size": [220, 140],
+      "pivot": [110, 70],
       "joints": {
-        "ground": [
-          110,
-          153
-        ],
-        "neck": [
-          66,
-          62
-        ],
-        "rump": [
-          207,
-          45
-        ],
-        "shoulder_fore_left": [
-          44,
-          106
-        ],
-        "shoulder_fore_right": [
-          31,
-          106
-        ],
-        "hip_hind_left": [
-          176,
-          106
-        ],
-        "hip_hind_right": [
-          189,
-          106
-        ]
+        "ground": [110, 175],
+        "neck": [66, 62],
+        "belly": [110, 112],
+        "rump": [207, 45],
+        "shoulder_fore_left": [44, 106],
+        "shoulder_fore_right": [31, 106],
+        "hip_hind_left": [176, 106],
+        "hip_hind_right": [189, 106]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "torso; every limb, the head and the tail hang off this"
+    },
+    {
+      "character": "mochi",
+      "layer": "belly_shade",
+      "file": "mochi/belly_shade.png",
+      "z": 11,
+      "size": [136, 30],
+      "pivot": [68, 15],
+      "joints": {
+        "fore": [2, 15],
+        "hind": [134, 15]
+      },
+      "sources": [],
+      "blend_mode": "multiply",
+      "opacity": 0.7,
+      "mesh": {
+        "bones": [
+          "shoulder_fore_left",
+          "hip_hind_left"
+        ],
+        "heads": [2.0, 134.0],
+        "axis": "x",
+        "vertices": [
+          [0.0, 0.0],
+          [0.0, 30.0],
+          [34.0, 0.0],
+          [34.0, 30.0],
+          [68.0, 0.0],
+          [68.0, 30.0],
+          [102.0, 0.0],
+          [102.0, 30.0],
+          [136.0, 0.0],
+          [136.0, 30.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [0.0, 1.0],
+          [0.25, 0.0],
+          [0.25, 1.0],
+          [0.5, 0.0],
+          [0.5, 1.0],
+          [0.75, 0.0],
+          [0.75, 1.0],
+          [1.0, 0.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6],
+          [6, 7, 9],
+          [6, 9, 8]
+        ],
+        "weights": [
+          [1.0, 0.0],
+          [1.0, 0.0],
+          [0.7576, 0.2424],
+          [0.7576, 0.2424],
+          [0.5, 0.5],
+          [0.5, 0.5],
+          [0.2424, 0.7576],
+          [0.2424, 0.7576],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "contact shade under the belly; multiply at 0.7, and a mesh bound to the near fore and hind leg bones so it follows the stride"
+    },
+    {
+      "character": "mochi",
+      "layer": "ear_right",
+      "file": "mochi/ear_right.png",
+      "z": 18,
+      "size": [52, 66],
+      "pivot": [26, 56],
+      "joints": {
+        "tip": [26, 0]
+      },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "mesh": null,
+      "note": "pivot at the ear base inside the skull, secondary motion"
     },
     {
       "character": "mochi",
       "layer": "ear_left",
       "file": "mochi/ear_left.png",
       "z": 19,
-      "size": [
-        52,
-        66
-      ],
-      "pivot": [
-        26,
-        56
-      ],
+      "size": [52, 66],
+      "pivot": [26, 56],
       "joints": {
-        "tip": [
-          26,
-          0
-        ]
+        "tip": [26, 0]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
-      "note": "pivot at the ear base inside the skull, secondary motion"
-    },
-    {
-      "character": "mochi",
-      "layer": "ear_right",
-      "file": "mochi/ear_right.png",
-      "z": 19,
-      "size": [
-        52,
-        66
-      ],
-      "pivot": [
-        26,
-        56
-      ],
-      "joints": {
-        "tip": [
-          26,
-          0
-        ]
-      },
-      "blend_mode": "normal",
-      "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the ear base inside the skull, secondary motion"
     },
     {
@@ -2048,42 +3002,22 @@
       "layer": "head",
       "file": "mochi/head.png",
       "z": 20,
-      "size": [
-        118,
-        118
-      ],
-      "pivot": [
-        106,
-        68
-      ],
+      "size": [118, 118],
+      "pivot": [106, 68],
       "joints": {
-        "ear_left": [
-          33,
-          28
-        ],
-        "ear_right": [
-          80,
-          28
-        ],
-        "eye_left": [
-          35,
-          52
-        ],
-        "eye_right": [
-          78,
-          52
-        ],
-        "nose": [
-          53,
-          79
-        ],
-        "mouth": [
-          53,
-          94
-        ]
+        "ear_left": [33, 28],
+        "ear_right": [80, 28],
+        "eye_left": [35, 52],
+        "eye_right": [78, 52],
+        "nose": [53, 79],
+        "mouth": [53, 94]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the neck, where the skull meets the torso"
     },
     {
@@ -2091,22 +3025,15 @@
       "layer": "eye_left",
       "file": "mochi/eye_left.png",
       "z": 22,
-      "size": [
-        34,
-        34
-      ],
-      "pivot": [
-        17,
-        17
-      ],
+      "size": [34, 34],
+      "pivot": [17, 17],
       "joints": {
-        "pupil": [
-          17,
-          17
-        ]
+        "pupil": [17, 17]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "sclera, pupil, highlight"
     },
     {
@@ -2114,22 +3041,15 @@
       "layer": "eye_right",
       "file": "mochi/eye_right.png",
       "z": 22,
-      "size": [
-        34,
-        34
-      ],
-      "pivot": [
-        17,
-        17
-      ],
+      "size": [34, 34],
+      "pivot": [17, 17],
       "joints": {
-        "pupil": [
-          17,
-          17
-        ]
+        "pupil": [17, 17]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "sclera, pupil, highlight"
     },
     {
@@ -2137,17 +3057,13 @@
       "layer": "nose",
       "file": "mochi/nose.png",
       "z": 23,
-      "size": [
-        34,
-        26
-      ],
-      "pivot": [
-        17,
-        13
-      ],
+      "size": [34, 26],
+      "pivot": [17, 13],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "muzzle centre"
     },
     {
@@ -2155,17 +3071,13 @@
       "layer": "mouth_neutral",
       "file": "mochi/mouth_neutral.png",
       "z": 24,
-      "size": [
-        28,
-        8
-      ],
-      "pivot": [
-        14,
-        0
-      ],
+      "size": [28, 8],
+      "pivot": [14, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "expression"
     },
     {
@@ -2173,17 +3085,13 @@
       "layer": "mouth_open",
       "file": "mochi/mouth_open.png",
       "z": 24,
-      "size": [
-        26,
-        32
-      ],
-      "pivot": [
-        13,
-        0
-      ],
+      "size": [26, 32],
+      "pivot": [13, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "expression"
     },
     {
@@ -2191,17 +3099,13 @@
       "layer": "mouth_smile",
       "file": "mochi/mouth_smile.png",
       "z": 24,
-      "size": [
-        36,
-        19
-      ],
-      "pivot": [
-        18,
-        0
-      ],
+      "size": [36, 19],
+      "pivot": [18, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "expression"
     },
     {
@@ -2209,200 +3113,444 @@
       "layer": "shadow",
       "file": "nu/shadow.png",
       "z": 0,
-      "size": [
-        137,
-        35
-      ],
-      "pivot": [
-        68,
-        18
-      ],
+      "size": [137, 35],
+      "pivot": [68, 18],
       "joints": {},
-      "blend_mode": "normal",
-      "opacity": 1.0,
-      "note": "ground contact, follows body x only"
+      "sources": [],
+      "blend_mode": "multiply",
+      "opacity": 0.8,
+      "mesh": null,
+      "note": "ground shadow; its centre is the ground plane the feet stand on"
     },
     {
       "character": "nu",
-      "layer": "leg_left",
-      "file": "nu/leg_left.png",
+      "layer": "leg_left_upper",
+      "file": "nu/leg_left_upper.png",
       "z": 1,
-      "size": [
-        27,
-        70
-      ],
-      "pivot": [
-        13,
-        13
-      ],
+      "size": [27, 49],
+      "pivot": [13, 13],
       "joints": {
-        "tip": [
-          13,
-          57
-        ],
-        "contact": [
-          13,
-          69
-        ]
+        "knee": [13, 49]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
-      "note": "pivot at hip; contact joint is the foot on the ground"
+      "mesh": {
+        "bones": [
+          "hip_left",
+          "knee_left"
+        ],
+        "heads": [13.5, 49.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [27.0, 0.0],
+          [0.0, 16.33],
+          [27.0, 16.33],
+          [0.0, 32.67],
+          [27.0, 32.67],
+          [0.0, 49.0],
+          [27.0, 49.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.33327],
+          [1.0, 0.33327],
+          [0.0, 0.66673],
+          [1.0, 0.66673],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6]
+        ],
+        "weights": [
+          [1.0, 0.0],
+          [1.0, 0.0],
+          [0.9203, 0.0797],
+          [0.9203, 0.0797],
+          [0.46, 0.54],
+          [0.46, 0.54],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "thigh; pivot at the hip, knee joint on its flat bottom edge, which is the seam it shares with leg_left_lower"
     },
     {
       "character": "nu",
-      "layer": "leg_right",
-      "file": "nu/leg_right.png",
+      "layer": "leg_left_lower",
+      "file": "nu/leg_left_lower.png",
       "z": 2,
-      "size": [
-        27,
-        70
-      ],
-      "pivot": [
-        13,
-        13
-      ],
+      "size": [27, 34],
+      "pivot": [13, 0],
       "joints": {
-        "tip": [
-          13,
-          57
-        ],
-        "contact": [
-          13,
-          69
-        ]
+        "tip": [13, 21],
+        "contact": [13, 33]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
-      "note": "pivot at hip; contact joint is the foot on the ground"
+      "mesh": {
+        "bones": [
+          "hip_left",
+          "knee_left"
+        ],
+        "heads": [-36, 0.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [27.0, 0.0],
+          [0.0, 11.33],
+          [27.0, 11.33],
+          [0.0, 22.67],
+          [27.0, 22.67],
+          [0.0, 34.0],
+          [27.0, 34.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.33324],
+          [1.0, 0.33324],
+          [0.0, 0.66676],
+          [1.0, 0.66676],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6]
+        ],
+        "weights": [
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "shin; pivot on its flat top edge, on the knee. The contact joint rides this part's mesh, so a bent knee moves the foot"
+    },
+    {
+      "character": "nu",
+      "layer": "leg_right_upper",
+      "file": "nu/leg_right_upper.png",
+      "z": 3,
+      "size": [27, 49],
+      "pivot": [13, 13],
+      "joints": {
+        "knee": [13, 49]
+      },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "mesh": {
+        "bones": [
+          "hip_right",
+          "knee_right"
+        ],
+        "heads": [13.5, 49.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [27.0, 0.0],
+          [0.0, 16.33],
+          [27.0, 16.33],
+          [0.0, 32.67],
+          [27.0, 32.67],
+          [0.0, 49.0],
+          [27.0, 49.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.33327],
+          [1.0, 0.33327],
+          [0.0, 0.66673],
+          [1.0, 0.66673],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6]
+        ],
+        "weights": [
+          [1.0, 0.0],
+          [1.0, 0.0],
+          [0.9203, 0.0797],
+          [0.9203, 0.0797],
+          [0.46, 0.54],
+          [0.46, 0.54],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "thigh; pivot at the hip, knee joint on its flat bottom edge, which is the seam it shares with leg_right_lower"
+    },
+    {
+      "character": "nu",
+      "layer": "leg_right_lower",
+      "file": "nu/leg_right_lower.png",
+      "z": 4,
+      "size": [27, 34],
+      "pivot": [13, 0],
+      "joints": {
+        "tip": [13, 21],
+        "contact": [13, 33]
+      },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "mesh": {
+        "bones": [
+          "hip_right",
+          "knee_right"
+        ],
+        "heads": [-36, 0.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [27.0, 0.0],
+          [0.0, 11.33],
+          [27.0, 11.33],
+          [0.0, 22.67],
+          [27.0, 22.67],
+          [0.0, 34.0],
+          [27.0, 34.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.33324],
+          [1.0, 0.33324],
+          [0.0, 0.66676],
+          [1.0, 0.66676],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6]
+        ],
+        "weights": [
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "shin; pivot on its flat top edge, on the knee. The contact joint rides this part's mesh, so a bent knee moves the foot"
     },
     {
       "character": "nu",
       "layer": "arm_left",
       "file": "nu/arm_left.png",
-      "z": 3,
-      "size": [
-        20,
-        99
-      ],
-      "pivot": [
-        10,
-        10
-      ],
+      "z": 5,
+      "size": [20, 99],
+      "pivot": [10, 10],
       "joints": {
-        "tip": [
-          10,
-          89
-        ],
-        "contact": [
-          10,
-          98
-        ]
+        "tip": [10, 89],
+        "contact": [10, 98],
+        "elbow": [10, 49]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
-      "note": "pivot at shoulder; tip joint is the wrist"
+      "mesh": {
+        "bones": [
+          "shoulder_left",
+          "elbow_left"
+        ],
+        "heads": [10.0, 49.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [20.0, 0.0],
+          [0.0, 24.75],
+          [20.0, 24.75],
+          [0.0, 49.5],
+          [20.0, 49.5],
+          [0.0, 74.25],
+          [20.0, 74.25],
+          [0.0, 99.0],
+          [20.0, 99.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.25],
+          [1.0, 0.25],
+          [0.0, 0.5],
+          [1.0, 0.5],
+          [0.0, 0.75],
+          [1.0, 0.75],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6],
+          [6, 7, 9],
+          [6, 9, 8]
+        ],
+        "weights": [
+          [1.0, 0.0],
+          [1.0, 0.0],
+          [0.6218, 0.3782],
+          [0.6218, 0.3782],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "pivot at shoulder; elbow joint bends it, tip joint is the wrist"
     },
     {
       "character": "nu",
       "layer": "arm_right",
       "file": "nu/arm_right.png",
-      "z": 4,
-      "size": [
-        20,
-        99
-      ],
-      "pivot": [
-        10,
-        10
-      ],
+      "z": 6,
+      "size": [20, 99],
+      "pivot": [10, 10],
       "joints": {
-        "tip": [
-          10,
-          89
-        ],
-        "contact": [
-          10,
-          98
-        ]
+        "tip": [10, 89],
+        "contact": [10, 98],
+        "elbow": [10, 49]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
-      "note": "pivot at shoulder; tip joint is the wrist"
+      "mesh": {
+        "bones": [
+          "shoulder_right",
+          "elbow_right"
+        ],
+        "heads": [10.0, 49.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [20.0, 0.0],
+          [0.0, 24.75],
+          [20.0, 24.75],
+          [0.0, 49.5],
+          [20.0, 49.5],
+          [0.0, 74.25],
+          [20.0, 74.25],
+          [0.0, 99.0],
+          [20.0, 99.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.25],
+          [1.0, 0.25],
+          [0.0, 0.5],
+          [1.0, 0.5],
+          [0.0, 0.75],
+          [1.0, 0.75],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6],
+          [6, 7, 9],
+          [6, 9, 8]
+        ],
+        "weights": [
+          [1.0, 0.0],
+          [1.0, 0.0],
+          [0.6218, 0.3782],
+          [0.6218, 0.3782],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "pivot at shoulder; elbow joint bends it, tip joint is the wrist"
     },
     {
       "character": "nu",
       "layer": "body",
       "file": "nu/body.png",
       "z": 10,
-      "size": [
-        160,
-        160
-      ],
-      "pivot": [
-        80,
-        80
-      ],
+      "size": [160, 160],
+      "pivot": [80, 80],
       "joints": {
-        "ground": [
-          80,
-          172
-        ],
-        "shoulder_left": [
-          22,
-          54
-        ],
-        "shoulder_right": [
-          138,
-          54
-        ],
-        "hip_left": [
-          42,
-          125
-        ],
-        "hip_right": [
-          118,
-          125
-        ],
-        "clothing": [
-          80,
-          90
-        ],
-        "eye_left": [
-          48,
-          48
-        ],
-        "eye_right": [
-          112,
-          48
-        ],
-        "brow_left": [
-          48,
-          17
-        ],
-        "brow_right": [
-          112,
-          17
-        ],
-        "mouth": [
-          80,
-          83
-        ],
-        "crown": [
-          80,
-          16
-        ],
-        "pigtail_left": [
-          -3,
-          26
-        ],
-        "pigtail_right": [
-          163,
-          26
-        ]
+        "ground": [80, 192],
+        "shoulder_left": [22, 54],
+        "shoulder_right": [138, 54],
+        "hip_left": [42, 125],
+        "hip_right": [118, 125],
+        "clothing": [80, 90],
+        "eye_left": [48, 48],
+        "eye_right": [112, 48],
+        "brow_left": [48, 17],
+        "brow_right": [112, 17],
+        "mouth": [80, 83],
+        "crown": [80, 16],
+        "pigtail_left": [-3, 26],
+        "pigtail_right": [163, 26]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "generated cloud silhouette, three lobes over a rounded slab"
     },
     {
@@ -2410,17 +3558,15 @@
       "layer": "clothing",
       "file": "nu/clothing.png",
       "z": 11,
-      "size": [
-        147,
-        54
-      ],
-      "pivot": [
-        74,
-        0
-      ],
+      "size": [147, 54],
+      "pivot": [74, 0],
       "joints": {},
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "dots, original pattern"
     },
     {
@@ -2428,22 +3574,18 @@
       "layer": "hand_left_closed",
       "file": "nu/hand_left_closed.png",
       "z": 12,
-      "size": [
-        38,
-        37
-      ],
-      "pivot": [
-        19,
-        4
-      ],
+      "size": [38, 37],
+      "pivot": [19, 4],
       "joints": {
-        "grip": [
-          19,
-          23
-        ]
+        "grip": [19, 23]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_hand_closed.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
@@ -2451,22 +3593,18 @@
       "layer": "hand_left_open",
       "file": "nu/hand_left_open.png",
       "z": 12,
-      "size": [
-        37,
-        41
-      ],
-      "pivot": [
-        18,
-        4
-      ],
+      "size": [37, 41],
+      "pivot": [18, 4],
       "joints": {
-        "grip": [
-          18,
-          25
-        ]
+        "grip": [18, 25]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_hand_open.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
@@ -2474,22 +3612,18 @@
       "layer": "hand_left_point",
       "file": "nu/hand_left_point.png",
       "z": 12,
-      "size": [
-        37,
-        39
-      ],
-      "pivot": [
-        18,
-        4
-      ],
+      "size": [37, 39],
+      "pivot": [18, 4],
       "joints": {
-        "grip": [
-          18,
-          24
-        ]
+        "grip": [18, 24]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_hand_point.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
@@ -2497,22 +3631,18 @@
       "layer": "hand_right_closed",
       "file": "nu/hand_right_closed.png",
       "z": 12,
-      "size": [
-        38,
-        37
-      ],
-      "pivot": [
-        19,
-        4
-      ],
+      "size": [38, 37],
+      "pivot": [19, 4],
       "joints": {
-        "grip": [
-          19,
-          23
-        ]
+        "grip": [19, 23]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_hand_closed.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
@@ -2520,22 +3650,18 @@
       "layer": "hand_right_open",
       "file": "nu/hand_right_open.png",
       "z": 12,
-      "size": [
-        37,
-        41
-      ],
-      "pivot": [
-        18,
-        4
-      ],
+      "size": [37, 41],
+      "pivot": [18, 4],
       "joints": {
-        "grip": [
-          18,
-          25
-        ]
+        "grip": [18, 25]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_hand_open.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
@@ -2543,22 +3669,18 @@
       "layer": "hand_right_point",
       "file": "nu/hand_right_point.png",
       "z": 12,
-      "size": [
-        37,
-        39
-      ],
-      "pivot": [
-        18,
-        4
-      ],
+      "size": [37, 39],
+      "pivot": [18, 4],
       "joints": {
-        "grip": [
-          18,
-          24
-        ]
+        "grip": [18, 24]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_hand_point.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
@@ -2566,22 +3688,15 @@
       "layer": "eye_left",
       "file": "nu/eye_left.png",
       "z": 20,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        20
-      ],
+      "size": [40, 40],
+      "pivot": [20, 20],
       "joints": {
-        "pupil": [
-          20,
-          20
-        ]
+        "pupil": [20, 20]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "sclera, pupil, highlight"
     },
     {
@@ -2589,22 +3704,15 @@
       "layer": "eye_left_look_left",
       "file": "nu/eye_left_look_left.png",
       "z": 20,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        20
-      ],
+      "size": [40, 40],
+      "pivot": [20, 20],
       "joints": {
-        "pupil": [
-          14,
-          20
-        ]
+        "pupil": [14, 20]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "gaze target"
     },
     {
@@ -2612,22 +3720,15 @@
       "layer": "eye_left_look_right",
       "file": "nu/eye_left_look_right.png",
       "z": 20,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        20
-      ],
+      "size": [40, 40],
+      "pivot": [20, 20],
       "joints": {
-        "pupil": [
-          26,
-          20
-        ]
+        "pupil": [26, 20]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "gaze target"
     },
     {
@@ -2635,22 +3736,15 @@
       "layer": "eye_right",
       "file": "nu/eye_right.png",
       "z": 20,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        20
-      ],
+      "size": [40, 40],
+      "pivot": [20, 20],
       "joints": {
-        "pupil": [
-          20,
-          20
-        ]
+        "pupil": [20, 20]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "sclera, pupil, highlight"
     },
     {
@@ -2658,22 +3752,15 @@
       "layer": "eye_right_look_left",
       "file": "nu/eye_right_look_left.png",
       "z": 20,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        20
-      ],
+      "size": [40, 40],
+      "pivot": [20, 20],
       "joints": {
-        "pupil": [
-          14,
-          20
-        ]
+        "pupil": [14, 20]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "gaze target"
     },
     {
@@ -2681,22 +3768,15 @@
       "layer": "eye_right_look_right",
       "file": "nu/eye_right_look_right.png",
       "z": 20,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        20
-      ],
+      "size": [40, 40],
+      "pivot": [20, 20],
       "joints": {
-        "pupil": [
-          26,
-          20
-        ]
+        "pupil": [26, 20]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "gaze target"
     },
     {
@@ -2704,17 +3784,16 @@
       "layer": "eyebrow_left",
       "file": "nu/eyebrow_left.png",
       "z": 21,
-      "size": [
-        40,
-        10
-      ],
-      "pivot": [
-        20,
-        5
-      ],
+      "size": [40, 10],
+      "pivot": [20, 5],
       "joints": {},
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/facial_part_eyebrow_a.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the brow centre"
     },
     {
@@ -2722,17 +3801,16 @@
       "layer": "eyebrow_right",
       "file": "nu/eyebrow_right.png",
       "z": 21,
-      "size": [
-        40,
-        10
-      ],
-      "pivot": [
-        20,
-        5
-      ],
+      "size": [40, 10],
+      "pivot": [20, 5],
       "joints": {},
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/facial_part_eyebrow_a.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the brow centre"
     },
     {
@@ -2740,17 +3818,13 @@
       "layer": "mouth_neutral",
       "file": "nu/mouth_neutral.png",
       "z": 22,
-      "size": [
-        33,
-        9
-      ],
-      "pivot": [
-        16,
-        0
-      ],
+      "size": [33, 9],
+      "pivot": [16, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "expression"
     },
     {
@@ -2758,17 +3832,13 @@
       "layer": "mouth_open",
       "file": "nu/mouth_open.png",
       "z": 22,
-      "size": [
-        31,
-        37
-      ],
-      "pivot": [
-        16,
-        0
-      ],
+      "size": [31, 37],
+      "pivot": [16, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "expression"
     },
     {
@@ -2776,17 +3846,13 @@
       "layer": "mouth_smile",
       "file": "nu/mouth_smile.png",
       "z": 22,
-      "size": [
-        43,
-        22
-      ],
-      "pivot": [
-        22,
-        0
-      ],
+      "size": [43, 22],
+      "pivot": [22, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "expression"
     },
     {
@@ -2794,17 +3860,13 @@
       "layer": "mouth_viseme_ai",
       "file": "nu/mouth_viseme_ai.png",
       "z": 22,
-      "size": [
-        35,
-        33
-      ],
-      "pivot": [
-        18,
-        0
-      ],
+      "size": [35, 33],
+      "pivot": [18, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -2812,17 +3874,13 @@
       "layer": "mouth_viseme_e",
       "file": "nu/mouth_viseme_e.png",
       "z": 22,
-      "size": [
-        39,
-        19
-      ],
-      "pivot": [
-        20,
-        0
-      ],
+      "size": [39, 19],
+      "pivot": [20, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -2830,17 +3888,13 @@
       "layer": "mouth_viseme_fv",
       "file": "nu/mouth_viseme_fv.png",
       "z": 22,
-      "size": [
-        32,
-        14
-      ],
-      "pivot": [
-        16,
-        0
-      ],
+      "size": [32, 14],
+      "pivot": [16, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -2848,17 +3902,13 @@
       "layer": "mouth_viseme_l",
       "file": "nu/mouth_viseme_l.png",
       "z": 22,
-      "size": [
-        30,
-        27
-      ],
-      "pivot": [
-        15,
-        0
-      ],
+      "size": [30, 27],
+      "pivot": [15, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -2866,17 +3916,13 @@
       "layer": "mouth_viseme_mbp",
       "file": "nu/mouth_viseme_mbp.png",
       "z": 22,
-      "size": [
-        33,
-        8
-      ],
-      "pivot": [
-        16,
-        0
-      ],
+      "size": [33, 8],
+      "pivot": [16, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -2884,17 +3930,13 @@
       "layer": "mouth_viseme_o",
       "file": "nu/mouth_viseme_o.png",
       "z": 22,
-      "size": [
-        23,
-        34
-      ],
-      "pivot": [
-        12,
-        0
-      ],
+      "size": [23, 34],
+      "pivot": [12, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -2902,17 +3944,13 @@
       "layer": "mouth_viseme_u",
       "file": "nu/mouth_viseme_u.png",
       "z": 22,
-      "size": [
-        18,
-        26
-      ],
-      "pivot": [
-        9,
-        0
-      ],
+      "size": [18, 26],
+      "pivot": [9, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -2920,17 +3958,13 @@
       "layer": "mouth_viseme_ws",
       "file": "nu/mouth_viseme_ws.png",
       "z": 22,
-      "size": [
-        25,
-        20
-      ],
-      "pivot": [
-        12,
-        0
-      ],
+      "size": [25, 20],
+      "pivot": [12, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -2938,17 +3972,13 @@
       "layer": "mouth_wide",
       "file": "nu/mouth_wide.png",
       "z": 22,
-      "size": [
-        46,
-        28
-      ],
-      "pivot": [
-        23,
-        0
-      ],
+      "size": [46, 28],
+      "pivot": [23, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "expression"
     },
     {
@@ -2956,63 +3986,51 @@
       "layer": "pigtail_left",
       "file": "nu/pigtail_left.png",
       "z": 29,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        7
-      ],
+      "size": [40, 40],
+      "pivot": [20, 7],
       "joints": {
-        "tip": [
-          20,
-          40
-        ]
+        "tip": [20, 40]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
-      "note": "pivot at the tie against the skull, secondary motion candidate"
+      "mesh": null,
+      "note": "pivot at the tie, set outboard of the cloud silhouette so the sphere reads clear of the head; secondary motion candidate"
     },
     {
       "character": "nu",
       "layer": "pigtail_right",
       "file": "nu/pigtail_right.png",
       "z": 29,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        7
-      ],
+      "size": [40, 40],
+      "pivot": [20, 7],
       "joints": {
-        "tip": [
-          20,
-          40
-        ]
+        "tip": [20, 40]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
-      "note": "pivot at the tie against the skull, secondary motion candidate"
+      "mesh": null,
+      "note": "pivot at the tie, set outboard of the cloud silhouette so the sphere reads clear of the head; secondary motion candidate"
     },
     {
       "character": "nu",
       "layer": "hair",
       "file": "nu/hair.png",
       "z": 30,
-      "size": [
-        83,
-        25
-      ],
-      "pivot": [
-        42,
-        24
-      ],
+      "size": [83, 25],
+      "pivot": [42, 24],
       "joints": {},
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot where the hair seats on the crown"
     },
     {
@@ -3020,192 +4038,443 @@
       "layer": "shadow",
       "file": "pim/shadow.png",
       "z": 0,
-      "size": [
-        137,
-        35
-      ],
-      "pivot": [
-        68,
-        18
-      ],
+      "size": [137, 35],
+      "pivot": [68, 18],
       "joints": {},
-      "blend_mode": "normal",
-      "opacity": 1.0,
-      "note": "ground contact, follows body x only"
+      "sources": [],
+      "blend_mode": "multiply",
+      "opacity": 0.8,
+      "mesh": null,
+      "note": "ground shadow; its centre is the ground plane the feet stand on"
     },
     {
       "character": "pim",
-      "layer": "leg_left",
-      "file": "pim/leg_left.png",
+      "layer": "leg_left_upper",
+      "file": "pim/leg_left_upper.png",
       "z": 1,
-      "size": [
-        27,
-        70
-      ],
-      "pivot": [
-        13,
-        13
-      ],
+      "size": [27, 49],
+      "pivot": [13, 13],
       "joints": {
-        "tip": [
-          13,
-          57
-        ],
-        "contact": [
-          13,
-          69
-        ]
+        "knee": [13, 49]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
-      "note": "pivot at hip; contact joint is the foot on the ground"
+      "mesh": {
+        "bones": [
+          "hip_left",
+          "knee_left"
+        ],
+        "heads": [13.5, 49.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [27.0, 0.0],
+          [0.0, 16.33],
+          [27.0, 16.33],
+          [0.0, 32.67],
+          [27.0, 32.67],
+          [0.0, 49.0],
+          [27.0, 49.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.33327],
+          [1.0, 0.33327],
+          [0.0, 0.66673],
+          [1.0, 0.66673],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6]
+        ],
+        "weights": [
+          [1.0, 0.0],
+          [1.0, 0.0],
+          [0.9203, 0.0797],
+          [0.9203, 0.0797],
+          [0.46, 0.54],
+          [0.46, 0.54],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "thigh; pivot at the hip, knee joint on its flat bottom edge, which is the seam it shares with leg_left_lower"
     },
     {
       "character": "pim",
-      "layer": "leg_right",
-      "file": "pim/leg_right.png",
+      "layer": "leg_left_lower",
+      "file": "pim/leg_left_lower.png",
       "z": 2,
-      "size": [
-        27,
-        70
-      ],
-      "pivot": [
-        13,
-        13
-      ],
+      "size": [27, 34],
+      "pivot": [13, 0],
       "joints": {
-        "tip": [
-          13,
-          57
-        ],
-        "contact": [
-          13,
-          69
-        ]
+        "tip": [13, 21],
+        "contact": [13, 33]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
-      "note": "pivot at hip; contact joint is the foot on the ground"
+      "mesh": {
+        "bones": [
+          "hip_left",
+          "knee_left"
+        ],
+        "heads": [-36, 0.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [27.0, 0.0],
+          [0.0, 11.33],
+          [27.0, 11.33],
+          [0.0, 22.67],
+          [27.0, 22.67],
+          [0.0, 34.0],
+          [27.0, 34.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.33324],
+          [1.0, 0.33324],
+          [0.0, 0.66676],
+          [1.0, 0.66676],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6]
+        ],
+        "weights": [
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "shin; pivot on its flat top edge, on the knee. The contact joint rides this part's mesh, so a bent knee moves the foot"
+    },
+    {
+      "character": "pim",
+      "layer": "leg_right_upper",
+      "file": "pim/leg_right_upper.png",
+      "z": 3,
+      "size": [27, 49],
+      "pivot": [13, 13],
+      "joints": {
+        "knee": [13, 49]
+      },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "mesh": {
+        "bones": [
+          "hip_right",
+          "knee_right"
+        ],
+        "heads": [13.5, 49.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [27.0, 0.0],
+          [0.0, 16.33],
+          [27.0, 16.33],
+          [0.0, 32.67],
+          [27.0, 32.67],
+          [0.0, 49.0],
+          [27.0, 49.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.33327],
+          [1.0, 0.33327],
+          [0.0, 0.66673],
+          [1.0, 0.66673],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6]
+        ],
+        "weights": [
+          [1.0, 0.0],
+          [1.0, 0.0],
+          [0.9203, 0.0797],
+          [0.9203, 0.0797],
+          [0.46, 0.54],
+          [0.46, 0.54],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "thigh; pivot at the hip, knee joint on its flat bottom edge, which is the seam it shares with leg_right_lower"
+    },
+    {
+      "character": "pim",
+      "layer": "leg_right_lower",
+      "file": "pim/leg_right_lower.png",
+      "z": 4,
+      "size": [27, 34],
+      "pivot": [13, 0],
+      "joints": {
+        "tip": [13, 21],
+        "contact": [13, 33]
+      },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "mesh": {
+        "bones": [
+          "hip_right",
+          "knee_right"
+        ],
+        "heads": [-36, 0.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [27.0, 0.0],
+          [0.0, 11.33],
+          [27.0, 11.33],
+          [0.0, 22.67],
+          [27.0, 22.67],
+          [0.0, 34.0],
+          [27.0, 34.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.33324],
+          [1.0, 0.33324],
+          [0.0, 0.66676],
+          [1.0, 0.66676],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6]
+        ],
+        "weights": [
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "shin; pivot on its flat top edge, on the knee. The contact joint rides this part's mesh, so a bent knee moves the foot"
     },
     {
       "character": "pim",
       "layer": "arm_left",
       "file": "pim/arm_left.png",
-      "z": 3,
-      "size": [
-        20,
-        99
-      ],
-      "pivot": [
-        10,
-        10
-      ],
+      "z": 5,
+      "size": [20, 99],
+      "pivot": [10, 10],
       "joints": {
-        "tip": [
-          10,
-          89
-        ],
-        "contact": [
-          10,
-          98
-        ]
+        "tip": [10, 89],
+        "contact": [10, 98],
+        "elbow": [10, 49]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
-      "note": "pivot at shoulder; tip joint is the wrist"
+      "mesh": {
+        "bones": [
+          "shoulder_left",
+          "elbow_left"
+        ],
+        "heads": [10.0, 49.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [20.0, 0.0],
+          [0.0, 24.75],
+          [20.0, 24.75],
+          [0.0, 49.5],
+          [20.0, 49.5],
+          [0.0, 74.25],
+          [20.0, 74.25],
+          [0.0, 99.0],
+          [20.0, 99.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.25],
+          [1.0, 0.25],
+          [0.0, 0.5],
+          [1.0, 0.5],
+          [0.0, 0.75],
+          [1.0, 0.75],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6],
+          [6, 7, 9],
+          [6, 9, 8]
+        ],
+        "weights": [
+          [1.0, 0.0],
+          [1.0, 0.0],
+          [0.6218, 0.3782],
+          [0.6218, 0.3782],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "pivot at shoulder; elbow joint bends it, tip joint is the wrist"
     },
     {
       "character": "pim",
       "layer": "arm_right",
       "file": "pim/arm_right.png",
-      "z": 4,
-      "size": [
-        20,
-        99
-      ],
-      "pivot": [
-        10,
-        10
-      ],
+      "z": 6,
+      "size": [20, 99],
+      "pivot": [10, 10],
       "joints": {
-        "tip": [
-          10,
-          89
-        ],
-        "contact": [
-          10,
-          98
-        ]
+        "tip": [10, 89],
+        "contact": [10, 98],
+        "elbow": [10, 49]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
-      "note": "pivot at shoulder; tip joint is the wrist"
+      "mesh": {
+        "bones": [
+          "shoulder_right",
+          "elbow_right"
+        ],
+        "heads": [10.0, 49.0],
+        "axis": "y",
+        "vertices": [
+          [0.0, 0.0],
+          [20.0, 0.0],
+          [0.0, 24.75],
+          [20.0, 24.75],
+          [0.0, 49.5],
+          [20.0, 49.5],
+          [0.0, 74.25],
+          [20.0, 74.25],
+          [0.0, 99.0],
+          [20.0, 99.0]
+        ],
+        "uv": [
+          [0.0, 0.0],
+          [1.0, 0.0],
+          [0.0, 0.25],
+          [1.0, 0.25],
+          [0.0, 0.5],
+          [1.0, 0.5],
+          [0.0, 0.75],
+          [1.0, 0.75],
+          [0.0, 1.0],
+          [1.0, 1.0]
+        ],
+        "triangles": [
+          [0, 1, 3],
+          [0, 3, 2],
+          [2, 3, 5],
+          [2, 5, 4],
+          [4, 5, 7],
+          [4, 7, 6],
+          [6, 7, 9],
+          [6, 9, 8]
+        ],
+        "weights": [
+          [1.0, 0.0],
+          [1.0, 0.0],
+          [0.6218, 0.3782],
+          [0.6218, 0.3782],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0],
+          [0.0, 1.0]
+        ]
+      },
+      "note": "pivot at shoulder; elbow joint bends it, tip joint is the wrist"
     },
     {
       "character": "pim",
       "layer": "body",
       "file": "pim/body.png",
       "z": 10,
-      "size": [
-        160,
-        160
-      ],
-      "pivot": [
-        80,
-        80
-      ],
+      "size": [160, 160],
+      "pivot": [80, 80],
       "joints": {
-        "ground": [
-          80,
-          172
-        ],
-        "shoulder_left": [
-          22,
-          54
-        ],
-        "shoulder_right": [
-          138,
-          54
-        ],
-        "hip_left": [
-          42,
-          125
-        ],
-        "hip_right": [
-          118,
-          125
-        ],
-        "clothing": [
-          80,
-          90
-        ],
-        "eye_left": [
-          48,
-          48
-        ],
-        "eye_right": [
-          112,
-          48
-        ],
-        "brow_left": [
-          48,
-          17
-        ],
-        "brow_right": [
-          112,
-          17
-        ],
-        "mouth": [
-          80,
-          83
-        ],
-        "crown": [
-          80,
-          16
-        ]
+        "ground": [80, 192],
+        "shoulder_left": [22, 54],
+        "shoulder_right": [138, 54],
+        "hip_left": [42, 125],
+        "hip_right": [118, 125],
+        "clothing": [80, 90],
+        "eye_left": [48, 48],
+        "eye_right": [112, 48],
+        "brow_left": [48, 17],
+        "brow_right": [112, 17],
+        "mouth": [80, 83],
+        "crown": [80, 16]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_body_squircle.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "Kenney squircle base, recoloured"
     },
     {
@@ -3213,17 +4482,15 @@
       "layer": "clothing",
       "file": "pim/clothing.png",
       "z": 11,
-      "size": [
-        147,
-        54
-      ],
-      "pivot": [
-        74,
-        0
-      ],
+      "size": [147, 54],
+      "pivot": [74, 0],
       "joints": {},
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "stripes, original pattern"
     },
     {
@@ -3231,22 +4498,18 @@
       "layer": "hand_left_closed",
       "file": "pim/hand_left_closed.png",
       "z": 12,
-      "size": [
-        38,
-        37
-      ],
-      "pivot": [
-        19,
-        4
-      ],
+      "size": [38, 37],
+      "pivot": [19, 4],
       "joints": {
-        "grip": [
-          19,
-          23
-        ]
+        "grip": [19, 23]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_hand_closed.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
@@ -3254,22 +4517,18 @@
       "layer": "hand_left_open",
       "file": "pim/hand_left_open.png",
       "z": 12,
-      "size": [
-        37,
-        41
-      ],
-      "pivot": [
-        18,
-        4
-      ],
+      "size": [37, 41],
+      "pivot": [18, 4],
       "joints": {
-        "grip": [
-          18,
-          25
-        ]
+        "grip": [18, 25]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_hand_open.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
@@ -3277,22 +4536,18 @@
       "layer": "hand_left_point",
       "file": "pim/hand_left_point.png",
       "z": 12,
-      "size": [
-        37,
-        39
-      ],
-      "pivot": [
-        18,
-        4
-      ],
+      "size": [37, 39],
+      "pivot": [18, 4],
       "joints": {
-        "grip": [
-          18,
-          24
-        ]
+        "grip": [18, 24]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_hand_point.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
@@ -3300,22 +4555,18 @@
       "layer": "hand_right_closed",
       "file": "pim/hand_right_closed.png",
       "z": 12,
-      "size": [
-        38,
-        37
-      ],
-      "pivot": [
-        19,
-        4
-      ],
+      "size": [38, 37],
+      "pivot": [19, 4],
       "joints": {
-        "grip": [
-          19,
-          23
-        ]
+        "grip": [19, 23]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_hand_closed.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
@@ -3323,22 +4574,18 @@
       "layer": "hand_right_open",
       "file": "pim/hand_right_open.png",
       "z": 12,
-      "size": [
-        37,
-        41
-      ],
-      "pivot": [
-        18,
-        4
-      ],
+      "size": [37, 41],
+      "pivot": [18, 4],
       "joints": {
-        "grip": [
-          18,
-          25
-        ]
+        "grip": [18, 25]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_hand_open.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
@@ -3346,22 +4593,18 @@
       "layer": "hand_right_point",
       "file": "pim/hand_right_point.png",
       "z": 12,
-      "size": [
-        37,
-        39
-      ],
-      "pivot": [
-        18,
-        4
-      ],
+      "size": [37, 39],
+      "pivot": [18, 4],
       "joints": {
-        "grip": [
-          18,
-          24
-        ]
+        "grip": [18, 24]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/blue_hand_point.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
@@ -3369,22 +4612,15 @@
       "layer": "eye_left",
       "file": "pim/eye_left.png",
       "z": 20,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        20
-      ],
+      "size": [40, 40],
+      "pivot": [20, 20],
       "joints": {
-        "pupil": [
-          20,
-          20
-        ]
+        "pupil": [20, 20]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "sclera, pupil, highlight"
     },
     {
@@ -3392,22 +4628,15 @@
       "layer": "eye_left_look_left",
       "file": "pim/eye_left_look_left.png",
       "z": 20,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        20
-      ],
+      "size": [40, 40],
+      "pivot": [20, 20],
       "joints": {
-        "pupil": [
-          14,
-          20
-        ]
+        "pupil": [14, 20]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "gaze target"
     },
     {
@@ -3415,22 +4644,15 @@
       "layer": "eye_left_look_right",
       "file": "pim/eye_left_look_right.png",
       "z": 20,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        20
-      ],
+      "size": [40, 40],
+      "pivot": [20, 20],
       "joints": {
-        "pupil": [
-          26,
-          20
-        ]
+        "pupil": [26, 20]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "gaze target"
     },
     {
@@ -3438,22 +4660,15 @@
       "layer": "eye_right",
       "file": "pim/eye_right.png",
       "z": 20,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        20
-      ],
+      "size": [40, 40],
+      "pivot": [20, 20],
       "joints": {
-        "pupil": [
-          20,
-          20
-        ]
+        "pupil": [20, 20]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "sclera, pupil, highlight"
     },
     {
@@ -3461,22 +4676,15 @@
       "layer": "eye_right_look_left",
       "file": "pim/eye_right_look_left.png",
       "z": 20,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        20
-      ],
+      "size": [40, 40],
+      "pivot": [20, 20],
       "joints": {
-        "pupil": [
-          14,
-          20
-        ]
+        "pupil": [14, 20]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "gaze target"
     },
     {
@@ -3484,22 +4692,15 @@
       "layer": "eye_right_look_right",
       "file": "pim/eye_right_look_right.png",
       "z": 20,
-      "size": [
-        40,
-        40
-      ],
-      "pivot": [
-        20,
-        20
-      ],
+      "size": [40, 40],
+      "pivot": [20, 20],
       "joints": {
-        "pupil": [
-          26,
-          20
-        ]
+        "pupil": [26, 20]
       },
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "gaze target"
     },
     {
@@ -3507,17 +4708,16 @@
       "layer": "eyebrow_left",
       "file": "pim/eyebrow_left.png",
       "z": 21,
-      "size": [
-        40,
-        10
-      ],
-      "pivot": [
-        20,
-        5
-      ],
+      "size": [40, 10],
+      "pivot": [20, 5],
       "joints": {},
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/facial_part_eyebrow_a.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the brow centre"
     },
     {
@@ -3525,17 +4725,16 @@
       "layer": "eyebrow_right",
       "file": "pim/eyebrow_right.png",
       "z": 21,
-      "size": [
-        40,
-        10
-      ],
-      "pivot": [
-        20,
-        5
-      ],
+      "size": [40, 10],
+      "pivot": [20, 5],
       "joints": {},
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/facial_part_eyebrow_a.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot at the brow centre"
     },
     {
@@ -3543,17 +4742,13 @@
       "layer": "mouth_neutral",
       "file": "pim/mouth_neutral.png",
       "z": 22,
-      "size": [
-        33,
-        9
-      ],
-      "pivot": [
-        16,
-        0
-      ],
+      "size": [33, 9],
+      "pivot": [16, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "expression"
     },
     {
@@ -3561,17 +4756,13 @@
       "layer": "mouth_open",
       "file": "pim/mouth_open.png",
       "z": 22,
-      "size": [
-        31,
-        37
-      ],
-      "pivot": [
-        16,
-        0
-      ],
+      "size": [31, 37],
+      "pivot": [16, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "expression"
     },
     {
@@ -3579,17 +4770,13 @@
       "layer": "mouth_smile",
       "file": "pim/mouth_smile.png",
       "z": 22,
-      "size": [
-        43,
-        22
-      ],
-      "pivot": [
-        22,
-        0
-      ],
+      "size": [43, 22],
+      "pivot": [22, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "expression"
     },
     {
@@ -3597,17 +4784,13 @@
       "layer": "mouth_viseme_ai",
       "file": "pim/mouth_viseme_ai.png",
       "z": 22,
-      "size": [
-        35,
-        33
-      ],
-      "pivot": [
-        18,
-        0
-      ],
+      "size": [35, 33],
+      "pivot": [18, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -3615,17 +4798,13 @@
       "layer": "mouth_viseme_e",
       "file": "pim/mouth_viseme_e.png",
       "z": 22,
-      "size": [
-        39,
-        19
-      ],
-      "pivot": [
-        20,
-        0
-      ],
+      "size": [39, 19],
+      "pivot": [20, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -3633,17 +4812,13 @@
       "layer": "mouth_viseme_fv",
       "file": "pim/mouth_viseme_fv.png",
       "z": 22,
-      "size": [
-        32,
-        14
-      ],
-      "pivot": [
-        16,
-        0
-      ],
+      "size": [32, 14],
+      "pivot": [16, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -3651,17 +4826,13 @@
       "layer": "mouth_viseme_l",
       "file": "pim/mouth_viseme_l.png",
       "z": 22,
-      "size": [
-        30,
-        27
-      ],
-      "pivot": [
-        15,
-        0
-      ],
+      "size": [30, 27],
+      "pivot": [15, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -3669,17 +4840,13 @@
       "layer": "mouth_viseme_mbp",
       "file": "pim/mouth_viseme_mbp.png",
       "z": 22,
-      "size": [
-        33,
-        8
-      ],
-      "pivot": [
-        16,
-        0
-      ],
+      "size": [33, 8],
+      "pivot": [16, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -3687,17 +4854,13 @@
       "layer": "mouth_viseme_o",
       "file": "pim/mouth_viseme_o.png",
       "z": 22,
-      "size": [
-        23,
-        34
-      ],
-      "pivot": [
-        12,
-        0
-      ],
+      "size": [23, 34],
+      "pivot": [12, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -3705,17 +4868,13 @@
       "layer": "mouth_viseme_u",
       "file": "pim/mouth_viseme_u.png",
       "z": 22,
-      "size": [
-        18,
-        26
-      ],
-      "pivot": [
-        9,
-        0
-      ],
+      "size": [18, 26],
+      "pivot": [9, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -3723,17 +4882,13 @@
       "layer": "mouth_viseme_ws",
       "file": "pim/mouth_viseme_ws.png",
       "z": 22,
-      "size": [
-        25,
-        20
-      ],
-      "pivot": [
-        12,
-        0
-      ],
+      "size": [25, 20],
+      "pivot": [12, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "viseme"
     },
     {
@@ -3741,17 +4896,13 @@
       "layer": "mouth_wide",
       "file": "pim/mouth_wide.png",
       "z": 22,
-      "size": [
-        46,
-        28
-      ],
-      "pivot": [
-        23,
-        0
-      ],
+      "size": [46, 28],
+      "pivot": [23, 0],
       "joints": {},
+      "sources": [],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "expression"
     },
     {
@@ -3759,17 +4910,15 @@
       "layer": "hair",
       "file": "pim/hair.png",
       "z": 30,
-      "size": [
-        83,
-        48
-      ],
-      "pivot": [
-        42,
-        32
-      ],
+      "size": [83, 48],
+      "pivot": [42, 32],
       "joints": {},
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "pivot where the hair seats on the crown"
     },
     {
@@ -3777,17 +4926,13 @@
       "layer": "shadow_small",
       "file": "props/shadow_small.png",
       "z": 0,
-      "size": [
-        72,
-        22
-      ],
-      "pivot": [
-        36,
-        11
-      ],
+      "size": [72, 22],
+      "pivot": [36, 11],
       "joints": {},
-      "blend_mode": "normal",
-      "opacity": 1.0,
+      "sources": [],
+      "blend_mode": "multiply",
+      "opacity": 0.8,
+      "mesh": null,
       "note": "shared prop shadow; reparent under any prop with a ground joint"
     },
     {
@@ -3795,26 +4940,19 @@
       "layer": "ball",
       "file": "props/ball.png",
       "z": 10,
-      "size": [
-        96,
-        96
-      ],
-      "pivot": [
-        48,
-        48
-      ],
+      "size": [96, 96],
+      "pivot": [48, 48],
       "joints": {
-        "grip": [
-          48,
-          48
-        ],
-        "ground": [
-          48,
-          100
-        ]
+        "grip": [48, 48],
+        "ground": [48, 95],
+        "highlight": [48, 48]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "handoff and attachment prop; grip joint meets a hand grip joint"
     },
     {
@@ -3822,123 +4960,522 @@
       "layer": "drum",
       "file": "props/drum.png",
       "z": 11,
-      "size": [
-        120,
-        84
-      ],
-      "pivot": [
-        60,
-        42
-      ],
+      "size": [120, 84],
+      "pivot": [60, 42],
       "joints": {
-        "grip": [
-          60,
-          42
-        ],
-        "strike": [
-          60,
-          8
-        ],
-        "ground": [
-          60,
-          88
-        ]
+        "grip": [60, 42],
+        "strike": [60, 8],
+        "ground": [60, 83]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "beat-synchronised prop; strike joint is the beat contact point"
+    },
+    {
+      "character": "props",
+      "layer": "ball_highlight",
+      "file": "props/ball_highlight.png",
+      "z": 12,
+      "size": [96, 96],
+      "pivot": [48, 48],
+      "joints": {},
+      "sources": [],
+      "blend_mode": "screen",
+      "opacity": 1.0,
+      "mesh": null,
+      "note": "specular highlight, screened over the ball; pivot coincides with the ball's own pivot so the two are aligned by construction"
+    },
+    {
+      "character": "scene",
+      "layer": "haze",
+      "file": "scene/haze.png",
+      "z": 0,
+      "size": [256, 56],
+      "pivot": [128, 55],
+      "joints": {
+        "ground": [128, 55]
+      },
+      "sources": [],
+      "blend_mode": "linear_light",
+      "opacity": 0.6,
+      "mesh": null,
+      "note": "horizon haze, farthest band; parallax factor 0.05. Declares `linear_light`, which is outside `blend_profile.supported` on purpose"
     },
     {
       "character": "scene",
       "layer": "cloud",
       "file": "scene/cloud.png",
-      "z": 0,
-      "size": [
-        80,
-        80
-      ],
-      "pivot": [
-        40,
-        80
-      ],
+      "z": 1,
+      "size": [80, 80],
+      "pivot": [40, 79],
       "joints": {
-        "ground": [
-          40,
-          80
-        ]
+        "ground": [40, 79]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/tile_cloud.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "sky band, farthest; parallax factor 0.1"
     },
     {
       "character": "scene",
       "layer": "tree_large",
       "file": "scene/tree_large.png",
-      "z": 1,
-      "size": [
-        192,
-        294
-      ],
-      "pivot": [
-        96,
-        294
-      ],
+      "z": 2,
+      "size": [192, 294],
+      "pivot": [96, 293],
       "joints": {
-        "ground": [
-          96,
-          294
-        ]
+        "ground": [96, 293]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/tile_background_tree_large.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "far band; parallax factor 0.3"
     },
     {
       "character": "scene",
       "layer": "tree_small",
       "file": "scene/tree_small.png",
-      "z": 2,
-      "size": [
-        144,
-        220
-      ],
-      "pivot": [
-        72,
-        220
-      ],
+      "z": 3,
+      "size": [144, 220],
+      "pivot": [72, 219],
       "joints": {
-        "ground": [
-          72,
-          220
-        ]
+        "ground": [72, 219]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/tile_background_tree_small.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "mid band; parallax factor 0.55"
     },
     {
       "character": "scene",
       "layer": "grass",
       "file": "scene/grass.png",
-      "z": 3,
-      "size": [
-        64,
-        36
-      ],
-      "pivot": [
-        32,
-        36
-      ],
+      "z": 4,
+      "size": [64, 36],
+      "pivot": [32, 35],
       "joints": {
-        "ground": [
-          32,
-          36
-        ]
+        "ground": [32, 35]
       },
+      "sources": [
+        "ambientcg-fabric034:Fabric034_1K-JPG_Color.jpg",
+        "kenney-shape-characters:PNG/Double/tile_background_grass.png"
+      ],
       "blend_mode": "normal",
       "opacity": 1.0,
+      "mesh": null,
       "note": "near band, carries the ground line; parallax factor 1.0"
     }
-  ]
+  ],
+  "poses": {
+    "note": "Angles are degrees, counter-clockwise on screen, the same convention as `rest_angle`. A bone absent from a pose is at 0. `vertices` are the deformed positions in character space and `joints` are the deformed joints of every meshed part, both to two decimals, so a consumer can check its own evaluation against this one rather than only look at it.",
+    "rest": {
+      "name": "rest",
+      "note": "Every bone at 0. Deformed vertices equal the rest positions exactly; the build refuses if skinning moves anything.",
+      "angles": {}
+    },
+    "reference": {
+      "name": "step",
+      "note": "One leg planted, the opposite leg lifted and bent, arms swinging in opposition. Every bone not named is at 0. The bipeds keep their left leg at 0 and mochi keeps its fore left and hind right legs at 0, so those contacts stay on the declared ground plane while the rest of the rig deforms \u2014 which is the point: deformation must not move the floor.",
+      "angles": {
+        "pim": {
+          "hip_right": 22.0,
+          "knee_right": -30.0,
+          "shoulder_left": -28.0,
+          "elbow_left": 20.0,
+          "shoulder_right": 16.0,
+          "elbow_right": -12.0
+        },
+        "bo": {
+          "hip_right": 22.0,
+          "knee_right": -30.0,
+          "shoulder_left": -28.0,
+          "elbow_left": 20.0,
+          "shoulder_right": 16.0,
+          "elbow_right": -12.0
+        },
+        "nu": {
+          "hip_right": 22.0,
+          "knee_right": -30.0,
+          "shoulder_left": -28.0,
+          "elbow_left": 20.0,
+          "shoulder_right": 16.0,
+          "elbow_right": -12.0
+        },
+        "mochi": {
+          "shoulder_fore_right": 18.0,
+          "knee_fore_right": -26.0,
+          "hip_hind_left": -16.0,
+          "knee_hind_left": 22.0,
+          "rump": -20.0,
+          "tail_mid": -24.0,
+          "tail_end": -28.0
+        }
+      },
+      "planted": {
+        "pim": [
+          "leg_left_lower/contact"
+        ],
+        "bo": [
+          "leg_left_lower/contact"
+        ],
+        "nu": [
+          "leg_left_lower/contact"
+        ],
+        "mochi": [
+          "leg_fore_left/contact",
+          "leg_hind_right/contact"
+        ]
+      },
+      "seams_checked": [
+        "bo/leg_left_upper|leg_left_lower",
+        "bo/leg_right_upper|leg_right_lower",
+        "nu/leg_left_upper|leg_left_lower",
+        "nu/leg_right_upper|leg_right_lower",
+        "pim/leg_left_upper|leg_left_lower",
+        "pim/leg_right_upper|leg_right_lower"
+      ],
+      "vertices": {
+        "bo/arm_left": [
+          [-54.34, -39.66],
+          [-44.34, -22.34],
+          [-78.83, -28.88],
+          [-66.82, -13.25],
+          [-99.76, -12.54],
+          [-84.44, 0.31],
+          [-115.67, 6.41],
+          [-100.34, 19.27],
+          [-131.57, 25.37],
+          [-116.25, 38.23]
+        ],
+        "bo/arm_right": [
+          [43.88, -25.26],
+          [57.26, -40.12],
+          [63.17, -10.57],
+          [77.61, -24.26],
+          [79.19, 6.38],
+          [95.37, -5.38],
+          [93.73, 26.4],
+          [109.91, 14.65],
+          [108.28, 46.42],
+          [124.46, 34.67]
+        ],
+        "bo/leg_left_lower": [
+          [-59.32, 76.79],
+          [-33.13, 83.32],
+          [-62.06, 87.78],
+          [-35.87, 94.31],
+          [-64.81, 98.78],
+          [-38.61, 105.31],
+          [-67.55, 109.78],
+          [-41.35, 116.31]
+        ],
+        "bo/leg_left_upper": [
+          [-47.47, 29.24],
+          [-21.27, 35.77],
+          [-51.42, 45.09],
+          [-25.22, 51.62],
+          [-55.37, 60.94],
+          [-29.17, 67.47],
+          [-59.32, 76.79],
+          [-33.13, 83.32]
+        ],
+        "bo/leg_right_lower": [
+          [46.23, 75.48],
+          [73.08, 72.66],
+          [47.42, 86.75],
+          [74.27, 83.93],
+          [48.6, 98.03],
+          [75.45, 95.21],
+          [49.79, 109.3],
+          [76.64, 106.47]
+        ],
+        "bo/leg_right_upper": [
+          [19.84, 42.12],
+          [41.69, 26.25],
+          [30.51, 54.35],
+          [52.75, 39.52],
+          [42.0, 63.53],
+          [66.55, 54.7],
+          [46.23, 75.48],
+          [73.08, 72.66]
+        ],
+        "mochi/belly_shade": [
+          [-68.0, 27.0],
+          [-68.0, 57.0],
+          [-32.46, 20.4],
+          [-34.46, 50.12],
+          [2.52, 18.08],
+          [-1.62, 47.5],
+          [36.82, 20.58],
+          [30.55, 49.7],
+          [70.4, 27.9],
+          [62.13, 56.74]
+        ],
+        "mochi/leg_fore_left": [
+          [-77.06, 21.32],
+          [-51.32, 24.94],
+          [-79.99, 42.11],
+          [-54.24, 45.73],
+          [-82.91, 62.91],
+          [-57.16, 66.53],
+          [-85.83, 83.7],
+          [-60.09, 87.32],
+          [-88.75, 104.5],
+          [-63.01, 108.12]
+        ],
+        "mochi/leg_fore_right": [
+          [-94.06, 25.45],
+          [-68.45, 20.94],
+          [-87.73, 44.66],
+          [-62.29, 43.37],
+          [-86.46, 60.98],
+          [-61.47, 68.14],
+          [-92.25, 81.16],
+          [-67.26, 88.33],
+          [-98.04, 101.35],
+          [-73.04, 108.52]
+        ],
+        "mochi/leg_hind_left": [
+          [54.94, 21.32],
+          [80.68, 24.94],
+          [49.88, 43.6],
+          [75.48, 44.48],
+          [49.35, 67.86],
+          [74.58, 61.57],
+          [54.43, 88.24],
+          [79.66, 81.95],
+          [59.51, 108.62],
+          [84.74, 102.33]
+        ],
+        "mochi/leg_hind_right": [
+          [64.32, 24.94],
+          [90.06, 21.32],
+          [67.24, 45.73],
+          [92.99, 42.11],
+          [70.16, 66.53],
+          [95.91, 62.91],
+          [73.09, 87.32],
+          [98.83, 83.7],
+          [76.01, 108.12],
+          [101.75, 104.5]
+        ],
+        "mochi/tail": [
+          [91.02, -12.18],
+          [84.18, -30.98],
+          [101.47, -16.73],
+          [95.49, -35.64],
+          [109.39, -20.6],
+          [109.41, -40.35],
+          [118.98, -22.82],
+          [124.52, -41.43],
+          [127.26, -20.24],
+          [137.85, -37.2],
+          [137.14, -14.06],
+          [147.74, -31.02],
+          [147.04, -7.88],
+          [157.64, -24.84]
+        ],
+        "nu/arm_left": [
+          [-54.34, -39.66],
+          [-44.34, -22.34],
+          [-78.83, -28.88],
+          [-66.82, -13.25],
+          [-99.76, -12.54],
+          [-84.44, 0.31],
+          [-115.67, 6.41],
+          [-100.34, 19.27],
+          [-131.57, 25.37],
+          [-116.25, 38.23]
+        ],
+        "nu/arm_right": [
+          [43.88, -25.26],
+          [57.26, -40.12],
+          [63.17, -10.57],
+          [77.61, -24.26],
+          [79.19, 6.38],
+          [95.37, -5.38],
+          [93.73, 26.4],
+          [109.91, 14.65],
+          [108.28, 46.42],
+          [124.46, 34.67]
+        ],
+        "nu/leg_left_lower": [
+          [-59.32, 76.79],
+          [-33.13, 83.32],
+          [-62.06, 87.78],
+          [-35.87, 94.31],
+          [-64.81, 98.78],
+          [-38.61, 105.31],
+          [-67.55, 109.78],
+          [-41.35, 116.31]
+        ],
+        "nu/leg_left_upper": [
+          [-47.47, 29.24],
+          [-21.27, 35.77],
+          [-51.42, 45.09],
+          [-25.22, 51.62],
+          [-55.37, 60.94],
+          [-29.17, 67.47],
+          [-59.32, 76.79],
+          [-33.13, 83.32]
+        ],
+        "nu/leg_right_lower": [
+          [46.23, 75.48],
+          [73.08, 72.66],
+          [47.42, 86.75],
+          [74.27, 83.93],
+          [48.6, 98.03],
+          [75.45, 95.21],
+          [49.79, 109.3],
+          [76.64, 106.47]
+        ],
+        "nu/leg_right_upper": [
+          [19.84, 42.12],
+          [41.69, 26.25],
+          [30.51, 54.35],
+          [52.75, 39.52],
+          [42.0, 63.53],
+          [66.55, 54.7],
+          [46.23, 75.48],
+          [73.08, 72.66]
+        ],
+        "pim/arm_left": [
+          [-54.34, -39.66],
+          [-44.34, -22.34],
+          [-78.83, -28.88],
+          [-66.82, -13.25],
+          [-99.76, -12.54],
+          [-84.44, 0.31],
+          [-115.67, 6.41],
+          [-100.34, 19.27],
+          [-131.57, 25.37],
+          [-116.25, 38.23]
+        ],
+        "pim/arm_right": [
+          [43.88, -25.26],
+          [57.26, -40.12],
+          [63.17, -10.57],
+          [77.61, -24.26],
+          [79.19, 6.38],
+          [95.37, -5.38],
+          [93.73, 26.4],
+          [109.91, 14.65],
+          [108.28, 46.42],
+          [124.46, 34.67]
+        ],
+        "pim/leg_left_lower": [
+          [-59.32, 76.79],
+          [-33.13, 83.32],
+          [-62.06, 87.78],
+          [-35.87, 94.31],
+          [-64.81, 98.78],
+          [-38.61, 105.31],
+          [-67.55, 109.78],
+          [-41.35, 116.31]
+        ],
+        "pim/leg_left_upper": [
+          [-47.47, 29.24],
+          [-21.27, 35.77],
+          [-51.42, 45.09],
+          [-25.22, 51.62],
+          [-55.37, 60.94],
+          [-29.17, 67.47],
+          [-59.32, 76.79],
+          [-33.13, 83.32]
+        ],
+        "pim/leg_right_lower": [
+          [46.23, 75.48],
+          [73.08, 72.66],
+          [47.42, 86.75],
+          [74.27, 83.93],
+          [48.6, 98.03],
+          [75.45, 95.21],
+          [49.79, 109.3],
+          [76.64, 106.47]
+        ],
+        "pim/leg_right_upper": [
+          [19.84, 42.12],
+          [41.69, 26.25],
+          [30.51, 54.35],
+          [52.75, 39.52],
+          [42.0, 63.53],
+          [66.55, 54.7],
+          [46.23, 75.48],
+          [73.08, 72.66]
+        ]
+      },
+      "joints": {
+        "bo/arm_left/contact": [-123.27, 31.04],
+        "bo/arm_left/elbow": [-91.67, -6.45],
+        "bo/arm_left/tip": [-117.49, 24.14],
+        "bo/arm_right/contact": [115.78, 39.74],
+        "bo/arm_right/elbow": [86.95, 0.16],
+        "bo/arm_right/tip": [110.49, 32.46],
+        "bo/leg_left_lower/contact": [-54.69, 111.95],
+        "bo/leg_left_lower/tip": [-51.79, 100.31],
+        "bo/leg_left_upper/knee": [-46.71, 79.93],
+        "bo/leg_right_lower/contact": [62.61, 106.94],
+        "bo/leg_right_lower/tip": [61.36, 95.01],
+        "bo/leg_right_upper/knee": [59.16, 74.12],
+        "mochi/belly_shade/fore": [-66.03, 41.6],
+        "mochi/belly_shade/hind": [64.29, 41.89],
+        "mochi/leg_fore_left/contact": [-75.74, 105.32],
+        "mochi/leg_fore_left/knee": [-70.04, 64.72],
+        "mochi/leg_fore_left/tip": [-74.07, 93.44],
+        "mochi/leg_fore_right/contact": [-85.27, 103.97],
+        "mochi/leg_fore_right/knee": [-73.96, 64.56],
+        "mochi/leg_fore_right/tip": [-81.96, 92.44],
+        "mochi/leg_hind_left/contact": [71.88, 104.5],
+        "mochi/leg_hind_left/knee": [61.96, 64.72],
+        "mochi/leg_hind_left/tip": [68.98, 92.86],
+        "mochi/leg_hind_right/contact": [88.74, 105.32],
+        "mochi/leg_hind_right/knee": [83.04, 64.72],
+        "mochi/leg_hind_right/tip": [87.07, 93.44],
+        "mochi/tail/contact": [151.49, -16.89],
+        "mochi/tail/knuckle_1": [112.86, -30.72],
+        "mochi/tail/knuckle_2": [132.08, -28.87],
+        "mochi/tail/tip": [143.86, -21.66],
+        "nu/arm_left/contact": [-123.27, 31.04],
+        "nu/arm_left/elbow": [-91.67, -6.45],
+        "nu/arm_left/tip": [-117.49, 24.14],
+        "nu/arm_right/contact": [115.78, 39.74],
+        "nu/arm_right/elbow": [86.95, 0.16],
+        "nu/arm_right/tip": [110.49, 32.46],
+        "nu/leg_left_lower/contact": [-54.69, 111.95],
+        "nu/leg_left_lower/tip": [-51.79, 100.31],
+        "nu/leg_left_upper/knee": [-46.71, 79.93],
+        "nu/leg_right_lower/contact": [62.61, 106.94],
+        "nu/leg_right_lower/tip": [61.36, 95.01],
+        "nu/leg_right_upper/knee": [59.16, 74.12],
+        "pim/arm_left/contact": [-123.27, 31.04],
+        "pim/arm_left/elbow": [-91.67, -6.45],
+        "pim/arm_left/tip": [-117.49, 24.14],
+        "pim/arm_right/contact": [115.78, 39.74],
+        "pim/arm_right/elbow": [86.95, 0.16],
+        "pim/arm_right/tip": [110.49, 32.46],
+        "pim/leg_left_lower/contact": [-54.69, 111.95],
+        "pim/leg_left_lower/tip": [-51.79, 100.31],
+        "pim/leg_left_upper/knee": [-46.71, 79.93],
+        "pim/leg_right_lower/contact": [62.61, 106.94],
+        "pim/leg_right_lower/tip": [61.36, 95.01],
+        "pim/leg_right_upper/knee": [59.16, 74.12]
+      }
+    }
+  }
 }

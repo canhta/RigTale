@@ -2,7 +2,9 @@
 
 Versioned, redistributable fixture assets for `SPIKE-F001` (`RGT-S003`).
 
-Everything here derives from the two CC0 sources recorded in `PROVENANCE.json` — Kenney Shape Characters and ambientCG Fabric034. Both are public domain dedications, so nothing here carries a downstream obligation. Nothing derives from the reference-read-only tier, and nothing derives from a video reference.
+The cast has two origins, and `PROVENANCE.json` records both. 72 parts derive from the two CC0 sources — Kenney Shape Characters supplies geometric bases, hands, eyebrows and scene tiles; ambientCG Fabric034 supplies the felt weave. The other 69 are authored here from primitives and derive from no source at all: the generated limbs, the cloud silhouette, clothing and its patterns, hair, pigtails, eyes, every mouth state, the quadruped, the cart, the props and every shadow. Each part record in `cast/manifest.json` names the archive members its pixels came from, and an authored part carries an empty list.
+
+Both positions are unencumbered. A CC0 dedication carries forward with nothing attached, and an authored part carries nothing to begin with, so the cast as a whole is redistributable with no downstream obligation. Nothing derives from the reference-read-only tier, and nothing derives from a video reference.
 
 ## Status
 
@@ -14,77 +16,125 @@ Everything here derives from the two CC0 sources recorded in `PROVENANCE.json` �
 |---|---|
 | `PROVENANCE.json` | Tracked source provenance and licence evidence |
 | `cast/` | Layered cutout parts, one PNG per rig layer |
-| `cast/manifest.json` | Per-part draw order, size, pivot, joints, blend mode and opacity, plus the rig tree |
-| `cast/preview.png` | Generated contact sheet, not an assertion |
-| `tools/build_cast.py` | Regenerates `cast/` from the CC0 sources |
-| `tools/preview_cast.py` | Poses the parts from the manifest alone, to show the rig data is sufficient |
+| `cast/manifest.json` | Per-part draw order, size, pivot, joints, sources, blend mode, opacity and deform mesh, plus the rig tree, the deform skeleton and the reference pose |
+| `cast/preview.png` | Generated contact sheet at rest, not an assertion |
+| `cast/preview_pose.png` | The same cast under the named reference pose, skinned from the mesh data |
+| `tools/build_cast.py` | Regenerates `cast/` from the CC0 sources and checks what it wrote |
+| `tools/rig.py` | The attachment rule and the skinning evaluator, shared by the generator and the preview so there is one implementation |
+| `tools/preview_cast.py` | Poses and skins the parts from the manifest alone, to show the rig data is sufficient |
 
 ## Regenerating
 
-The CC0 sources are not vendored. Download the two archives named in `PROVENANCE.json` — each record carries its download URL, SHA-256 and byte size — into `.sandbox/downloads/`, then extract them so that:
+The CC0 sources are not vendored. Download the two archives named in `PROVENANCE.json` — each record carries its download URL, SHA-256 and byte size — into `.sandbox/downloads/`. Do not extract them; the build reads what it needs out of the archives.
 
-- the Kenney part PNGs are at `.sandbox/assets/kenney-shape-characters/PNG/Double/`;
-- the Fabric034 colour map is at `.sandbox/assets/fabric034/Fabric034_1K-JPG_Color.jpg`.
-
-Those paths are where the build reads its inputs. They are not the fixture's provenance: the licence evidence is `PROVENANCE.json`, which is tracked in Git. `.sandbox/` is a Git-ignored working area whose rules are set out in `.sandbox/README.md`.
+`.sandbox/` is a Git-ignored working area whose rules are set out in `.sandbox/README.md`. It is a fetch location, not provenance: the licence evidence is `PROVENANCE.json`, which is tracked in Git.
 
 ```
 python3 fixtures/tools/build_cast.py
 python3 fixtures/tools/preview_cast.py
 ```
 
-The generator verifies every archive against the SHA-256 and byte size in `PROVENANCE.json` before it builds. A missing or mismatched source stops the build with an explicit message rather than producing a partial cast. Two runs produce byte-identical output.
+The guard binds the bytes the build consumes, not a container beside them. Every input is decompressed from an archive that has already matched its recorded SHA-256 and byte size, and each member is then checked against the digest recorded for that member, so no file on disk outside a verified archive can reach the output. The Kenney licence text quoted in `PROVENANCE.json` is checked against the `License.txt` in the archive on the same pass. A missing archive, a mismatched archive, a mismatched member, a recorded member the archive does not contain, and altered licence text each stop the build with an explicit message rather than producing a partial cast. Two runs produce byte-identical output.
+
+The generator also checks what it wrote: the manifest and the emitted files must agree exactly, no two parts sharing a `z` may overlap, and every contact must sit on its character's declared ground plane. `PROVENANCE.json`'s `derives` lists and its authored-part count are generated from the build's own reads; if the code's inputs change, the build stops and asks for `--update-provenance`, so the record cannot drift from the code.
 
 ## Cast
 
-132 PNG files across seven groups, 349 KB, plus a 75 KB manifest.
+141 PNG files across seven groups, 364 KB, plus a 138 KB manifest.
 
 | Group | Archetype | Files | Exercises |
 |---|---|---|---|
-| `pim`, `bo`, `nu` | biped | 34, 34, 36 | Three simultaneous instances with distinct silhouette, palette, hair and clothing |
-| `mochi` | quadruped | 16 | Four-point ground contact, secondary motion on ears and tail |
+| `pim`, `bo`, `nu` | biped | 36, 36, 38 | Three simultaneous instances with distinct silhouette, palette, hair and clothing; deformed arms and a two-part deformed leg |
+| `mochi` | quadruped | 17 | Four-point ground contact, secondary motion on ears and tail, a three-bone deformed tail, a deformed contact shade |
 | `cart` | vehicle | 5 | Wheel cycle against ground travel, character and prop attachment |
-| `props` | prop | 3 | Handoff, attachment, beat-synchronised action |
-| `scene` | environment | 4 | Parallax bands, draw order |
+| `props` | prop | 4 | Handoff, attachment, beat-synchronised action, a `screen` highlight locked to the light |
+| `scene` | environment | 5 | Parallax bands, draw order, the out-of-profile blend case |
 
 The three bipeds use three different base silhouettes: `pim` a squircle and `bo` a circle, both recoloured Kenney bases, and `nu` a generated cloud — the third shape in the spike's stated vocabulary, which the Kenney pack does not supply.
 
-Every biped carries separated arms, legs, hands in three grips, eyes with three gaze targets, eyebrows, and twelve mouth states — four expressions plus eight visemes. Parts are separate because the fixture exists to exercise rigging; a flattened character would assert nothing.
+Every biped carries separated arms, legs split at the knee, hands in three grips, eyes with three gaze targets, eyebrows, and twelve mouth states — four expressions plus eight visemes. Parts are separate because the fixture exists to exercise rigging; a flattened character would assert nothing.
 
 ### Files against unique images
 
-The 132 files hold **78 unique images**. 54 files are byte-identical to another file, for two reasons:
+The 141 files hold **84 unique images**. 57 files are byte-identical to another file, for two reasons:
 
-- **Mirroring a symmetric shape is a no-op.** A capsule limb, a sphere pigtail, a circular wheel, eye and ear shapes are all left-right symmetric, so the left and right copies are identical bytes. This covers each biped's `arm_left`/`arm_right` and `leg_left`/`leg_right`, `nu`'s two pigtails, `mochi`'s four legs and its ears and eyes, and the cart's two wheels.
+- **Mirroring a symmetric shape is a no-op.** A capsule limb, a sphere pigtail, a circular wheel, eye and ear shapes are all left-right symmetric, so the left and right copies are identical bytes. This covers each biped's `arm_left`/`arm_right`, `leg_left_upper`/`leg_right_upper` and `leg_left_lower`/`leg_right_lower`, `nu`'s two pigtails, `mochi`'s four legs and its ears and eyes, and the cart's two wheels.
 - **Faces are shared across the cast.** All three bipeds are 160×160, so their eyes, their twelve mouth states and their ground shadow come out at the same size in the same ink, and the files match.
 
 The duplicates are kept rather than deduplicated: each character is a self-contained directory, so a consumer can edit or replace one character's parts without reaching into another's. Consumers that care about payload size should deduplicate on content hash at packaging time.
 
 ## Rig data
 
-`cast/manifest.json` carries enough structure to place and parent every part without guessing. `tools/preview_cast.py` contains no joint offsets of its own; it reads all of them from the manifest, which is what demonstrates the data is sufficient.
+`cast/manifest.json` carries enough structure to place and parent every part without guessing. `tools/preview_cast.py` contains no joint offsets of its own; it reads all of them from the manifest, and it stands each group on the contact sheet's floor line using only that group's declared ground plane, which is what demonstrates the data is sufficient.
 
 - **Part space.** A part's `pivot` and each entry in its `joints` are pixels from that part's own top-left.
 - **Character space.** A character's space is its root part's pivot, +x right, +y down, in pixels.
 - **Attachment.** `rig.<character>.attach` gives every part a `parent`, the named `joint` on that parent it hangs from, and a `rest_angle`. A part is placed by putting its own pivot on that joint, then rotating counter-clockwise by `rest_angle`. A part's pivot is always its anchor, so there is no separate anchor field. `roots` lists the parts with no parent.
 - **Slots.** `rig.<character>.slots` groups mutually exclusive alternates — the three hand grips, the three gaze targets per eye, the mouth states — and names the default. Exactly one member of a slot is posed at a time.
-- **Draw order.** `z` is unique per part except within a slot and between non-overlapping left-right pairs.
-- **Compositing.** Every part carries an explicit `blend_mode` and `opacity`. `blend_profile` at the top of the manifest declares the modes the fixture expects a consumer to support; a consumer that cannot honour a declared mode must fail rather than silently substitute `normal`.
+- **Constraints.** `attach.constraint` is `null` when a part inherits its parent's transform whole. Every shadow instead carries `ground_projected`: it takes the parent's x translation only, holds its y on the ground plane, and keeps its angle fixed in character space. A shadow that rotated with its body would be wrong, and the schema now says so rather than leaving it to a note.
+- **Ground.** `rig.<character>.ground` names, per root, the joint that is that root's floor plane and the contact joints standing on it — feet, wheels, a prop's resting point, a scene band's ground line. Put that joint on the shot's floor line and every group in the cast stands on the same floor. The plane is derived from the contacts, never from the silhouette; `build_cast.py` refuses to build if any contact misses its declared plane by more than half a pixel, which is the rounding of a joint to whole pixels.
+- **Draw order.** `z` is scoped to one character group and says nothing across groups: `pim/body` and `cart/body` are both `z: 10` and never compete, because a shot decides which group is in front. Inside a group `z` is unique per part, except where two parts can never be composited over each other — alternates in one slot, of which exactly one is posed, and parts whose opaque pixels do not meet in character space. The build proves that exception rather than asserting it: it rasterises every pair sharing a `z` in character space and refuses if they overlap by a single pixel.
+- **Compositing.** Every part carries an explicit `blend_mode` and `opacity`. See Colour and compositing below.
 - **Parallax.** `rig.scene.parallax` gives each environment band its depth factor, ordered with `z` from far to near.
 
 Pivots name real joints. A limb's pivot is the centre of its top cap, so it rotates from the shoulder or hip; `mochi`'s head pivot is at the neck, not the skull centre, so a nod is a nod.
 
+## Deformation
+
+Rigid sprite parenting is not the primitive the product is made of. `PR-R002` requires basic mesh or bone deformation, and `PR-R005` names the backend-independent adapter surface as a textured deformed mesh plus a blend mode. So 24 parts carry real mesh data — vertices in part space, triangle indices, UVs and per-vertex weights binding to bones whose heads are existing rig joints: both arms and both two-part legs on all three bipeds, all four of `mochi`'s legs, its three-bone tail, and its belly shade. 172 triangles in total.
+
+- **Bones.** `rig.<character>.bones` is the deform skeleton: 8 bones per biped, 11 on `mochi`. A bone is a rotation about its `head`, and a head is always an existing joint written `part/joint`, so nothing is declared twice. Rest is the identity — with every angle at 0 a skinned vertex lands exactly where the rigid rest pose puts it, and the build refuses to ship if it does not.
+- **Weights.** One rule covers every weight in the cast: a bone's weight ramps linearly from 0 at the previous bone's head to 1 at its own head, and stays 1 beyond it; the previous bone takes the remainder. Each mesh records those head positions, so a reviewer can recompute every weight from two numbers.
+- **Chains, not isolated joints.** A biped arm bends at the elbow inside one part while the shoulder swings the whole arm; `mochi`'s tail runs rump → mid → end. The reference pose moves the chain and the mesh together, which is what `SPIKE-F001`'s first diagnostic shot asks for.
+- **A shared-edge seam.** `leg_<side>_upper` and `leg_<side>_lower` meet along the knee. The thigh has a flat bottom, the shin a flat top, and the two edges are the same two points in character space, carried by both meshes. The split sits below the body silhouette on every biped — the build refuses if it does not, because a seam hidden behind a torso asserts nothing. A consumer that places the shin from the undeformed joint, or interpolates the two sides differently, opens a visible gap; the build measures that gap under the reference pose and accepts only zero.
+- **Contacts on a deformed limb.** A joint on a meshed part is a point on the mesh, not a rigid offset. Locate it in its triangle in rest part space, take its barycentric coordinates, and apply them to that triangle's deformed vertices. The same rule anchors a rigid child — a hand on an arm's `tip` — and its rotation is the bone angles blended by the weights at that same point. At rest this reproduces the rigid position exactly, so the declared ground plane is untouched; under a pose the foot moves with the geometry.
+- **Mesh and blend together.** `mochi/belly_shade` is a mesh, `multiply`, and opacity 0.7 at once, and it is skinned to the fore and hind leg bones rather than to its own parent — the ordinary case of a part bound outside its attachment chain, and the case where a backend that treats mesh and blend as separate features fails.
+
+### The reference pose
+
+`poses.reference` is `step`: one leg planted, the opposite leg lifted and bent, arms swinging in opposition, `mochi` mid-stride with its tail curled. It records the bone angles, the resulting deformed vertices and the deformed joints, both in character space to two decimals, so a consumer can check its own evaluation against this one rather than merely look at a picture. `tools/preview_cast.py` renders it to `cast/preview_pose.png` by skinning the manifest data and warping each triangle through its UVs, which is what makes the harness a skinning evaluator rather than a sprite placer.
+
+The planted contacts stay on the declared ground plane while everything else deforms, and the build refuses otherwise. That is the join between this section and the ground plane above: deformation must not move the floor.
+
+The three bipeds have identical body dimensions, so their arms and legs are not merely the same topology but the same vertices. The build checks that the reference pose deforms them identically, which is what makes the reuse claim testable rather than decorative.
+
+## Colour and compositing
+
+`production-contracts.md` calls undeclared colour and alpha the most likely reason two renderer backends will disagree, and requires alpha association to be fixed at the published-pack boundary. This cast is such a boundary, so the manifest's `colour` block fixes all four values, and the build checks each of them against the bytes it emitted rather than asserting them:
+
+| Field | Value |
+|---|---|
+| Working space | sRGB IEC 61966-2-1, D65 |
+| Transfer | sRGB, non-linear; nothing here is linear light |
+| Blend space | the same sRGB encoding — a consumer blending in linear light will not reproduce this cast |
+| Alpha | straight, unassociated |
+| Bit depth | 8 per channel, RGBA, PNG colour type 6 |
+
+No part PNG embeds a profile: there is no `iCCP`, `sRGB`, `gAMA` or `cHRM` chunk in any of them, so this manifest is the only declaration and the build fails if one appears. Straight alpha is not assumed either — the build searches the emitted pixels for one that a premultiplied encoding could not hold, a colour channel above its own alpha, and records the pixel it found in `colour.alpha_evidence`. A part may override any of these fields with its own `colour` object; none does.
+
+Alpha is authored by silhouette only. Every translucent decoration — a clothing pattern, a wheel hub, an eye highlight — is composited as a colour tint, so no part carries a hole where a tint was meant, and no part carries an opaque stamp where a 25% tint was meant.
+
+`blend_profile` declares the modes a consumer must support, `normal`, `multiply` and `screen`, and names the W3C Compositing-1 formula for each, because a mode name is not a formula. Every declared mode is used, so the profile is testable:
+
+- **`multiply`** on all six ground shadows at **opacity 0.8**, and on `mochi/belly_shade` at **0.7**. A shadow darkens what is under it, and these are also the parts that exercise blend and opacity together — `belly_shade` adds a mesh to the same part.
+- **`screen`** on `props/ball_highlight`, a specular that belongs to the light rather than to the ball — it is a separate part with a `light_locked` constraint, so it does not turn when the ball rolls.
+- **`linear_light`** on `scene/haze`, **outside** the profile on purpose. Photoshop publishes no formula for it and no 2D library screened implements it, so `PR-R008`'s refusal path needs an artifact to refuse. `preview_cast.py` leaves it out of the contact sheet and names it in the run log; `preview_cast.py --all` demands it and the harness exits with a refusal. Neither path substitutes `normal`.
+
+Where a part carries both, **opacity is applied first**: alpha is multiplied by `opacity`, and the result is then blended. That is the OpenRaster rule — a layer's alpha is multiplied by its opacity before blending, and a non-isolated group multiplies its opacity into its children — and a consumer that blends first and attenuates afterwards lands on a different pixel.
+
 ## Attribution and provenance
 
-`PROVENANCE.json` is the record: per source, the source page, the final download URL, the retrieval date, the licence, the licence evidence, the archive SHA-256 and byte size, and which generated part groups derive from it.
+`PROVENANCE.json` is the record: per source, the source page, the final download URL, the retrieval date, the licence, the licence evidence, the archive SHA-256 and byte size, and then per archive member consumed, its own SHA-256 and byte size, what the build does to it, and every part its pixels reach.
 
 Kenney Shape Characters ships a `License.txt` inside its archive that states the CC0 dedication verbatim. ambientCG Fabric034 ships no licence file, so its evidence is the source page.
+
+Both archives were fetched into the Git-ignored sandbox at tier `cc0-eligible-for-official`, which `.sandbox/README.md` defines as the one tier that may be promoted to an official fixture asset once `SPIKE-F001` records its provenance. `PROVENANCE.json` records the tier and the promotion per source, so the promotion can be shown from the tracked repository alone — the sandbox ledger that first assigned the tier is Git-ignored and cannot serve as that evidence. No `sandbox-only` or `reference-read-only` asset reaches this fixture.
 
 Neither licence requires attribution. Both are credited because it is right, not because it is required.
 
 ## Originality
 
-The characters are original compositions. Palette, hair, clothing patterns, limbs, eyes, mouth states, the cloud silhouette, the quadruped, the vehicle and the props were all authored here; Kenney supplies geometric bases and ambientCG supplies a texture.
+The characters are original compositions. Palette, hair, clothing patterns, limbs, eyes, mouth states, the cloud silhouette, the quadruped, the vehicle and the props were all authored here; Kenney supplies geometric bases, hands, eyebrows and scene tiles, and ambientCG supplies a texture.
 
 **No visual identity is copied from any reference channel** — not shape, colour, hair, costume, or naming. Channels studied for art direction were used as visual reference only and supplied no asset. Local or non-commercial use does not by itself permit downloading or reusing video content: the [YouTube Terms of Service](https://www.youtube.com/static?template=terms) restrict it unless a service feature, the rights holder, or law permits it.
 

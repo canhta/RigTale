@@ -60,7 +60,11 @@ Desk research cannot promote this requirement, and `RGT-S009B`, the only route t
 
 Audio, lyrics, beat, phoneme, viseme, and timing data must be accepted when required by the production. Locked audio constrains synchronized animation but is not the mandatory product entry point or the sole source of character direction.
 
-**New obligation from `RGT-S009` Part A.** A published distributor specification requires a Music & Effects package in which background music is carried "exactly as it is represented in the original language mix", while **sung vocals — including character songs — must be delivered as separate optional tracks and again as a dialogue guide**. It also requires a textless picture covering "any graphic and/or animated text that occurs over picture".
+**New obligation from `RGT-S009` Part A.** Evidence labels from `docs/research/small-studio-workflow.md` section 8 are carried here, because what is specified and what is inferred lead to the same design but not to the same confidence.
+
+`[FACT]` A published distributor specification requires a fully-filled Music & Effects package whose required assets are an M&E track, optional tracks, a dialogue guide and a print master. The M&E body carries "background music exactly as it is represented in the original language mix", and **optional tracks must carry "Vocals from a character singing on-screen"**. `[FACT]` Textless picture is required **for IMF and servicing packages**, covering "any graphic and/or animated text that occurs over picture", with carve-outs for text over pure black or white frames, text that was part of visual-effects composites, and in-story brands.
+
+`[INFERENCE]` That every sung vocal must therefore be deliverable **both** as an optional track **and** as a dialogue stem is read from those requirements taken together, not stated by the specification. The design consequence is the same either way and is the reason this requirement exists.
 
 Two consequences are structural, not optional:
 
