@@ -1,24 +1,914 @@
 {
   "fixture": "rigtale-reference-cast",
-  "version": "0.1.0-draft",
+  "version": "0.2.0-draft",
   "status": "draft, not approved; RGT-S003 is active and RGT-D-fixture has not been recorded",
   "generator": "fixtures/tools/build_cast.py",
-  "sources": [
-    {
-      "name": "Kenney Shape Characters",
-      "licence": "CC0 1.0",
-      "url": "https://kenney.nl/assets/shape-characters",
-      "used_for": "body, hand, eyebrow and environment tile bases"
-    },
-    {
-      "name": "ambientCG Fabric034",
-      "licence": "CC0 1.0",
-      "url": "https://ambientcg.com/view?id=Fabric034",
-      "used_for": "felt weave overlay"
-    }
-  ],
+  "provenance_record": "fixtures/PROVENANCE.json",
   "originality": "Characters are original compositions: new palette, new hair, new clothing patterns, generated limbs, eyes and visemes. No visual identity is copied from any reference channel, and no reference video supplied any asset.",
-  "coordinate_note": "Pivot is in pixels from each part's own top-left. Placement in character space is the rig's responsibility and is deliberately not baked in.",
+  "coordinate_note": "A part's `pivot` and its `joints` are pixels from that part's own top-left. `rig` places parts in character space: a character's space is its root part's pivot, +x right, +y down, in pixels. A part is attached by putting its own pivot on the named joint of its parent, then rotating by `rest_angle` degrees counter-clockwise about that point. A part's pivot is always its anchor, so no separate anchor field is needed.",
+  "blend_profile": {
+    "default": "normal",
+    "supported": [
+      "normal",
+      "multiply",
+      "screen"
+    ],
+    "note": "Every part carries an explicit `blend_mode` and `opacity`. A consumer that cannot honour a part's declared mode must fail rather than silently substitute `normal`."
+  },
+  "rig": {
+    "pim": {
+      "roots": [
+        "body"
+      ],
+      "space": "body pivot, +x right, +y down, pixels",
+      "attach": {
+        "body": {
+          "parent": null,
+          "joint": null,
+          "rest_angle": 0.0
+        },
+        "shadow": {
+          "parent": "body",
+          "joint": "ground",
+          "rest_angle": 0.0
+        },
+        "leg_left": {
+          "parent": "body",
+          "joint": "hip_left",
+          "rest_angle": -14.0
+        },
+        "arm_left": {
+          "parent": "body",
+          "joint": "shoulder_left",
+          "rest_angle": -32.0
+        },
+        "leg_right": {
+          "parent": "body",
+          "joint": "hip_right",
+          "rest_angle": 14.0
+        },
+        "arm_right": {
+          "parent": "body",
+          "joint": "shoulder_right",
+          "rest_angle": 32.0
+        },
+        "clothing": {
+          "parent": "body",
+          "joint": "clothing",
+          "rest_angle": 0.0
+        },
+        "hand_left_open": {
+          "parent": "arm_left",
+          "joint": "tip",
+          "rest_angle": 0.0
+        },
+        "hand_left_closed": {
+          "parent": "arm_left",
+          "joint": "tip",
+          "rest_angle": 0.0
+        },
+        "hand_left_point": {
+          "parent": "arm_left",
+          "joint": "tip",
+          "rest_angle": 0.0
+        },
+        "hand_right_open": {
+          "parent": "arm_right",
+          "joint": "tip",
+          "rest_angle": 0.0
+        },
+        "hand_right_closed": {
+          "parent": "arm_right",
+          "joint": "tip",
+          "rest_angle": 0.0
+        },
+        "hand_right_point": {
+          "parent": "arm_right",
+          "joint": "tip",
+          "rest_angle": 0.0
+        },
+        "eye_left": {
+          "parent": "body",
+          "joint": "eye_left",
+          "rest_angle": 0.0
+        },
+        "eye_left_look_left": {
+          "parent": "body",
+          "joint": "eye_left",
+          "rest_angle": 0.0
+        },
+        "eye_left_look_right": {
+          "parent": "body",
+          "joint": "eye_left",
+          "rest_angle": 0.0
+        },
+        "eye_right": {
+          "parent": "body",
+          "joint": "eye_right",
+          "rest_angle": 0.0
+        },
+        "eye_right_look_left": {
+          "parent": "body",
+          "joint": "eye_right",
+          "rest_angle": 0.0
+        },
+        "eye_right_look_right": {
+          "parent": "body",
+          "joint": "eye_right",
+          "rest_angle": 0.0
+        },
+        "eyebrow_left": {
+          "parent": "body",
+          "joint": "brow_left",
+          "rest_angle": 0.0
+        },
+        "eyebrow_right": {
+          "parent": "body",
+          "joint": "brow_right",
+          "rest_angle": 0.0
+        },
+        "mouth_neutral": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_smile": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_open": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_wide": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_ai": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_e": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_o": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_u": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_mbp": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_fv": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_l": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_ws": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "hair": {
+          "parent": "body",
+          "joint": "crown",
+          "rest_angle": 0.0
+        }
+      },
+      "slots": {
+        "hand_left": {
+          "members": [
+            "hand_left_open",
+            "hand_left_closed",
+            "hand_left_point"
+          ],
+          "default": "hand_left_open"
+        },
+        "hand_right": {
+          "members": [
+            "hand_right_open",
+            "hand_right_closed",
+            "hand_right_point"
+          ],
+          "default": "hand_right_open"
+        },
+        "eye_left": {
+          "members": [
+            "eye_left",
+            "eye_left_look_left",
+            "eye_left_look_right"
+          ],
+          "default": "eye_left"
+        },
+        "eye_right": {
+          "members": [
+            "eye_right",
+            "eye_right_look_left",
+            "eye_right_look_right"
+          ],
+          "default": "eye_right"
+        },
+        "mouth": {
+          "members": [
+            "mouth_neutral",
+            "mouth_smile",
+            "mouth_open",
+            "mouth_wide",
+            "mouth_viseme_ai",
+            "mouth_viseme_e",
+            "mouth_viseme_o",
+            "mouth_viseme_u",
+            "mouth_viseme_mbp",
+            "mouth_viseme_fv",
+            "mouth_viseme_l",
+            "mouth_viseme_ws"
+          ],
+          "default": "mouth_smile"
+        }
+      }
+    },
+    "bo": {
+      "roots": [
+        "body"
+      ],
+      "space": "body pivot, +x right, +y down, pixels",
+      "attach": {
+        "body": {
+          "parent": null,
+          "joint": null,
+          "rest_angle": 0.0
+        },
+        "shadow": {
+          "parent": "body",
+          "joint": "ground",
+          "rest_angle": 0.0
+        },
+        "leg_left": {
+          "parent": "body",
+          "joint": "hip_left",
+          "rest_angle": -14.0
+        },
+        "arm_left": {
+          "parent": "body",
+          "joint": "shoulder_left",
+          "rest_angle": -32.0
+        },
+        "leg_right": {
+          "parent": "body",
+          "joint": "hip_right",
+          "rest_angle": 14.0
+        },
+        "arm_right": {
+          "parent": "body",
+          "joint": "shoulder_right",
+          "rest_angle": 32.0
+        },
+        "clothing": {
+          "parent": "body",
+          "joint": "clothing",
+          "rest_angle": 0.0
+        },
+        "hand_left_open": {
+          "parent": "arm_left",
+          "joint": "tip",
+          "rest_angle": 0.0
+        },
+        "hand_left_closed": {
+          "parent": "arm_left",
+          "joint": "tip",
+          "rest_angle": 0.0
+        },
+        "hand_left_point": {
+          "parent": "arm_left",
+          "joint": "tip",
+          "rest_angle": 0.0
+        },
+        "hand_right_open": {
+          "parent": "arm_right",
+          "joint": "tip",
+          "rest_angle": 0.0
+        },
+        "hand_right_closed": {
+          "parent": "arm_right",
+          "joint": "tip",
+          "rest_angle": 0.0
+        },
+        "hand_right_point": {
+          "parent": "arm_right",
+          "joint": "tip",
+          "rest_angle": 0.0
+        },
+        "eye_left": {
+          "parent": "body",
+          "joint": "eye_left",
+          "rest_angle": 0.0
+        },
+        "eye_left_look_left": {
+          "parent": "body",
+          "joint": "eye_left",
+          "rest_angle": 0.0
+        },
+        "eye_left_look_right": {
+          "parent": "body",
+          "joint": "eye_left",
+          "rest_angle": 0.0
+        },
+        "eye_right": {
+          "parent": "body",
+          "joint": "eye_right",
+          "rest_angle": 0.0
+        },
+        "eye_right_look_left": {
+          "parent": "body",
+          "joint": "eye_right",
+          "rest_angle": 0.0
+        },
+        "eye_right_look_right": {
+          "parent": "body",
+          "joint": "eye_right",
+          "rest_angle": 0.0
+        },
+        "eyebrow_left": {
+          "parent": "body",
+          "joint": "brow_left",
+          "rest_angle": 0.0
+        },
+        "eyebrow_right": {
+          "parent": "body",
+          "joint": "brow_right",
+          "rest_angle": 0.0
+        },
+        "mouth_neutral": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_smile": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_open": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_wide": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_ai": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_e": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_o": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_u": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_mbp": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_fv": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_l": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_ws": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "hair": {
+          "parent": "body",
+          "joint": "crown",
+          "rest_angle": 0.0
+        }
+      },
+      "slots": {
+        "hand_left": {
+          "members": [
+            "hand_left_open",
+            "hand_left_closed",
+            "hand_left_point"
+          ],
+          "default": "hand_left_open"
+        },
+        "hand_right": {
+          "members": [
+            "hand_right_open",
+            "hand_right_closed",
+            "hand_right_point"
+          ],
+          "default": "hand_right_open"
+        },
+        "eye_left": {
+          "members": [
+            "eye_left",
+            "eye_left_look_left",
+            "eye_left_look_right"
+          ],
+          "default": "eye_left"
+        },
+        "eye_right": {
+          "members": [
+            "eye_right",
+            "eye_right_look_left",
+            "eye_right_look_right"
+          ],
+          "default": "eye_right"
+        },
+        "mouth": {
+          "members": [
+            "mouth_neutral",
+            "mouth_smile",
+            "mouth_open",
+            "mouth_wide",
+            "mouth_viseme_ai",
+            "mouth_viseme_e",
+            "mouth_viseme_o",
+            "mouth_viseme_u",
+            "mouth_viseme_mbp",
+            "mouth_viseme_fv",
+            "mouth_viseme_l",
+            "mouth_viseme_ws"
+          ],
+          "default": "mouth_smile"
+        }
+      }
+    },
+    "nu": {
+      "roots": [
+        "body"
+      ],
+      "space": "body pivot, +x right, +y down, pixels",
+      "attach": {
+        "body": {
+          "parent": null,
+          "joint": null,
+          "rest_angle": 0.0
+        },
+        "shadow": {
+          "parent": "body",
+          "joint": "ground",
+          "rest_angle": 0.0
+        },
+        "leg_left": {
+          "parent": "body",
+          "joint": "hip_left",
+          "rest_angle": -14.0
+        },
+        "arm_left": {
+          "parent": "body",
+          "joint": "shoulder_left",
+          "rest_angle": -32.0
+        },
+        "leg_right": {
+          "parent": "body",
+          "joint": "hip_right",
+          "rest_angle": 14.0
+        },
+        "arm_right": {
+          "parent": "body",
+          "joint": "shoulder_right",
+          "rest_angle": 32.0
+        },
+        "clothing": {
+          "parent": "body",
+          "joint": "clothing",
+          "rest_angle": 0.0
+        },
+        "hand_left_open": {
+          "parent": "arm_left",
+          "joint": "tip",
+          "rest_angle": 0.0
+        },
+        "hand_left_closed": {
+          "parent": "arm_left",
+          "joint": "tip",
+          "rest_angle": 0.0
+        },
+        "hand_left_point": {
+          "parent": "arm_left",
+          "joint": "tip",
+          "rest_angle": 0.0
+        },
+        "hand_right_open": {
+          "parent": "arm_right",
+          "joint": "tip",
+          "rest_angle": 0.0
+        },
+        "hand_right_closed": {
+          "parent": "arm_right",
+          "joint": "tip",
+          "rest_angle": 0.0
+        },
+        "hand_right_point": {
+          "parent": "arm_right",
+          "joint": "tip",
+          "rest_angle": 0.0
+        },
+        "eye_left": {
+          "parent": "body",
+          "joint": "eye_left",
+          "rest_angle": 0.0
+        },
+        "eye_left_look_left": {
+          "parent": "body",
+          "joint": "eye_left",
+          "rest_angle": 0.0
+        },
+        "eye_left_look_right": {
+          "parent": "body",
+          "joint": "eye_left",
+          "rest_angle": 0.0
+        },
+        "eye_right": {
+          "parent": "body",
+          "joint": "eye_right",
+          "rest_angle": 0.0
+        },
+        "eye_right_look_left": {
+          "parent": "body",
+          "joint": "eye_right",
+          "rest_angle": 0.0
+        },
+        "eye_right_look_right": {
+          "parent": "body",
+          "joint": "eye_right",
+          "rest_angle": 0.0
+        },
+        "eyebrow_left": {
+          "parent": "body",
+          "joint": "brow_left",
+          "rest_angle": 0.0
+        },
+        "eyebrow_right": {
+          "parent": "body",
+          "joint": "brow_right",
+          "rest_angle": 0.0
+        },
+        "mouth_neutral": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_smile": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_open": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_wide": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_ai": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_e": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_o": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_u": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_mbp": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_fv": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_l": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_viseme_ws": {
+          "parent": "body",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "hair": {
+          "parent": "body",
+          "joint": "crown",
+          "rest_angle": 0.0
+        },
+        "pigtail_left": {
+          "parent": "body",
+          "joint": "pigtail_left",
+          "rest_angle": 0.0
+        },
+        "pigtail_right": {
+          "parent": "body",
+          "joint": "pigtail_right",
+          "rest_angle": 0.0
+        }
+      },
+      "slots": {
+        "hand_left": {
+          "members": [
+            "hand_left_open",
+            "hand_left_closed",
+            "hand_left_point"
+          ],
+          "default": "hand_left_open"
+        },
+        "hand_right": {
+          "members": [
+            "hand_right_open",
+            "hand_right_closed",
+            "hand_right_point"
+          ],
+          "default": "hand_right_open"
+        },
+        "eye_left": {
+          "members": [
+            "eye_left",
+            "eye_left_look_left",
+            "eye_left_look_right"
+          ],
+          "default": "eye_left"
+        },
+        "eye_right": {
+          "members": [
+            "eye_right",
+            "eye_right_look_left",
+            "eye_right_look_right"
+          ],
+          "default": "eye_right"
+        },
+        "mouth": {
+          "members": [
+            "mouth_neutral",
+            "mouth_smile",
+            "mouth_open",
+            "mouth_wide",
+            "mouth_viseme_ai",
+            "mouth_viseme_e",
+            "mouth_viseme_o",
+            "mouth_viseme_u",
+            "mouth_viseme_mbp",
+            "mouth_viseme_fv",
+            "mouth_viseme_l",
+            "mouth_viseme_ws"
+          ],
+          "default": "mouth_smile"
+        }
+      }
+    },
+    "mochi": {
+      "roots": [
+        "body"
+      ],
+      "space": "body pivot, +x right, +y down, pixels",
+      "attach": {
+        "body": {
+          "parent": null,
+          "joint": null,
+          "rest_angle": 0.0
+        },
+        "shadow": {
+          "parent": "body",
+          "joint": "ground",
+          "rest_angle": 0.0
+        },
+        "leg_fore_left": {
+          "parent": "body",
+          "joint": "shoulder_fore_left",
+          "rest_angle": -10.0
+        },
+        "leg_fore_right": {
+          "parent": "body",
+          "joint": "shoulder_fore_right",
+          "rest_angle": -6.0
+        },
+        "leg_hind_left": {
+          "parent": "body",
+          "joint": "hip_hind_left",
+          "rest_angle": 10.0
+        },
+        "leg_hind_right": {
+          "parent": "body",
+          "joint": "hip_hind_right",
+          "rest_angle": 6.0
+        },
+        "tail": {
+          "parent": "body",
+          "joint": "rump",
+          "rest_angle": 130.0
+        },
+        "head": {
+          "parent": "body",
+          "joint": "neck",
+          "rest_angle": 0.0
+        },
+        "ear_left": {
+          "parent": "head",
+          "joint": "ear_left",
+          "rest_angle": 0.0
+        },
+        "ear_right": {
+          "parent": "head",
+          "joint": "ear_right",
+          "rest_angle": 0.0
+        },
+        "eye_left": {
+          "parent": "head",
+          "joint": "eye_left",
+          "rest_angle": 0.0
+        },
+        "eye_right": {
+          "parent": "head",
+          "joint": "eye_right",
+          "rest_angle": 0.0
+        },
+        "nose": {
+          "parent": "head",
+          "joint": "nose",
+          "rest_angle": 0.0
+        },
+        "mouth_neutral": {
+          "parent": "head",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_open": {
+          "parent": "head",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        },
+        "mouth_smile": {
+          "parent": "head",
+          "joint": "mouth",
+          "rest_angle": 0.0
+        }
+      },
+      "slots": {
+        "mouth": {
+          "members": [
+            "mouth_neutral",
+            "mouth_open",
+            "mouth_smile"
+          ],
+          "default": "mouth_smile"
+        }
+      }
+    },
+    "cart": {
+      "roots": [
+        "body"
+      ],
+      "space": "body pivot, +x right, +y down, pixels",
+      "attach": {
+        "body": {
+          "parent": null,
+          "joint": null,
+          "rest_angle": 0.0
+        },
+        "shadow": {
+          "parent": "body",
+          "joint": "ground",
+          "rest_angle": 0.0
+        },
+        "wheel_rear": {
+          "parent": "body",
+          "joint": "axle_rear",
+          "rest_angle": 0.0
+        },
+        "wheel_front": {
+          "parent": "body",
+          "joint": "axle_front",
+          "rest_angle": 0.0
+        },
+        "handle": {
+          "parent": "body",
+          "joint": "hitch",
+          "rest_angle": -118.0
+        }
+      },
+      "slots": {}
+    },
+    "props": {
+      "roots": [
+        "ball",
+        "drum"
+      ],
+      "space": "each prop's own pivot, +x right, +y down, pixels",
+      "attach": {
+        "ball": {
+          "parent": null,
+          "joint": null,
+          "rest_angle": 0.0
+        },
+        "drum": {
+          "parent": null,
+          "joint": null,
+          "rest_angle": 0.0
+        },
+        "shadow_small": {
+          "parent": "ball",
+          "joint": "ground",
+          "rest_angle": 0.0
+        }
+      },
+      "slots": {}
+    },
+    "scene": {
+      "roots": [
+        "cloud",
+        "tree_large",
+        "tree_small",
+        "grass"
+      ],
+      "space": "each band's own pivot at the ground line, +x right, +y down, pixels",
+      "attach": {
+        "cloud": {
+          "parent": null,
+          "joint": null,
+          "rest_angle": 0.0
+        },
+        "tree_large": {
+          "parent": null,
+          "joint": null,
+          "rest_angle": 0.0
+        },
+        "tree_small": {
+          "parent": null,
+          "joint": null,
+          "rest_angle": 0.0
+        },
+        "grass": {
+          "parent": null,
+          "joint": null,
+          "rest_angle": 0.0
+        }
+      },
+      "slots": {},
+      "parallax": {
+        "cloud": 0.1,
+        "tree_large": 0.3,
+        "tree_small": 0.55,
+        "grass": 1.0
+      }
+    }
+  },
   "parts": [
     {
       "character": "bo",
@@ -31,24 +921,12 @@
       ],
       "pivot": [
         68,
-        17
+        18
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "ground contact, follows body x only"
-    },
-    {
-      "character": "bo",
-      "layer": "arm_left",
-      "file": "bo/arm_left.png",
-      "z": 1,
-      "size": [
-        20,
-        99
-      ],
-      "pivot": [
-        10,
-        10
-      ],
-      "note": "pivot at shoulder"
     },
     {
       "character": "bo",
@@ -63,22 +941,19 @@
         13,
         13
       ],
-      "note": "pivot at hip"
-    },
-    {
-      "character": "bo",
-      "layer": "arm_right",
-      "file": "bo/arm_right.png",
-      "z": 2,
-      "size": [
-        20,
-        99
-      ],
-      "pivot": [
-        10,
-        10
-      ],
-      "note": "pivot at shoulder"
+      "joints": {
+        "tip": [
+          13,
+          57
+        ],
+        "contact": [
+          13,
+          69
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at hip; contact joint is the foot on the ground"
     },
     {
       "character": "bo",
@@ -93,7 +968,73 @@
         13,
         13
       ],
-      "note": "pivot at hip"
+      "joints": {
+        "tip": [
+          13,
+          57
+        ],
+        "contact": [
+          13,
+          69
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at hip; contact joint is the foot on the ground"
+    },
+    {
+      "character": "bo",
+      "layer": "arm_left",
+      "file": "bo/arm_left.png",
+      "z": 3,
+      "size": [
+        20,
+        99
+      ],
+      "pivot": [
+        10,
+        10
+      ],
+      "joints": {
+        "tip": [
+          10,
+          89
+        ],
+        "contact": [
+          10,
+          98
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at shoulder; tip joint is the wrist"
+    },
+    {
+      "character": "bo",
+      "layer": "arm_right",
+      "file": "bo/arm_right.png",
+      "z": 4,
+      "size": [
+        20,
+        99
+      ],
+      "pivot": [
+        10,
+        10
+      ],
+      "joints": {
+        "tip": [
+          10,
+          89
+        ],
+        "contact": [
+          10,
+          98
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at shoulder; tip joint is the wrist"
     },
     {
       "character": "bo",
@@ -108,6 +1049,58 @@
         80,
         80
       ],
+      "joints": {
+        "ground": [
+          80,
+          172
+        ],
+        "shoulder_left": [
+          22,
+          54
+        ],
+        "shoulder_right": [
+          138,
+          54
+        ],
+        "hip_left": [
+          42,
+          125
+        ],
+        "hip_right": [
+          118,
+          125
+        ],
+        "clothing": [
+          80,
+          90
+        ],
+        "eye_left": [
+          48,
+          48
+        ],
+        "eye_right": [
+          112,
+          48
+        ],
+        "brow_left": [
+          48,
+          17
+        ],
+        "brow_right": [
+          112,
+          17
+        ],
+        "mouth": [
+          80,
+          83
+        ],
+        "crown": [
+          80,
+          16
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "Kenney circle base, recoloured"
     },
     {
@@ -120,9 +1113,12 @@
         54
       ],
       "pivot": [
-        73,
+        74,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "checks, original pattern"
     },
     {
@@ -138,7 +1134,15 @@
         19,
         4
       ],
-      "note": "attaches at arm tip; anchor for props"
+      "joints": {
+        "grip": [
+          19,
+          23
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
       "character": "bo",
@@ -153,7 +1157,15 @@
         18,
         4
       ],
-      "note": "attaches at arm tip; anchor for props"
+      "joints": {
+        "grip": [
+          18,
+          25
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
       "character": "bo",
@@ -168,7 +1180,15 @@
         18,
         4
       ],
-      "note": "attaches at arm tip; anchor for props"
+      "joints": {
+        "grip": [
+          18,
+          24
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
       "character": "bo",
@@ -183,7 +1203,15 @@
         19,
         4
       ],
-      "note": "attaches at arm tip; anchor for props"
+      "joints": {
+        "grip": [
+          19,
+          23
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
       "character": "bo",
@@ -198,7 +1226,15 @@
         18,
         4
       ],
-      "note": "attaches at arm tip; anchor for props"
+      "joints": {
+        "grip": [
+          18,
+          25
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
       "character": "bo",
@@ -213,7 +1249,15 @@
         18,
         4
       ],
-      "note": "attaches at arm tip; anchor for props"
+      "joints": {
+        "grip": [
+          18,
+          24
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
       "character": "bo",
@@ -228,6 +1272,14 @@
         20,
         20
       ],
+      "joints": {
+        "pupil": [
+          20,
+          20
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "sclera, pupil, highlight"
     },
     {
@@ -243,6 +1295,14 @@
         20,
         20
       ],
+      "joints": {
+        "pupil": [
+          14,
+          20
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "gaze target"
     },
     {
@@ -258,6 +1318,14 @@
         20,
         20
       ],
+      "joints": {
+        "pupil": [
+          26,
+          20
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "gaze target"
     },
     {
@@ -273,6 +1341,14 @@
         20,
         20
       ],
+      "joints": {
+        "pupil": [
+          20,
+          20
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "sclera, pupil, highlight"
     },
     {
@@ -288,6 +1364,14 @@
         20,
         20
       ],
+      "joints": {
+        "pupil": [
+          14,
+          20
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "gaze target"
     },
     {
@@ -303,6 +1387,14 @@
         20,
         20
       ],
+      "joints": {
+        "pupil": [
+          26,
+          20
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "gaze target"
     },
     {
@@ -318,7 +1410,10 @@
         20,
         5
       ],
-      "note": ""
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the brow centre"
     },
     {
       "character": "bo",
@@ -333,7 +1428,10 @@
         20,
         5
       ],
-      "note": ""
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the brow centre"
     },
     {
       "character": "bo",
@@ -348,6 +1446,9 @@
         16,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "expression"
     },
     {
@@ -360,9 +1461,12 @@
         37
       ],
       "pivot": [
-        15,
+        16,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "expression"
     },
     {
@@ -375,9 +1479,12 @@
         22
       ],
       "pivot": [
-        21,
+        22,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "expression"
     },
     {
@@ -390,9 +1497,12 @@
         33
       ],
       "pivot": [
-        17,
+        18,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -405,9 +1515,12 @@
         19
       ],
       "pivot": [
-        19,
+        20,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -423,6 +1536,9 @@
         16,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -438,6 +1554,9 @@
         15,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -453,6 +1572,9 @@
         16,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -465,9 +1587,12 @@
         34
       ],
       "pivot": [
-        11,
+        12,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -483,6 +1608,9 @@
         9,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -498,6 +1626,9 @@
         12,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -513,6 +1644,9 @@
         23,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "expression"
     },
     {
@@ -526,9 +1660,12 @@
       ],
       "pivot": [
         68,
-        38
+        29
       ],
-      "note": ""
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot where the hair seats on the crown"
     },
     {
       "character": "cart",
@@ -540,10 +1677,13 @@
         30
       ],
       "pivot": [
-        119,
+        120,
         15
       ],
-      "note": ""
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "ground contact, follows body x only"
     },
     {
       "character": "cart",
@@ -558,7 +1698,19 @@
         11,
         11
       ],
-      "note": "pivot at hitch"
+      "joints": {
+        "tip": [
+          11,
+          109
+        ],
+        "contact": [
+          11,
+          119
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the hitch; tip is the pull point"
     },
     {
       "character": "cart",
@@ -573,7 +1725,54 @@
         130,
         60
       ],
-      "note": "prop and character attachment surface"
+      "joints": {
+        "ground": [
+          130,
+          145
+        ],
+        "axle_front": [
+          52,
+          110
+        ],
+        "axle_rear": [
+          208,
+          110
+        ],
+        "hitch": [
+          10,
+          36
+        ],
+        "cargo": [
+          130,
+          0
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "prop and character attachment surface; cargo joint is the load point"
+    },
+    {
+      "character": "cart",
+      "layer": "wheel_rear",
+      "file": "cart/wheel_rear.png",
+      "z": 11,
+      "size": [
+        76,
+        76
+      ],
+      "pivot": [
+        38,
+        38
+      ],
+      "joints": {
+        "contact": [
+          38,
+          75
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at axle centre, rotation cycle must match ground travel"
     },
     {
       "character": "cart",
@@ -588,21 +1787,14 @@
         38,
         38
       ],
-      "note": "pivot at axle centre, rotation cycle must match ground travel"
-    },
-    {
-      "character": "cart",
-      "layer": "wheel_rear",
-      "file": "cart/wheel_rear.png",
-      "z": 12,
-      "size": [
-        76,
-        76
-      ],
-      "pivot": [
-        38,
-        38
-      ],
+      "joints": {
+        "contact": [
+          38,
+          75
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "pivot at axle centre, rotation cycle must match ground travel"
     },
     {
@@ -618,12 +1810,15 @@
         99,
         17
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "four-point contact, locomotion critical"
     },
     {
       "character": "mochi",
-      "layer": "leg_fore_left",
-      "file": "mochi/leg_fore_left.png",
+      "layer": "leg_hind_right",
+      "file": "mochi/leg_hind_right.png",
       "z": 1,
       "size": [
         26,
@@ -633,22 +1828,19 @@
         13,
         13
       ],
-      "note": "pivot at hip or shoulder, ground contact at tip"
-    },
-    {
-      "character": "mochi",
-      "layer": "leg_hind_left",
-      "file": "mochi/leg_hind_left.png",
-      "z": 1,
-      "size": [
-        26,
-        84
-      ],
-      "pivot": [
-        13,
-        13
-      ],
-      "note": "pivot at hip or shoulder, ground contact at tip"
+      "joints": {
+        "tip": [
+          13,
+          71
+        ],
+        "contact": [
+          13,
+          83
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the far hip; contact joint is the ground point"
     },
     {
       "character": "mochi",
@@ -663,13 +1855,25 @@
         13,
         13
       ],
-      "note": "pivot at hip or shoulder, ground contact at tip"
+      "joints": {
+        "tip": [
+          13,
+          71
+        ],
+        "contact": [
+          13,
+          83
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the far shoulder; contact joint is the ground point"
     },
     {
       "character": "mochi",
-      "layer": "leg_hind_right",
-      "file": "mochi/leg_hind_right.png",
-      "z": 2,
+      "layer": "leg_hind_left",
+      "file": "mochi/leg_hind_left.png",
+      "z": 3,
       "size": [
         26,
         84
@@ -678,7 +1882,46 @@
         13,
         13
       ],
-      "note": "pivot at hip or shoulder, ground contact at tip"
+      "joints": {
+        "tip": [
+          13,
+          71
+        ],
+        "contact": [
+          13,
+          83
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the near hip; contact joint is the ground point"
+    },
+    {
+      "character": "mochi",
+      "layer": "leg_fore_left",
+      "file": "mochi/leg_fore_left.png",
+      "z": 4,
+      "size": [
+        26,
+        84
+      ],
+      "pivot": [
+        13,
+        13
+      ],
+      "joints": {
+        "tip": [
+          13,
+          71
+        ],
+        "contact": [
+          13,
+          83
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the near shoulder; contact joint is the ground point"
     },
     {
       "character": "mochi",
@@ -693,7 +1936,19 @@
         10,
         10
       ],
-      "note": "pivot at rump, secondary motion"
+      "joints": {
+        "tip": [
+          10,
+          60
+        ],
+        "contact": [
+          10,
+          69
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the rump, secondary motion"
     },
     {
       "character": "mochi",
@@ -708,7 +1963,39 @@
         110,
         70
       ],
-      "note": ""
+      "joints": {
+        "ground": [
+          110,
+          153
+        ],
+        "neck": [
+          66,
+          62
+        ],
+        "rump": [
+          207,
+          45
+        ],
+        "shoulder_fore_left": [
+          44,
+          106
+        ],
+        "shoulder_fore_right": [
+          31,
+          106
+        ],
+        "hip_hind_left": [
+          176,
+          106
+        ],
+        "hip_hind_right": [
+          189,
+          106
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "torso; every limb, the head and the tail hang off this"
     },
     {
       "character": "mochi",
@@ -721,9 +2008,17 @@
       ],
       "pivot": [
         26,
-        8
+        56
       ],
-      "note": "pivot at skull, secondary motion"
+      "joints": {
+        "tip": [
+          26,
+          0
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the ear base inside the skull, secondary motion"
     },
     {
       "character": "mochi",
@@ -736,9 +2031,17 @@
       ],
       "pivot": [
         26,
-        8
+        56
       ],
-      "note": "pivot at skull, secondary motion"
+      "joints": {
+        "tip": [
+          26,
+          0
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the ear base inside the skull, secondary motion"
     },
     {
       "character": "mochi",
@@ -750,10 +2053,38 @@
         118
       ],
       "pivot": [
-        59,
-        59
+        106,
+        68
       ],
-      "note": "pivot at neck"
+      "joints": {
+        "ear_left": [
+          33,
+          28
+        ],
+        "ear_right": [
+          80,
+          28
+        ],
+        "eye_left": [
+          35,
+          52
+        ],
+        "eye_right": [
+          78,
+          52
+        ],
+        "nose": [
+          53,
+          79
+        ],
+        "mouth": [
+          53,
+          94
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the neck, where the skull meets the torso"
     },
     {
       "character": "mochi",
@@ -768,7 +2099,15 @@
         17,
         17
       ],
-      "note": ""
+      "joints": {
+        "pupil": [
+          17,
+          17
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "sclera, pupil, highlight"
     },
     {
       "character": "mochi",
@@ -783,52 +2122,15 @@
         17,
         17
       ],
-      "note": ""
-    },
-    {
-      "character": "mochi",
-      "layer": "mouth_neutral",
-      "file": "mochi/mouth_neutral.png",
-      "z": 23,
-      "size": [
-        28,
-        8
-      ],
-      "pivot": [
-        14,
-        0
-      ],
-      "note": "expression"
-    },
-    {
-      "character": "mochi",
-      "layer": "mouth_open",
-      "file": "mochi/mouth_open.png",
-      "z": 23,
-      "size": [
-        26,
-        32
-      ],
-      "pivot": [
-        13,
-        0
-      ],
-      "note": "expression"
-    },
-    {
-      "character": "mochi",
-      "layer": "mouth_smile",
-      "file": "mochi/mouth_smile.png",
-      "z": 23,
-      "size": [
-        36,
-        19
-      ],
-      "pivot": [
-        18,
-        0
-      ],
-      "note": "expression"
+      "joints": {
+        "pupil": [
+          17,
+          17
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "sclera, pupil, highlight"
     },
     {
       "character": "mochi",
@@ -843,7 +2145,64 @@
         17,
         13
       ],
-      "note": ""
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "muzzle centre"
+    },
+    {
+      "character": "mochi",
+      "layer": "mouth_neutral",
+      "file": "mochi/mouth_neutral.png",
+      "z": 24,
+      "size": [
+        28,
+        8
+      ],
+      "pivot": [
+        14,
+        0
+      ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "expression"
+    },
+    {
+      "character": "mochi",
+      "layer": "mouth_open",
+      "file": "mochi/mouth_open.png",
+      "z": 24,
+      "size": [
+        26,
+        32
+      ],
+      "pivot": [
+        13,
+        0
+      ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "expression"
+    },
+    {
+      "character": "mochi",
+      "layer": "mouth_smile",
+      "file": "mochi/mouth_smile.png",
+      "z": 24,
+      "size": [
+        36,
+        19
+      ],
+      "pivot": [
+        18,
+        0
+      ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "expression"
     },
     {
       "character": "nu",
@@ -856,24 +2215,12 @@
       ],
       "pivot": [
         68,
-        17
+        18
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "ground contact, follows body x only"
-    },
-    {
-      "character": "nu",
-      "layer": "arm_left",
-      "file": "nu/arm_left.png",
-      "z": 1,
-      "size": [
-        20,
-        99
-      ],
-      "pivot": [
-        10,
-        10
-      ],
-      "note": "pivot at shoulder"
     },
     {
       "character": "nu",
@@ -888,22 +2235,19 @@
         13,
         13
       ],
-      "note": "pivot at hip"
-    },
-    {
-      "character": "nu",
-      "layer": "arm_right",
-      "file": "nu/arm_right.png",
-      "z": 2,
-      "size": [
-        20,
-        99
-      ],
-      "pivot": [
-        10,
-        10
-      ],
-      "note": "pivot at shoulder"
+      "joints": {
+        "tip": [
+          13,
+          57
+        ],
+        "contact": [
+          13,
+          69
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at hip; contact joint is the foot on the ground"
     },
     {
       "character": "nu",
@@ -918,7 +2262,73 @@
         13,
         13
       ],
-      "note": "pivot at hip"
+      "joints": {
+        "tip": [
+          13,
+          57
+        ],
+        "contact": [
+          13,
+          69
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at hip; contact joint is the foot on the ground"
+    },
+    {
+      "character": "nu",
+      "layer": "arm_left",
+      "file": "nu/arm_left.png",
+      "z": 3,
+      "size": [
+        20,
+        99
+      ],
+      "pivot": [
+        10,
+        10
+      ],
+      "joints": {
+        "tip": [
+          10,
+          89
+        ],
+        "contact": [
+          10,
+          98
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at shoulder; tip joint is the wrist"
+    },
+    {
+      "character": "nu",
+      "layer": "arm_right",
+      "file": "nu/arm_right.png",
+      "z": 4,
+      "size": [
+        20,
+        99
+      ],
+      "pivot": [
+        10,
+        10
+      ],
+      "joints": {
+        "tip": [
+          10,
+          89
+        ],
+        "contact": [
+          10,
+          98
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at shoulder; tip joint is the wrist"
     },
     {
       "character": "nu",
@@ -933,7 +2343,67 @@
         80,
         80
       ],
-      "note": "Kenney squircle base, recoloured"
+      "joints": {
+        "ground": [
+          80,
+          172
+        ],
+        "shoulder_left": [
+          22,
+          54
+        ],
+        "shoulder_right": [
+          138,
+          54
+        ],
+        "hip_left": [
+          42,
+          125
+        ],
+        "hip_right": [
+          118,
+          125
+        ],
+        "clothing": [
+          80,
+          90
+        ],
+        "eye_left": [
+          48,
+          48
+        ],
+        "eye_right": [
+          112,
+          48
+        ],
+        "brow_left": [
+          48,
+          17
+        ],
+        "brow_right": [
+          112,
+          17
+        ],
+        "mouth": [
+          80,
+          83
+        ],
+        "crown": [
+          80,
+          16
+        ],
+        "pigtail_left": [
+          -3,
+          26
+        ],
+        "pigtail_right": [
+          163,
+          26
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "generated cloud silhouette, three lobes over a rounded slab"
     },
     {
       "character": "nu",
@@ -945,9 +2415,12 @@
         54
       ],
       "pivot": [
-        73,
+        74,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "dots, original pattern"
     },
     {
@@ -963,7 +2436,15 @@
         19,
         4
       ],
-      "note": "attaches at arm tip; anchor for props"
+      "joints": {
+        "grip": [
+          19,
+          23
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
       "character": "nu",
@@ -978,7 +2459,15 @@
         18,
         4
       ],
-      "note": "attaches at arm tip; anchor for props"
+      "joints": {
+        "grip": [
+          18,
+          25
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
       "character": "nu",
@@ -993,7 +2482,15 @@
         18,
         4
       ],
-      "note": "attaches at arm tip; anchor for props"
+      "joints": {
+        "grip": [
+          18,
+          24
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
       "character": "nu",
@@ -1008,7 +2505,15 @@
         19,
         4
       ],
-      "note": "attaches at arm tip; anchor for props"
+      "joints": {
+        "grip": [
+          19,
+          23
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
       "character": "nu",
@@ -1023,7 +2528,15 @@
         18,
         4
       ],
-      "note": "attaches at arm tip; anchor for props"
+      "joints": {
+        "grip": [
+          18,
+          25
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
       "character": "nu",
@@ -1038,7 +2551,15 @@
         18,
         4
       ],
-      "note": "attaches at arm tip; anchor for props"
+      "joints": {
+        "grip": [
+          18,
+          24
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
       "character": "nu",
@@ -1053,6 +2574,14 @@
         20,
         20
       ],
+      "joints": {
+        "pupil": [
+          20,
+          20
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "sclera, pupil, highlight"
     },
     {
@@ -1068,6 +2597,14 @@
         20,
         20
       ],
+      "joints": {
+        "pupil": [
+          14,
+          20
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "gaze target"
     },
     {
@@ -1083,6 +2620,14 @@
         20,
         20
       ],
+      "joints": {
+        "pupil": [
+          26,
+          20
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "gaze target"
     },
     {
@@ -1098,6 +2643,14 @@
         20,
         20
       ],
+      "joints": {
+        "pupil": [
+          20,
+          20
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "sclera, pupil, highlight"
     },
     {
@@ -1113,6 +2666,14 @@
         20,
         20
       ],
+      "joints": {
+        "pupil": [
+          14,
+          20
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "gaze target"
     },
     {
@@ -1128,6 +2689,14 @@
         20,
         20
       ],
+      "joints": {
+        "pupil": [
+          26,
+          20
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "gaze target"
     },
     {
@@ -1143,7 +2712,10 @@
         20,
         5
       ],
-      "note": ""
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the brow centre"
     },
     {
       "character": "nu",
@@ -1158,7 +2730,10 @@
         20,
         5
       ],
-      "note": ""
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the brow centre"
     },
     {
       "character": "nu",
@@ -1173,6 +2748,9 @@
         16,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "expression"
     },
     {
@@ -1185,9 +2763,12 @@
         37
       ],
       "pivot": [
-        15,
+        16,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "expression"
     },
     {
@@ -1200,9 +2781,12 @@
         22
       ],
       "pivot": [
-        21,
+        22,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "expression"
     },
     {
@@ -1215,9 +2799,12 @@
         33
       ],
       "pivot": [
-        17,
+        18,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -1230,9 +2817,12 @@
         19
       ],
       "pivot": [
-        19,
+        20,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -1248,6 +2838,9 @@
         16,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -1263,6 +2856,9 @@
         15,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -1278,6 +2874,9 @@
         16,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -1290,9 +2889,12 @@
         34
       ],
       "pivot": [
-        11,
+        12,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -1308,6 +2910,9 @@
         9,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -1323,6 +2928,9 @@
         12,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -1338,6 +2946,9 @@
         23,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "expression"
     },
     {
@@ -1353,7 +2964,15 @@
         20,
         7
       ],
-      "note": "pivot near the skull, secondary motion candidate"
+      "joints": {
+        "tip": [
+          20,
+          40
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the tie against the skull, secondary motion candidate"
     },
     {
       "character": "nu",
@@ -1368,7 +2987,15 @@
         20,
         7
       ],
-      "note": "pivot near the skull, secondary motion candidate"
+      "joints": {
+        "tip": [
+          20,
+          40
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the tie against the skull, secondary motion candidate"
     },
     {
       "character": "nu",
@@ -1380,10 +3007,13 @@
         25
       ],
       "pivot": [
-        41,
-        22
+        42,
+        24
       ],
-      "note": "fringe, narrower so the pigtails read"
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot where the hair seats on the crown"
     },
     {
       "character": "pim",
@@ -1396,24 +3026,12 @@
       ],
       "pivot": [
         68,
-        17
+        18
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "ground contact, follows body x only"
-    },
-    {
-      "character": "pim",
-      "layer": "arm_left",
-      "file": "pim/arm_left.png",
-      "z": 1,
-      "size": [
-        20,
-        99
-      ],
-      "pivot": [
-        10,
-        10
-      ],
-      "note": "pivot at shoulder"
     },
     {
       "character": "pim",
@@ -1428,22 +3046,19 @@
         13,
         13
       ],
-      "note": "pivot at hip"
-    },
-    {
-      "character": "pim",
-      "layer": "arm_right",
-      "file": "pim/arm_right.png",
-      "z": 2,
-      "size": [
-        20,
-        99
-      ],
-      "pivot": [
-        10,
-        10
-      ],
-      "note": "pivot at shoulder"
+      "joints": {
+        "tip": [
+          13,
+          57
+        ],
+        "contact": [
+          13,
+          69
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at hip; contact joint is the foot on the ground"
     },
     {
       "character": "pim",
@@ -1458,7 +3073,73 @@
         13,
         13
       ],
-      "note": "pivot at hip"
+      "joints": {
+        "tip": [
+          13,
+          57
+        ],
+        "contact": [
+          13,
+          69
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at hip; contact joint is the foot on the ground"
+    },
+    {
+      "character": "pim",
+      "layer": "arm_left",
+      "file": "pim/arm_left.png",
+      "z": 3,
+      "size": [
+        20,
+        99
+      ],
+      "pivot": [
+        10,
+        10
+      ],
+      "joints": {
+        "tip": [
+          10,
+          89
+        ],
+        "contact": [
+          10,
+          98
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at shoulder; tip joint is the wrist"
+    },
+    {
+      "character": "pim",
+      "layer": "arm_right",
+      "file": "pim/arm_right.png",
+      "z": 4,
+      "size": [
+        20,
+        99
+      ],
+      "pivot": [
+        10,
+        10
+      ],
+      "joints": {
+        "tip": [
+          10,
+          89
+        ],
+        "contact": [
+          10,
+          98
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at shoulder; tip joint is the wrist"
     },
     {
       "character": "pim",
@@ -1473,6 +3154,58 @@
         80,
         80
       ],
+      "joints": {
+        "ground": [
+          80,
+          172
+        ],
+        "shoulder_left": [
+          22,
+          54
+        ],
+        "shoulder_right": [
+          138,
+          54
+        ],
+        "hip_left": [
+          42,
+          125
+        ],
+        "hip_right": [
+          118,
+          125
+        ],
+        "clothing": [
+          80,
+          90
+        ],
+        "eye_left": [
+          48,
+          48
+        ],
+        "eye_right": [
+          112,
+          48
+        ],
+        "brow_left": [
+          48,
+          17
+        ],
+        "brow_right": [
+          112,
+          17
+        ],
+        "mouth": [
+          80,
+          83
+        ],
+        "crown": [
+          80,
+          16
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "Kenney squircle base, recoloured"
     },
     {
@@ -1485,9 +3218,12 @@
         54
       ],
       "pivot": [
-        73,
+        74,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "stripes, original pattern"
     },
     {
@@ -1503,7 +3239,15 @@
         19,
         4
       ],
-      "note": "attaches at arm tip; anchor for props"
+      "joints": {
+        "grip": [
+          19,
+          23
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
       "character": "pim",
@@ -1518,7 +3262,15 @@
         18,
         4
       ],
-      "note": "attaches at arm tip; anchor for props"
+      "joints": {
+        "grip": [
+          18,
+          25
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
       "character": "pim",
@@ -1533,7 +3285,15 @@
         18,
         4
       ],
-      "note": "attaches at arm tip; anchor for props"
+      "joints": {
+        "grip": [
+          18,
+          24
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
       "character": "pim",
@@ -1548,7 +3308,15 @@
         19,
         4
       ],
-      "note": "attaches at arm tip; anchor for props"
+      "joints": {
+        "grip": [
+          19,
+          23
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
       "character": "pim",
@@ -1563,7 +3331,15 @@
         18,
         4
       ],
-      "note": "attaches at arm tip; anchor for props"
+      "joints": {
+        "grip": [
+          18,
+          25
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
       "character": "pim",
@@ -1578,7 +3354,15 @@
         18,
         4
       ],
-      "note": "attaches at arm tip; anchor for props"
+      "joints": {
+        "grip": [
+          18,
+          24
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the wrist; grip joint is where a prop attaches"
     },
     {
       "character": "pim",
@@ -1593,6 +3377,14 @@
         20,
         20
       ],
+      "joints": {
+        "pupil": [
+          20,
+          20
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "sclera, pupil, highlight"
     },
     {
@@ -1608,6 +3400,14 @@
         20,
         20
       ],
+      "joints": {
+        "pupil": [
+          14,
+          20
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "gaze target"
     },
     {
@@ -1623,6 +3423,14 @@
         20,
         20
       ],
+      "joints": {
+        "pupil": [
+          26,
+          20
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "gaze target"
     },
     {
@@ -1638,6 +3446,14 @@
         20,
         20
       ],
+      "joints": {
+        "pupil": [
+          20,
+          20
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "sclera, pupil, highlight"
     },
     {
@@ -1653,6 +3469,14 @@
         20,
         20
       ],
+      "joints": {
+        "pupil": [
+          14,
+          20
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "gaze target"
     },
     {
@@ -1668,6 +3492,14 @@
         20,
         20
       ],
+      "joints": {
+        "pupil": [
+          26,
+          20
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "gaze target"
     },
     {
@@ -1683,7 +3515,10 @@
         20,
         5
       ],
-      "note": ""
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the brow centre"
     },
     {
       "character": "pim",
@@ -1698,7 +3533,10 @@
         20,
         5
       ],
-      "note": ""
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot at the brow centre"
     },
     {
       "character": "pim",
@@ -1713,6 +3551,9 @@
         16,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "expression"
     },
     {
@@ -1725,9 +3566,12 @@
         37
       ],
       "pivot": [
-        15,
+        16,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "expression"
     },
     {
@@ -1740,9 +3584,12 @@
         22
       ],
       "pivot": [
-        21,
+        22,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "expression"
     },
     {
@@ -1755,9 +3602,12 @@
         33
       ],
       "pivot": [
-        17,
+        18,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -1770,9 +3620,12 @@
         19
       ],
       "pivot": [
-        19,
+        20,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -1788,6 +3641,9 @@
         16,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -1803,6 +3659,9 @@
         15,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -1818,6 +3677,9 @@
         16,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -1830,9 +3692,12 @@
         34
       ],
       "pivot": [
-        11,
+        12,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -1848,6 +3713,9 @@
         9,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -1863,6 +3731,9 @@
         12,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "viseme"
     },
     {
@@ -1878,6 +3749,9 @@
         23,
         0
       ],
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
       "note": "expression"
     },
     {
@@ -1890,10 +3764,13 @@
         48
       ],
       "pivot": [
-        41,
-        44
+        42,
+        32
       ],
-      "note": ""
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "pivot where the hair seats on the crown"
     },
     {
       "character": "props",
@@ -1908,7 +3785,10 @@
         36,
         11
       ],
-      "note": "shared prop shadow"
+      "joints": {},
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "shared prop shadow; reparent under any prop with a ground joint"
     },
     {
       "character": "props",
@@ -1923,13 +3803,25 @@
         48,
         48
       ],
-      "note": "handoff and attachment prop"
+      "joints": {
+        "grip": [
+          48,
+          48
+        ],
+        "ground": [
+          48,
+          100
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "handoff and attachment prop; grip joint meets a hand grip joint"
     },
     {
       "character": "props",
       "layer": "drum",
       "file": "props/drum.png",
-      "z": 10,
+      "z": 11,
       "size": [
         120,
         84
@@ -1938,7 +3830,23 @@
         60,
         42
       ],
-      "note": "beat-synchronised prop"
+      "joints": {
+        "grip": [
+          60,
+          42
+        ],
+        "strike": [
+          60,
+          8
+        ],
+        "ground": [
+          60,
+          88
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "beat-synchronised prop; strike joint is the beat contact point"
     },
     {
       "character": "scene",
@@ -1953,28 +3861,21 @@
         40,
         80
       ],
-      "note": "far parallax band"
-    },
-    {
-      "character": "scene",
-      "layer": "grass",
-      "file": "scene/grass.png",
-      "z": 0,
-      "size": [
-        64,
-        36
-      ],
-      "pivot": [
-        32,
-        36
-      ],
-      "note": "near parallax band"
+      "joints": {
+        "ground": [
+          40,
+          80
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "sky band, farthest; parallax factor 0.1"
     },
     {
       "character": "scene",
       "layer": "tree_large",
       "file": "scene/tree_large.png",
-      "z": 0,
+      "z": 1,
       "size": [
         192,
         294
@@ -1983,13 +3884,21 @@
         96,
         294
       ],
-      "note": "far parallax band"
+      "joints": {
+        "ground": [
+          96,
+          294
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "far band; parallax factor 0.3"
     },
     {
       "character": "scene",
       "layer": "tree_small",
       "file": "scene/tree_small.png",
-      "z": 0,
+      "z": 2,
       "size": [
         144,
         220
@@ -1998,7 +3907,38 @@
         72,
         220
       ],
-      "note": "mid parallax band"
+      "joints": {
+        "ground": [
+          72,
+          220
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "mid band; parallax factor 0.55"
+    },
+    {
+      "character": "scene",
+      "layer": "grass",
+      "file": "scene/grass.png",
+      "z": 3,
+      "size": [
+        64,
+        36
+      ],
+      "pivot": [
+        32,
+        36
+      ],
+      "joints": {
+        "ground": [
+          32,
+          36
+        ]
+      },
+      "blend_mode": "normal",
+      "opacity": 1.0,
+      "note": "near band, carries the ground line; parallax factor 1.0"
     }
   ]
 }

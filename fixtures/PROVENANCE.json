@@ -1,0 +1,82 @@
+{
+  "record": "Source provenance and licence evidence for the RigTale reference cast",
+  "fixture": "rigtale-reference-cast",
+  "spike": "SPIKE-F001 (RGT-S003)",
+  "purpose": "This file is the fixture's licence evidence. It is tracked in Git so that every redistributable artifact under fixtures/ can be shown to have verified provenance and a compatible licence from the repository alone. Checksums are verified by fixtures/tools/build_cast.py on every build; a source that does not match refuses to build.",
+  "verified": "2026-08-03, SHA-256 and byte size recomputed from the retrieved archives",
+  "sources": [
+    {
+      "name": "Kenney Shape Characters",
+      "version": "1.0, creation date 2023-10-26",
+      "source_page": "https://kenney.nl/assets/shape-characters",
+      "download_url": "https://kenney.nl/media/pages/assets/shape-characters/c016420b08-1698339465/kenney_shape-characters.zip",
+      "retrieved": "2026-08-03",
+      "licence": "CC0 1.0 Universal",
+      "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "licence_evidence": {
+        "kind": "licence file shipped inside the archive",
+        "location": "License.txt, archive root",
+        "verbatim": "License: (Creative Commons Zero, CC0)"
+      },
+      "archive": {
+        "file": "kenney_shape-characters.zip",
+        "sha256": "6d56877922af39e0ac9153c057c9cff1654973567514a32ae86454e37a2dfb93",
+        "bytes": 546442
+      },
+      "redistribution": "Unrestricted. Public domain dedication, no downstream obligation.",
+      "attribution": "Not required by the licence. 'Kenney / www.kenney.nl' is credited by choice.",
+      "derives": [
+        {"parts": "pim/body", "from": "PNG/Double/blue_body_squircle.png, recoloured onto the coral ramp"},
+        {"parts": "bo/body", "from": "PNG/Double/blue_body_circle.png, recoloured onto the teal ramp"},
+        {"parts": "pim, bo, nu — hand_{left,right}_{open,closed,point}", "from": "PNG/Double/blue_hand_open.png, blue_hand_closed.png, blue_hand_point.png, recoloured, scaled to 0.55 and mirrored for the right side"},
+        {"parts": "pim, bo, nu — eyebrow_{left,right}", "from": "PNG/Double/facial_part_eyebrow_a.png, recoloured onto the hair ramp"},
+        {"parts": "scene/tree_large", "from": "PNG/Double/tile_background_tree_large.png, recoloured"},
+        {"parts": "scene/tree_small", "from": "PNG/Double/tile_background_tree_small.png, recoloured"},
+        {"parts": "scene/cloud", "from": "PNG/Double/tile_cloud.png, recoloured"},
+        {"parts": "scene/grass", "from": "PNG/Double/tile_background_grass.png, recoloured"}
+      ]
+    },
+    {
+      "name": "ambientCG Fabric034",
+      "version": "1K-JPG",
+      "source_page": "https://ambientcg.com/view?id=Fabric034",
+      "download_url": "https://ambientcg.com/get?file=Fabric034_1K-JPG.zip",
+      "retrieved": "2026-08-03",
+      "licence": "CC0 1.0 Universal",
+      "licence_url": "https://ambientcg.com/help/licensing",
+      "licence_evidence": {
+        "kind": "source page only",
+        "location": "https://ambientcg.com/view?id=Fabric034 and the licensing page it links",
+        "verbatim": "The archive ships no licence file. Its ten members are the Color, Displacement, NormalDX, NormalGL and Roughness JPG maps, a preview PNG, and usdc, blend, mtlx and tres material definitions. The CC0 dedication is stated on the source page, and that page is the evidence."
+      },
+      "archive": {
+        "file": "Fabric034_1K-JPG.zip",
+        "sha256": "10ce98f31a2fd336d2bcb82731d35502932f38da42446980bc91a08166d5fb53",
+        "bytes": 8219829
+      },
+      "redistribution": "Unrestricted. Public domain dedication, no downstream obligation.",
+      "attribution": "Not required by the licence. 'ambientCG' is credited by choice.",
+      "derives": [
+        {
+          "parts": "every textured part: all bodies, arms, legs, clothing, hands, hair, pigtails, mochi body, head, ears and legs, cart body, wheels and handle, props ball and drum, and all four scene tiles",
+          "from": "Fabric034_1K-JPG_Color.jpg, converted to luminance, tiled, mean-centred and added at 0.16 strength (0.10 on scene tiles). Alpha is never touched."
+        }
+      ]
+    }
+  ],
+  "generated_from_neither_source": [
+    "pim, bo, nu — arm_{left,right}, leg_{left,right}: generated capsules",
+    "nu/body: generated cloud silhouette, three lobes over a rounded slab",
+    "pim, bo, nu — clothing: generated band with an original stripe, check or dot pattern",
+    "pim, bo, nu — eye_* (three gaze targets per side) and the twelve mouth states: generated",
+    "pim, bo, nu — hair, pigtail_{left,right}: generated tufts, curls and spheres",
+    "all shadow layers: generated soft blur",
+    "mochi: body, head, ears, legs, tail, eyes, nose and mouths are all generated",
+    "cart: body, wheels and handle are generated",
+    "props: ball and drum are generated"
+  ],
+  "excluded": [
+    "No asset, shape, colour, hair, costume or name is taken from any video reference channel. Channels studied for art direction supplied no asset.",
+    "No Adobe sample puppet and no Spine runtime example asset reaches this fixture. Their redistribution rights are not established, so they are read-only references and are not sources here."
+  ]
+}

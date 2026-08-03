@@ -2,9 +2,15 @@
 """Assemble the cast parts into a contact sheet.
 
 This is a posing harness, not a renderer and not an assertion. It exists to show
-that the layered parts compose, that pivots are usable, and that nothing is
-missing from the manifest. Visual acceptance belongs to `SPIKE-R002` and the
-quality rubric, not here.
+that the layered parts compose, that the manifest's rig data is sufficient to
+place and parent every part without guessing, and that nothing is missing from
+the manifest. Visual acceptance belongs to `SPIKE-R002` and the quality rubric,
+not here.
+
+No joint offset is written down in this file. Every position comes from
+`cast/manifest.json`: a part is placed by putting its own pivot on the named
+joint of its parent, then rotating by the recorded `rest_angle`. The only
+hardcoded geometry is the contact sheet's own layout.
 
     python3 fixtures/tools/preview_cast.py [-o path.png]
 """
@@ -19,137 +25,163 @@ from pathlib import Path
 from PIL import Image
 
 CAST_DIR = Path(__file__).resolve().parents[1] / "cast"
-BIPEDS = ("pim", "bo", "nu")
+SUPPORTED_BLEND_MODES = {"normal"}
 
 
 def load_manifest() -> dict:
     path = CAST_DIR / "manifest.json"
     if not path.exists():
         raise SystemExit("No manifest. Run fixtures/tools/build_cast.py first.")
-    doc = json.loads(path.read_text())
-    return {(p["character"], p["layer"]): p for p in doc["parts"]}
+    return json.loads(path.read_text())
+
+
+def over(base: Image.Image, img: Image.Image, x: float, y: float) -> None:
+    """Alpha-composite `img` onto `base`, clipping anything off the edges."""
+    x, y = int(round(x)), int(round(y))
+    sx, sy = max(0, -x), max(0, -y)
+    if sx >= img.width or sy >= img.height:
+        return
+    if sx or sy:
+        img = img.crop((sx, sy, img.width, img.height))
+        x += sx
+        y += sy
+    w = min(img.width, base.width - x)
+    h = min(img.height, base.height - y)
+    if w <= 0 or h <= 0:
+        return
+    if (w, h) != img.size:
+        img = img.crop((0, 0, w, h))
+    base.alpha_composite(img, (x, y))
+
+
+def rotate_point(p: tuple, origin: tuple, angle_deg: float) -> tuple[float, float]:
+    """Rotate `p` about `origin` counter-clockwise on screen, in y-down pixels."""
+    t = math.radians(angle_deg)
+    dx, dy = p[0] - origin[0], p[1] - origin[1]
+    return (origin[0] + dx * math.cos(t) + dy * math.sin(t),
+            origin[1] - dx * math.sin(t) + dy * math.cos(t))
 
 
 class Rig:
-    def __init__(self, index: dict) -> None:
-        self.index = index
+    """Evaluates a character's rest pose straight out of the manifest."""
 
-    def has(self, character: str, layer: str) -> bool:
-        return (character, layer) in self.index
+    def __init__(self, doc: dict) -> None:
+        self.doc = doc
+        self.index = {(p["character"], p["layer"]): p for p in doc["parts"]}
+        self.rig = doc["rig"]
 
     def part(self, character: str, layer: str) -> Image.Image:
-        return Image.open(CAST_DIR / self.index[(character, layer)]["file"]).convert("RGBA")
+        record = self.index[(character, layer)]
+        if record["blend_mode"] not in SUPPORTED_BLEND_MODES:
+            raise SystemExit(
+                f"{character}/{layer} declares blend mode '{record['blend_mode']}', "
+                f"which this harness does not implement. Supported: "
+                f"{sorted(SUPPORTED_BLEND_MODES)}."
+            )
+        img = Image.open(CAST_DIR / record["file"]).convert("RGBA")
+        opacity = float(record["opacity"])
+        if opacity < 1.0:
+            alpha = img.getchannel("A").point(lambda v: int(round(v * opacity)))
+            img.putalpha(alpha)
+        return img
 
-    def limb(self, canvas: Image.Image, character: str, layer: str,
-             joint: tuple[int, int], angle: float) -> tuple[int, int]:
-        """Draw a limb rotated about its pivot; return the far tip."""
-        img = self.part(character, layer)
-        length = img.height
-        rotated = img.rotate(angle, expand=True, resample=Image.BICUBIC)
-        canvas.alpha_composite(rotated, (joint[0] - rotated.width // 2, joint[1]))
-        a = math.radians(angle)
-        return joint[0] + int(math.sin(a) * length * 0.92), joint[1] + int(math.cos(a) * length * 0.92)
+    def root_of(self, character: str, layer: str) -> str:
+        attach = self.rig[character]["attach"]
+        while attach[layer]["parent"] is not None:
+            layer = attach[layer]["parent"]
+        return layer
 
+    def visible(self, character: str, layer: str) -> bool:
+        """A slot holds mutually exclusive alternates; only its default is posed."""
+        for slot in self.rig[character]["slots"].values():
+            if layer in slot["members"]:
+                return layer == slot["default"]
+        return True
 
-def pose_biped(rig: Rig, name: str) -> Image.Image:
-    body = rig.part(name, "body")
-    bw, bh = body.size
-    canvas = Image.new("RGBA", (int(bw * 2.2), int(bh * 2.4)), (0, 0, 0, 0))
-    cx, cy = canvas.width // 2, int(canvas.height * 0.56)
+    def frames(self, character: str) -> dict:
+        """Map every layer to (cumulative angle, its pivot in character space)."""
+        attach = self.rig[character]["attach"]
+        solved: dict[str, tuple[float, tuple[float, float]]] = {}
 
-    shadow = rig.part(name, "shadow")
-    canvas.alpha_composite(shadow, (cx - shadow.width // 2, cy + bh // 2 - 6))
+        def solve(layer: str):
+            if layer in solved:
+                return solved[layer]
+            entry = attach[layer]
+            parent = entry["parent"]
+            if parent is None:
+                solved[layer] = (float(entry["rest_angle"]), (0.0, 0.0))
+            else:
+                p_angle, p_pivot_char = solve(parent)
+                p_record = self.index[(character, parent)]
+                joint = p_record["joints"][entry["joint"]]
+                where = rotate_point(joint, p_record["pivot"], p_angle)
+                solved[layer] = (
+                    p_angle + float(entry["rest_angle"]),
+                    (p_pivot_char[0] + where[0] - p_record["pivot"][0],
+                     p_pivot_char[1] + where[1] - p_record["pivot"][1]),
+                )
+            return solved[layer]
 
-    for side, dx, angle in (("left", -0.26, 16), ("right", 0.26, -16)):
-        rig.limb(canvas, name, f"leg_{side}", (int(cx + bw * dx), cy + int(bh * 0.30)), angle)
+        for layer in attach:
+            solve(layer)
+        return solved
 
-    tips = {}
-    for side, dx, angle in (("left", -0.40, 34), ("right", 0.40, -34)):
-        tips[side] = rig.limb(canvas, name, f"arm_{side}",
-                              (int(cx + bw * dx), cy - int(bh * 0.16)), angle)
+    def pose(self, character: str, root: str) -> Image.Image:
+        """Render one root and everything parented under it, in z order."""
+        solved = self.frames(character)
+        placed = []
+        for layer, (angle, pivot_char) in solved.items():
+            if self.root_of(character, layer) != root or not self.visible(character, layer):
+                continue
+            record = self.index[(character, layer)]
+            img = self.part(character, layer)
+            pivot = record["pivot"]
+            if angle:
+                out = img.rotate(angle, expand=True, resample=Image.BICUBIC)
+                centre = ((img.width - 1) / 2, (img.height - 1) / 2)
+                moved = rotate_point(pivot, centre, angle)
+                anchor = (moved[0] - centre[0] + (out.width - 1) / 2,
+                          moved[1] - centre[1] + (out.height - 1) / 2)
+            else:
+                out, anchor = img, (float(pivot[0]), float(pivot[1]))
+            placed.append((record["z"], layer, out,
+                           pivot_char[0] - anchor[0], pivot_char[1] - anchor[1]))
 
-    canvas.alpha_composite(body, (cx - bw // 2, cy - bh // 2))
+        left = min(x for _, _, _, x, _ in placed)
+        top = min(y for _, _, _, _, y in placed)
+        right = max(x + im.width for _, _, im, x, _ in placed)
+        bottom = max(y + im.height for _, _, im, _, y in placed)
+        canvas = Image.new("RGBA", (int(math.ceil(right - left)),
+                                    int(math.ceil(bottom - top))), (0, 0, 0, 0))
+        for _, _, im, x, y in sorted(placed, key=lambda r: (r[0], r[1])):
+            over(canvas, im, x - left, y - top)
+        return canvas
 
-    cloth = rig.part(name, "clothing")
-    canvas.alpha_composite(cloth, (cx - cloth.width // 2, cy + int(bh * 0.06)))
-
-    for side in ("left", "right"):
-        hand = rig.part(name, f"hand_{side}_open")
-        canvas.alpha_composite(hand, (tips[side][0] - hand.width // 2, tips[side][1] - 6))
-
-    radius = rig.part(name, "eye_left").width // 2
-    for side, dx in (("left", -0.20), ("right", 0.20)):
-        eye = rig.part(name, f"eye_{side}")
-        ex, ey = int(cx + bw * dx) - radius, cy - int(bh * 0.20) - radius
-        canvas.alpha_composite(eye, (ex, ey))
-        brow = rig.part(name, f"eyebrow_{side}")
-        canvas.alpha_composite(brow, (ex + radius - brow.width // 2, ey - brow.height - 6))
-
-    mouth = rig.part(name, "mouth_smile")
-    canvas.alpha_composite(mouth, (cx - mouth.width // 2, cy + int(bh * 0.02)))
-
-    if rig.has(name, "pigtail_left"):
-        for side, dx in (("left", -0.52), ("right", 0.52)):
-            pt = rig.part(name, f"pigtail_{side}")
-            canvas.alpha_composite(pt, (int(cx + bw * dx) - pt.width // 2, cy - int(bh * 0.42)))
-
-    hair = rig.part(name, "hair")
-    canvas.alpha_composite(hair, (cx - hair.width // 2, cy - int(bh * 0.50) - hair.height // 3))
-    return canvas
-
-
-def pose_quadruped(rig: Rig) -> Image.Image:
-    name = "mochi"
-    body = rig.part(name, "body")
-    bw, bh = body.size
-    canvas = Image.new("RGBA", (int(bw * 1.7), int(bh * 2.6)), (0, 0, 0, 0))
-    cx, cy = canvas.width // 2, int(canvas.height * 0.60)
-
-    shadow = rig.part(name, "shadow")
-    canvas.alpha_composite(shadow, (cx - shadow.width // 2, cy + bh // 2 - 4))
-
-    for side, dx, angle in (("fore_left", -0.30, 10), ("fore_right", -0.36, -8),
-                            ("hind_left", 0.30, -10), ("hind_right", 0.36, 8)):
-        rig.limb(canvas, name, f"leg_{side}", (int(cx + bw * dx), cy + int(bh * 0.26)), angle)
-
-    rig.limb(canvas, name, "tail", (cx + int(bw * 0.44), cy - int(bh * 0.18)), -50)
-    canvas.alpha_composite(body, (cx - bw // 2, cy - bh // 2))
-
-    head = rig.part(name, "head")
-    hx, hy = cx - int(bw * 0.42) - head.width // 2, cy - int(bh * 0.55)
-    for side, dx in (("left", -0.22), ("right", 0.18)):
-        ear = rig.part(name, f"ear_{side}")
-        canvas.alpha_composite(ear, (hx + head.width // 2 + int(head.width * dx) - ear.width // 2,
-                                     hy - int(ear.height * 0.42)))
-    canvas.alpha_composite(head, (hx, hy))
-    for side, dx in (("left", -0.20), ("right", 0.16)):
-        eye = rig.part(name, f"eye_{side}")
-        canvas.alpha_composite(eye, (hx + head.width // 2 + int(head.width * dx) - eye.width // 2,
-                                     hy + int(head.height * 0.30)))
-    nose = rig.part(name, "nose")
-    canvas.alpha_composite(nose, (hx + head.width // 2 - nose.width // 2 - 6,
-                                  hy + int(head.height * 0.56)))
-    mouth = rig.part(name, "mouth_smile")
-    canvas.alpha_composite(mouth, (hx + head.width // 2 - mouth.width // 2 - 6,
-                                   hy + int(head.height * 0.70)))
-    return canvas
+    def tiles(self, character: str) -> list:
+        return [self.pose(character, root) for root in self.rig[character]["roots"]]
 
 
-def pose_vehicle(rig: Rig) -> Image.Image:
-    name = "cart"
-    body = rig.part(name, "body")
-    bw, bh = body.size
-    canvas = Image.new("RGBA", (int(bw * 1.6), int(bh * 2.6)), (0, 0, 0, 0))
-    cx, cy = canvas.width // 2, int(canvas.height * 0.52)
+def draw_backdrop(rig: Rig, sheet: Image.Image, ground_y: int) -> None:
+    """Lay the scene bands onto the sheet in z order, far to near.
 
-    shadow = rig.part(name, "shadow")
-    canvas.alpha_composite(shadow, (cx - shadow.width // 2, cy + bh // 2 + 10))
-    rig.limb(canvas, name, "handle", (cx - int(bw * 0.46), cy - int(bh * 0.20)), 118)
-    canvas.alpha_composite(body, (cx - bw // 2, cy - bh // 2))
-    wheel = rig.part(name, "wheel_front")
-    for dx in (-0.30, 0.30):
-        canvas.alpha_composite(wheel, (int(cx + bw * dx) - wheel.width // 2, cy + int(bh * 0.34)))
-    return canvas
+    The x positions here are contact-sheet layout. The stacking order and the
+    ground line come from the manifest: `z` orders the bands and each band's
+    `ground` joint is the point that sits on the ground line.
+    """
+    bands = sorted((rig.index[("scene", layer)] for layer in rig.rig["scene"]["roots"]),
+                   key=lambda r: r["z"])
+    for record in bands:
+        img = rig.part("scene", record["layer"])
+        gx, gy = record["joints"]["ground"]
+        if record["layer"] == "grass":
+            for x in range(0, sheet.width + img.width, img.width):
+                over(sheet, img, x - gx, ground_y - gy)
+        elif record["layer"] == "cloud":
+            over(sheet, img, 60, 30)
+        elif record["layer"] == "tree_large":
+            over(sheet, img, sheet.width - img.width - 40, ground_y - gy - 20)
+        else:
+            over(sheet, img, sheet.width - img.width - 190, ground_y - gy - 10)
 
 
 def main() -> None:
@@ -158,26 +190,23 @@ def main() -> None:
     args = ap.parse_args()
 
     rig = Rig(load_manifest())
-    tiles = [pose_biped(rig, n) for n in BIPEDS]
-    tiles += [pose_quadruped(rig), pose_vehicle(rig)]
-    tiles += [rig.part("props", "ball"), rig.part("props", "drum")]
+    tiles = []
+    for character in rig.rig:
+        if character == "scene":
+            continue
+        tiles.extend(rig.tiles(character))
 
     pad = 24
     width = sum(t.width + pad for t in tiles) + pad
     height = max(t.height for t in tiles) + pad * 2 + 90
     sheet = Image.new("RGBA", (width, height), (250, 249, 246, 255))
 
-    grass = rig.part("scene", "grass")
-    for x in range(0, width, grass.width):
-        sheet.alpha_composite(grass, (x, height - grass.height - 10))
-    tree = rig.part("scene", "tree_large")
-    sheet.alpha_composite(tree, (width - tree.width - 40, height - tree.height - 30))
-    cloud = rig.part("scene", "cloud")
-    sheet.alpha_composite(cloud, (60, 30))
+    baseline = height - 120
+    draw_backdrop(rig, sheet, height - 40)
 
-    x, baseline = pad, height - 120
+    x = pad
     for tile in tiles:
-        sheet.alpha_composite(tile, (x, baseline - tile.height + 60))
+        over(sheet, tile, x, baseline - tile.height + 60)
         x += tile.width + pad
 
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)

@@ -112,10 +112,10 @@ Thresholds that cannot be justified before execution remain explicitly evidence-
 
 ## Method
 
-1. Derive a risk catalogue from the charter, v1 requirements, quality system, competitive research, and repository reviews. **Done — `docs/quality/fixture-risk-matrix.md`, 31 risks.**
-2. Map each material risk to at least one isolated fixture assertion. **Done in the same document, with three unassertable risks recorded and every requirement either covered or explicitly out of fixture scope.**
-3. Design an original production brief and cast sufficient to exercise the required archetypes. **Cast done — `fixtures/`, 132 parts covering biped ×3, quadruped, vehicle, prop and environment. Brief outstanding.**
-4. Record provenance and license compatibility before asset work begins, and decide per asset whether it is originated, commissioned, or adapted from a compatibly licensed source. `RGT-O001` fixed the constraint — official assets must be redistributable — and left the route per asset to this step.
+1. Derive a risk catalogue from the charter, v1 requirements, quality system, competitive research, and repository reviews. **Done — `docs/quality/fixture-risk-matrix.md`, 54 risks.**
+2. Map each material risk to at least one isolated fixture assertion. **Done in the same document. Three residual risks are unassertable after their assertable parts were split out, two entries are fixture-construction rules audited by reading rather than by execution and are never counted as coverage, and every requirement is either covered or excluded with a reason.**
+3. Design an original production brief and cast sufficient to exercise the required archetypes. **Cast done — `fixtures/`, 132 part files holding 78 unique images, covering biped ×3, quadruped, vehicle, prop and environment, with joints and a rig tree. Brief outstanding.**
+4. Record provenance and license compatibility before asset work begins, and decide per asset whether it is originated, commissioned, or adapted from a compatibly licensed source. `RGT-O001` fixed the constraint — official assets must be redistributable — and left the route per asset to this step. **Done for the cast — `fixtures/PROVENANCE.json`, tracked, both sources CC0 and adapted. The generator refuses to build unless every archive matches the recorded SHA-256 and byte size, so the record cannot decay unnoticed.**
 5. Produce engine-neutral source assets, expected references, semantic descriptions, and invalid cases.
 6. Review the fixture for accidental backend bias and missing full-duration risks.
 7. Version and publish the fixture manifest before orchestration or renderer experiments.
