@@ -1,6 +1,7 @@
 .research/
 
 # Local sandbox for third-party experimental assets. See .sandbox/README.md.
-# Everything here is local-only: downloads, assets, and any output derived from them.
+# Everything here is local-only: downloads, assets, generated files, output,
+# and the provenance ledger.
 .sandbox/*
 !.sandbox/README.md

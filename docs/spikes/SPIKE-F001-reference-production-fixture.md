@@ -26,6 +26,7 @@ Owner decision, 2026-08-03. This is what closed `RGT-O001` and it governs every 
 | Tier | May be used for | May never be used for |
 |---|---|---|
 | **Sandbox** — downloaded from the Internet under its own licence or terms, held in the ignored `.sandbox/` workspace | Local technical experiments: does a renderer composite headlessly, does an importer preserve layer structure, does a rig deform | Fixtures, approval evidence, decision records, the reference production, anything committed, packaged, published, or released |
+| **Reference-read-only** — a subset of sandbox whose terms are narrower still, such as Adobe sample puppets and the Spine runtimes | Reading a format or a rig structure | Integration, redistribution, or supplying any shipped artwork |
 | **Official** — provable redistribution rights, provenance and licence recorded before use | Everything, including all of the above | — |
 
 **Any result that becomes official evidence must be reproduced on official assets.** A sandbox run may tell you a candidate works; it may not be the record that says so. Full policy: `.sandbox/README.md`.
@@ -70,6 +71,19 @@ A 150–210 second, multi-shot 2D cutout production exercising:
 - final assembly, captions, manifests, QC, export, restore, and rerender.
 
 The subject, script, and visual design must be original or safely licensed. Similar production constraints may be studied, but the fixture must not imitate protected characters, music, artwork, or branding.
+
+## Cast Construction
+
+Owner direction, 2026-08-03. The target look is preschool cutout. **The cast is built from CC0 geometric parts, not copied from any reference channel.**
+
+1. Assemble bodies, eyes, mouths, hands, and expressions from **Kenney Shape Characters** (CC0, 212 separated PNG parts).
+2. Overlay felt or paper texture from **ambientCG Fabric034 or Paper001** (CC0), blended lightly.
+3. Compose original characters by choosing colour, hair, clothing, and face. Silhouettes are circle, squircle, or cloud-like; eyes are two large circles with black pupil and white highlight; limbs are separate layers with pivots at shoulder and hip; mouths are separate states for neutral, smile, open, and each phoneme; clothing uses new patterns; shadows are a very soft small blur to read as cut paper.
+4. Study Adobe Character Animator sample puppets for **layer and rig structure only**. No artwork from them reaches the fixture.
+
+**Kenney plus ambientCG is the only combination eligible for official assets**, because both are CC0. It is also far lighter than the Adobe puppets.
+
+**No visual identity may be copied** — not shape, colour, hair, costume, or naming. The reference channel is studied for art direction and never used as an asset source; see the YouTube rule in `.sandbox/README.md`.
 
 ## Fixture-Neutrality Rules
 
