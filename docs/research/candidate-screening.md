@@ -209,7 +209,7 @@ But it makes no reproducibility claim, and its regression tooling argues against
 
 ### Others
 
-**Cairo** (LGPL-2.1 or MPL-1.1, note MPL **1.1** not 2.0) releases roughly annually, most recently 1.18.4 on 2025-03-08. Its only determinism statement is a marketing line about consistent output. No test-suite evidence located. Not verified.
+**Cairo** (LGPL-2.1 or MPL-1.1, note MPL **1.1** not 2.0) releases roughly annually, most recently 1.18.4 on 2025-03-08. No determinism statement exists anywhere in the repository — a grep of the full clone at `bd04e43e` for "deterministic\|reproducib" returns zero hits. No test-suite evidence located.
 
 **Blend2D** (Zlib) is a fast CPU rasteriser, but it is "Powered by a JIT Compiler" — runtime code generation specialised per detected CPU feature set is a structural determinism concern. Flag, do not adopt blind.
 
