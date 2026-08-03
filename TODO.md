@@ -12,7 +12,7 @@ An item may be marked `completed` only when its linked exit criteria are satisfi
 
 | ID | Type | Item | Evidence | Status |
 |---|---|---|---|---|
-| RGT-S003 | Fixture spike | Define the representative multi-character production fixture | `docs/spikes/SPIKE-F001-reference-production-fixture.md`, `docs/quality/fixture-risk-matrix.md`, `fixtures/` | `active` since 2026-08-03. Steps 1, 2 and 4 done; step 3 part-done — the cast exists, the production brief does not. Outstanding: production brief, contract and failure corpus including the seeded audience-defect corpus, diagnostic-shot manifests, calibration plan, approving decision record |
+| RGT-S003 | Fixture spike | Define the representative multi-character production fixture | `docs/spikes/SPIKE-F001-reference-production-fixture.md`, `docs/quality/fixture-risk-matrix.md`, `fixtures/` | `active` since 2026-08-03. Steps 1–4 done — risk matrix, coverage map, cast and brief. Outstanding: contract and failure corpus including the seeded audience-defect corpus, diagnostic-shot manifests with expected evidence, calibration plan, approving decision record. **Blocked in part on original audio**: both productions need a song with split stems, timed lyrics, phoneme intervals and a beat map, and none exists |
 
 ## Blocked
 
