@@ -1,0 +1,101 @@
+{
+  "fixture": "rigtale-reference-production",
+  "version": "0.1.0-draft",
+  "status": "draft, not approved; RGT-S003 is active and RGT-D-fixture has not been recorded",
+  "owner": "SPIKE-F001 (RGT-S003), method step 3",
+  "note": "The creative-intent artifact Gate 1 checks. It carries the six Gate 1 fields as data for both productions, plus the stimulation profile RISK-58 requires and the originality statement RISK-10 requires. Narrative content, shot lists and the structured correction live in production-brief.md; this file does not restate them.",
+  "gate1_fields": [
+    "audience",
+    "purpose",
+    "duration_seconds",
+    "factual_source_expectations",
+    "safety_constraints",
+    "success_criteria"
+  ],
+  "shared": {
+    "audience": {
+      "primary": "children aged 2 to 5",
+      "viewing_context": "co-viewing with an adult; no interaction required from the child",
+      "note": "[OWNER-STATED] The audience is declared by the Project Owner, not established by research. RGT-S009B was rejected, so no audience evidence will exist. See docs/requirements/charter.md, Charter Revision 1."
+    },
+    "safety_constraints": {
+      "no_flashing": "no luminance change exceeding the declared per-shot amplitude within any 1-second window",
+      "no_sudden_loudness": "no level step exceeding the declared audio range between adjacent shots",
+      "no_peril": "no character is endangered, lost, frightened or alone in distress at any point",
+      "no_on_screen_text": "the only text over picture is the lyric layer, which is removable; see production-brief.md",
+      "low_stimulation": "the stimulation_profile below is a delivery constraint, not a style note"
+    },
+    "success_criteria": {
+      "rubric": "the five human-review dimensions in docs/quality/quality-system.md",
+      "threshold": "average of at least 4 out of 5, from charter Objective 4",
+      "blocking": "zero blocking findings at any gate",
+      "note": "[OWNER-STATED] Scored by the Project Owner. Blind review is waived, so the score is an owner self-assessment; state that limitation wherever it is used."
+    },
+    "factual_source_expectations": {
+      "claims_made": "none",
+      "reason": "Both productions are fictional narratives about an original cast. Neither asserts a fact about the world, so no factual source is required and the factual-accuracy validator has nothing to resolve against.",
+      "consequence": "A production that later introduces a factual claim — counting, naming a real place, stating how something works — must add its sources here before Gate 1 passes. The empty list is a declaration, not an absence."
+    },
+    "originality": {
+      "subject": "original",
+      "script": "original",
+      "visual_design": "original; see fixtures/cast/manifest.json originality",
+      "music": "original, and not yet produced; see production-brief.md, Audio dependency",
+      "statement": "No protected character, artwork, music or brand identity is copied. No reference channel supplied a subject, a storyline, a character or an asset. Reference channels were studied for art direction only."
+    },
+    "stimulation_profile": {
+      "note": "Fields are fixed here. Every value is `evidence-pending` and is calibrated by SPIKE-F001's calibration plan, not by this brief. The measured column records what the declared shot list actually produces, so a later limit can be set against a real number rather than an invented one.",
+      "cut_rate": {
+        "unit": "cuts per minute",
+        "limit": "evidence-pending",
+        "measured_production_a": 3.21,
+        "measured_production_b": 3.46
+      },
+      "motion_amplitude": {
+        "unit": "peak joint angular velocity, degrees per second, per shot",
+        "limit": "evidence-pending",
+        "measured": "not measured; requires a compiled run"
+      },
+      "colour_intensity": {
+        "unit": "peak chroma and adjacent-shot contrast ratio",
+        "limit": "evidence-pending",
+        "measured": "not measured; requires a compiled run"
+      },
+      "audio_level_range": {
+        "unit": "integrated loudness LUFS and true peak dBTP",
+        "limit": "evidence-pending",
+        "measured": "not measured; audio does not exist"
+      }
+    }
+  },
+  "productions": [
+    {
+      "id": "A",
+      "title": "Carry It Together",
+      "duration_seconds": 168,
+      "purpose": "Show turn-taking and shared effort: a thing too awkward for one is easy for three.",
+      "declared_storyline": "Three friends and a quadruped move one ball across open ground to a cart, passing it between them when each in turn finds it awkward, and finally carrying it together.",
+      "declared_focus": "cooperation and turn-taking",
+      "declared_concept": "a cumulative journey with a destination; each repetition adds a participant and changes the formation"
+    },
+    {
+      "id": "B",
+      "title": "Where Did It Go?",
+      "duration_seconds": 156,
+      "purpose": "Show searching as a named, orderly activity: look, say where you looked, look somewhere else.",
+      "declared_storyline": "The ball goes missing. Three friends search three named places in turn, each reporting what they found, until the quadruped reveals it had it all along.",
+      "declared_focus": "searching, and naming places",
+      "declared_concept": "an episodic question-and-answer search with a reveal, no travel and no destination; each repetition returns to the same question from a different place"
+    }
+  ],
+  "narrative_axis_separation": {
+    "requirement": "RGT-S009 section 8: YouTube prohibits \"a highly similar storyline template across multiple videos\" while expressly allowing \"Similar content, like a series following a set of characters across episodes… but in which each video has a distinct storyline, focus or concept\".",
+    "shared": "cast, visual design, palette, environment, asset packs",
+    "differs": [
+      "storyline: transporting a known object to a destination, versus recovering an unknown-location object with no destination",
+      "focus: cooperation, versus search and naming",
+      "concept: cumulative journey with a travelling refrain, versus stationary question-and-answer with a reveal"
+    ],
+    "assertion": "A second production that differed from the first only in cast, palette or asset set would fail RISK-41. These two differ on all three declared axes and share only the cast and its environment, which the source expressly permits."
+  }
+}
