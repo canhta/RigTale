@@ -314,7 +314,7 @@ Verified blend-mode coverage, each from the enum in the library's own source:
 | libvips (`libvips/include/vips/conversion.h:110-139`) | yes | yes | yes | **no** |
 | raqote (`src/draw_target.rs:79-109`) | yes | yes | yes | **no** |
 | Aseprite `src/doc` (`blend_mode.h:15-44`) | — | yes | yes | addition/subtract/divide only |
-| ImageMagick (`MagickCore/composite.h`) | yes | yes | yes (Hue/Saturate/Colorize/Luminize) | **yes** — LinearBurn, LinearLight, PinLight, VividLight, HardMix, PegtopLight, Freeze, Reflect |
+| ImageMagick (`MagickCore/composite.h`) | yes | yes | yes (Hue/Saturate/Colorize/Luminize) | **yes** — LinearBurn, LinearDodge, LinearLight, PinLight, VividLight and HardMix by exact name; Dissolve, DivideSrc/DivideDst and ModulusSubtract under names whose formulas differ from Photoshop's; darker colour, lighter colour and `smud` absent under any name. PegtopLight, Freeze and Reflect are not Photoshop keys at all |
 | Blend2D (`blend2d/core/context.h:242-305`) | yes | yes | **none** | LinearBurn, LinearLight, PinLight |
 | GEGL (`operations/generated/`) | yes | yes | **none** | no |
 | OpenImageIO (`imagebufalgo.h:1005-1044`) | `over`/`zover` only | **none** | **none** | no |
