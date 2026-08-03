@@ -164,7 +164,7 @@ Preview and final rendering should consume the same authoritative production sta
 
 ### PR-R008 — Supported blend-mode profile (`decision-pending`)
 
-**New requirement from `RGT-S014`.** Photoshop defines 28 blend keys and publishes no formula for any of them. W3C Compositing-1 defines 16 with normative formulas. **No general-purpose 2D graphics library screened implements the twelve extra Photoshop modes** — not Skia, tiny-skia, Cairo, pixman, libvips, or raqote. A user's PSD using Linear Light therefore has nothing to map onto in any candidate backend.
+**New requirement from `RGT-S014`.** Photoshop defines 28 blend keys and publishes no formula for any of them. W3C Compositing-1 defines 16 with normative formulas. Eleven of the twenty-eight are blend modes W3C does not define, the twelfth difference being the `pass` group pass-through. **No general-purpose 2D graphics library screened implements those eleven** — not Skia, tiny-skia, Cairo, pixman, libvips, or raqote. A user's PSD using Linear Light therefore has nothing to map onto in any candidate backend.
 
 RigTale must declare a **supported blend-mode profile** that fixes one formula per supported mode, and must fail explicitly on any mode outside it. Silent substitution to Normal is prohibited — it is `PR-C003` applied to compositing, and it is the shipped behaviour of Inochi Creator that this requirement exists to avoid.
 
