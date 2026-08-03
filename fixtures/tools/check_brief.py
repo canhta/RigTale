@@ -171,6 +171,48 @@ def check_intent(intent: dict) -> None:
           "3 narrative axes distinct")
 
 
+def check_structure(runs: dict, intent: dict) -> None:
+    """RISK-57 and RISK-60: shots and brief elements must resolve to each other.
+
+    Every shot resolves to a narrative beat or a declared objective, and every
+    beat and objective resolves to at least one shot. A shot serving nothing is
+    an unmotivated shot; an objective reaching no shot is an undelivered claim.
+    """
+    shot_ids = {}
+    for match in re.finditer(r"^\|\s*([AB]\d\d)\s*\|", BRIEF.read_text(), re.M):
+        shot = match.group(1)
+        shot_ids.setdefault(shot[0], set()).add(shot)
+
+    for production in intent["productions"]:
+        pid = production["id"]
+        structure = production.get("structure")
+        if not structure:
+            fail(f"production {pid} declares no structure; RISK-60 requires shots and "
+                 "brief elements to resolve to each other")
+        elements = structure.get("objectives", []) + structure.get("beats", [])
+        if not structure.get("objectives"):
+            fail(f"production {pid} declares no educational objectives, which RISK-57 requires")
+
+        covered, declared = set(), shot_ids.get(pid, set())
+        for element in elements:
+            if not element.get("shots"):
+                fail(f"{element['id']} reaches no shot; RISK-57 and RISK-60 require every "
+                     "brief element to resolve to at least one shot")
+            if not element.get("statement", "").strip():
+                fail(f"{element['id']} carries no statement")
+            unknown = set(element["shots"]) - declared
+            if unknown:
+                fail(f"{element['id']} names shots that are not in the brief: {sorted(unknown)}")
+            covered.update(element["shots"])
+
+        orphans = declared - covered
+        if orphans:
+            fail(f"production {pid} has shots serving no objective or beat: "
+                 f"{sorted(orphans)}. RISK-60 requires every shot to resolve to a brief element")
+        print(f"production {pid}: {len(structure['objectives'])} objectives, "
+              f"{len(structure['beats'])} beats, all {len(declared)} shots resolve both ways")
+
+
 def main() -> None:
     manifest = json.loads(MANIFEST.read_text())
     text = BRIEF.read_text()
@@ -178,7 +220,9 @@ def main() -> None:
 
     checked = check_references(text, manifest)
     check_intent(intent)
-    check_shots(parse_shots(text), intent)
+    runs = parse_shots(text)
+    check_shots(runs, intent)
+    check_structure(runs, intent)
     print(f"brief: {checked} rig references resolve against cast/manifest.json")
 
 

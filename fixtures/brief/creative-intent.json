@@ -76,7 +76,69 @@
       "purpose": "Show turn-taking and shared effort: a thing too awkward for one is easy for three.",
       "declared_storyline": "Three friends and a quadruped move one ball across open ground to a cart, passing it between them when each in turn finds it awkward, and finally carrying it together.",
       "declared_focus": "cooperation and turn-taking",
-      "declared_concept": "a cumulative journey with a destination; each repetition adds a participant and changes the formation"
+      "declared_concept": "a cumulative journey with a destination; each repetition adds a participant and changes the formation",
+      "structure": {
+        "note": "RISK-60 requires every shot to resolve to a brief element and every brief element to resolve to a shot. Objectives are what the production teaches; beats are what it does structurally. Together their shot lists must cover every shot.",
+        "objectives": [
+          {
+            "id": "A-OBJ1",
+            "statement": "Everyone gets a turn to carry.",
+            "shots": [
+              "A02",
+              "A04",
+              "A08"
+            ]
+          },
+          {
+            "id": "A-OBJ2",
+            "statement": "When a thing is awkward, pass it on rather than struggle alone.",
+            "shots": [
+              "A04",
+              "A05"
+            ]
+          },
+          {
+            "id": "A-OBJ3",
+            "statement": "Together they move what one could not.",
+            "shots": [
+              "A08",
+              "A09"
+            ]
+          }
+        ],
+        "beats": [
+          {
+            "id": "A-BEAT-open",
+            "statement": "Establish the place, and mochi alone in it.",
+            "shots": [
+              "A01"
+            ]
+          },
+          {
+            "id": "A-BEAT-refrain",
+            "statement": "The travelling refrain, sung while the group moves.",
+            "shots": [
+              "A03",
+              "A06",
+              "A09"
+            ]
+          },
+          {
+            "id": "A-BEAT-rhythm",
+            "statement": "The drum section, where the beat is the subject.",
+            "shots": [
+              "A07"
+            ]
+          },
+          {
+            "id": "A-BEAT-resolve",
+            "statement": "Close on the wide that opened the film.",
+            "shots": [
+              "A10"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "B",
@@ -85,7 +147,74 @@
       "purpose": "Show searching as a named, orderly activity: look, say where you looked, look somewhere else.",
       "declared_storyline": "The ball goes missing. Three friends search three named places in turn, each reporting what they found, until the quadruped reveals it had it all along.",
       "declared_focus": "searching, and naming places",
-      "declared_concept": "an episodic question-and-answer search with a reveal, no travel and no destination; each repetition returns to the same question from a different place"
+      "declared_concept": "an episodic question-and-answer search with a reveal, no travel and no destination; each repetition returns to the same question from a different place",
+      "structure": {
+        "objectives": [
+          {
+            "id": "B-OBJ1",
+            "statement": "Searching is orderly: look, say what you found, look somewhere else.",
+            "shots": [
+              "B02",
+              "B04",
+              "B06"
+            ]
+          },
+          {
+            "id": "B-OBJ2",
+            "statement": "Places have names — behind, under.",
+            "shots": [
+              "B04",
+              "B06"
+            ]
+          },
+          {
+            "id": "B-OBJ3",
+            "statement": "What is lost may be with someone rather than somewhere.",
+            "shots": [
+              "B08"
+            ]
+          }
+        ],
+        "beats": [
+          {
+            "id": "B-BEAT-open",
+            "statement": "The ball goes missing, unseen by anyone.",
+            "shots": [
+              "B01"
+            ]
+          },
+          {
+            "id": "B-BEAT-refrain",
+            "statement": "The same question asked three times, standing still.",
+            "shots": [
+              "B03",
+              "B05",
+              "B07"
+            ]
+          },
+          {
+            "id": "B-BEAT-reveal",
+            "statement": "mochi had it the whole time.",
+            "shots": [
+              "B08"
+            ]
+          },
+          {
+            "id": "B-BEAT-rhythm",
+            "statement": "Drum celebration.",
+            "shots": [
+              "B09"
+            ]
+          },
+          {
+            "id": "B-BEAT-resolve",
+            "statement": "Wide close.",
+            "shots": [
+              "B10"
+            ]
+          }
+        ]
+      }
     }
   ],
   "narrative_axis_separation": {
