@@ -208,71 +208,15 @@ class Rig:
                                             entry["part"], entry["joint"])[1]
         return None
 
-    def skinned(self, character: str, angles: dict) -> tuple:
-        """Solve one pose: bone transforms, deformed meshes, and rigid frames.
-
-        A meshed part is drawn from its skinned vertices. A rigid part is placed
-        the way the rest pose places it, except that its anchor comes from the
-        parent's *deformed* mesh when the parent has one, and it takes the bone
-        angles blended at that anchor. That is the rule the manifest states, and
-        it is what carries a hand on a bending arm and a contact on a bending leg.
-        """
-        records = self.records(character)
-        rest_solved = self.frames(character)
-        transforms = rig_eval.bone_transforms(self.doc, character, angles,
-                                              records, rest_solved)
-        meshes: dict[str, tuple] = {}
-
-        def mesh_of(layer: str):
-            record = records[layer]
-            if record["mesh"] is None:
-                return None
-            if layer not in meshes:
-                rest = rig_eval.rest_vertices(records, rest_solved, layer)
-                meshes[layer] = (rest, rig_eval.skin(rest, record["mesh"], transforms))
-            return meshes[layer]
-
-        attach = self.rig[character]["attach"]
-        frames: dict[str, tuple] = {}
-
-        def solve(layer: str):
-            if layer in frames:
-                return frames[layer]
-            entry = attach[layer]
-            parent = entry["parent"]
-            if parent is None:
-                frames[layer] = (rest_solved[layer][0], rest_solved[layer][1], 0.0)
-                return frames[layer]
-            _, p_pos, p_extra = solve(parent)
-            record = records[parent]
-            joint = record["joints"][entry["joint"]]
-            deformed = mesh_of(parent)
-            if deformed is not None:
-                where = rig_eval.deform_point(record["mesh"], *deformed, joint)
-                weights = rig_eval.point_weights(record["mesh"], joint)
-                extra = sum(w * transforms[b][0]
-                            for w, b in zip(weights, record["mesh"]["bones"]))
-            else:
-                rest_where = rig_eval.joint_point(records, rest_solved, parent,
-                                                  entry["joint"])
-                where = rotate_point(rest_where, p_pos, p_extra)
-                extra = p_extra
-            frames[layer] = (rest_solved[layer][0] + extra, where, extra)
-            return frames[layer]
-
-        for layer in attach:
-            solve(layer)
-        return records, frames, meshes
-
     def pose(self, character: str, root: str,
-             angles: dict | None = None) -> tuple[Image.Image, float]:
+             pose: dict | None = None) -> tuple[Image.Image, float]:
         """Render one root and everything parented under it, in z order.
 
         Returns the tile and the y inside it that is the character's ground
         plane, so a caller can stand every group on one floor line.
         """
-        angles = angles or {}
-        records, frames, meshes = self.skinned(character, angles)
+        records, frames, meshes = rig_eval.solve_pose(
+            self.doc, character, **rig_eval.pose_slice(pose or {}, character))
         placed = []
         for layer, (angle, anchor_char, _) in frames.items():
             if self.root_of(character, layer) != root or not self.visible(character, layer):
@@ -285,6 +229,16 @@ class Rig:
                 placed.append((record["z"], layer, "mesh", img,
                                record["blend_mode"], record["mesh"], meshes[layer][1]))
                 continue
+            if record["mesh"] is not None:
+                # A meshed part drawn through the rigid path is a silent
+                # downgrade: it would still land somewhere plausible, so nothing
+                # in the picture says the mesh was never evaluated.
+                raise SystemExit(
+                    f"{character}/{layer} carries mesh data but was about to be "
+                    "drawn as a rigid sprite. Every meshed part is skinned; a "
+                    "harness that skins only some of them is not a skinning "
+                    "evaluator."
+                )
             pivot = record["pivot"]
             if angle:
                 out = img.rotate(angle, expand=True, resample=Image.BICUBIC)
@@ -321,8 +275,8 @@ class Rig:
         plane = self.ground_of(character, root, self.frames(character))
         return canvas, (0.0 if plane is None else plane - top)
 
-    def tiles(self, character: str, angles: dict | None = None) -> list:
-        return [self.pose(character, root, angles)
+    def tiles(self, character: str, pose: dict | None = None) -> list:
+        return [self.pose(character, root, pose)
                 for root in self.rig[character]["roots"]]
 
 
@@ -359,7 +313,7 @@ def contact_sheet(rig: Rig, pose: dict) -> Image.Image:
     for character in rig.rig:
         if character == "scene":
             continue
-        tiles.extend(rig.tiles(character, pose.get("angles", {}).get(character)))
+        tiles.extend(rig.tiles(character, pose))
 
     # Every group is placed by its own declared ground plane onto one floor line.
     # Nothing here knows how tall a character is; if two groups did not agree on

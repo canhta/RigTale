@@ -8,28 +8,29 @@
   "coordinate_note": "A part's `pivot` and its `joints` are pixels from that part's own top-left. `rig` places parts in character space: a character's space is its root part's pivot, +x right, +y down, in pixels. A part is attached by putting its own pivot on the named joint of its parent, then rotating by `rest_angle` degrees counter-clockwise about that point. A part's pivot is always its anchor, so no separate anchor field is needed.",
   "draw_order": {
     "scope": "character group",
-    "note": "`z` orders parts within one character group and says nothing across groups: `pim/body` and `cart/body` both sit at z 10 and never compete, because a shot decides which group is in front. Inside a group, `z` is unique per part except where two parts can never be composited over each other \u2014 alternates in one slot, of which exactly one is posed, and parts whose opaque pixels do not meet in character space. `build_cast.py` proves the exception rather than asserting it: every pair sharing a `z` is rasterised in character space and refused if it overlaps by a single pixel."
+    "note": "`z` orders parts within one character group and says nothing across groups: `pim/body` and `cart/body` both sit at z 10 and never compete, because a shot decides which group is in front. Inside a group, `z` is unique per part except where two parts can never be composited over each other \u2014 alternates in one slot, of which exactly one is posed, and parts whose opaque pixels do not meet in character space. `build_cast.py` proves the exception rather than asserting it: under every pose in `poses`, every pair sharing a `z` is rasterised in character space and refused if it overlaps by a single pixel. A pair that misses at rest can meet once the rig moves, so rest alone would not settle it. That check places a part rigidly and therefore refuses any meshed part that shares a `z`, because it could not decide the overlap of a deformed silhouette."
   },
   "constraints": {
-    "note": "`attach.constraint` is null when a part inherits its parent's transform whole. A non-null constraint restricts that inheritance, and a consumer that ignores it renders the part wrongly.",
+    "note": "`attach.constraint` is null when a part inherits its parent's transform whole. A non-null constraint restricts that inheritance, and a consumer that ignores it renders the part wrongly. `rig.py` implements both kinds below, and the build refuses to ship a constraint that no recorded pose separates from plain inheritance: `poses.plant` moves and turns the roots the constrained parts hang off, so honouring a constraint and ignoring it give different answers there.",
     "kinds": {
-      "ground_projected": "The part takes the parent's x translation only. Its y stays on the character's ground plane and its angle stays fixed in character space, so a body that leans, turns or leaves the floor neither rotates nor lifts its shadow."
+      "ground_projected": "The part takes the parent's x translation only. Its y stays on the character's ground plane and its angle stays fixed in character space, so a body that leans, turns or leaves the floor neither rotates nor lifts its shadow. Carried by every ground shadow. Under `poses.plant` each biped root drops 8.27 px and travels 10 px: the shadow takes the 10 and stays on the plane, and the cart's shadow keeps its angle while the cart tilts 5 degrees.",
+      "light_locked": "The part takes the parent's x and y translation and none of its rotation, because it belongs to the key light rather than to the surface under it. Carried by props/ball_highlight: a specular sits where the light puts it, so it travels with the ball and does not turn with it. Under `poses.plant` the ball rolls 34 degrees and travels 12 px, and the highlight takes the 12 px only."
     }
   },
   "ground": {
-    "note": "`rig.<group>.ground` lists, per root, the joint that is that root's floor plane and the contact joints standing on it. Place a group by putting that joint on the shot's floor line and every character in the cast stands on the same floor. The joint is derived from the contacts, never from the silhouette.",
+    "note": "`rig.<group>.ground` lists, per root, the joint that is that root's floor plane and the contact joints standing on it. Place a group by putting that joint on the shot's floor line and every character in the cast stands on the same floor. A character stands on contacts that belong to other parts \u2014 feet, wheels \u2014 and its plane is derived from them and not from its silhouette. A prop and a scene band stand on themselves: the plane joint is the sole contact, so there the plane is the part's own resting point, and the build holds it to the last opaque row of the emitted image rather than to itself. The plane does not move with a pose: `poses.<name>.root` moves the character, and the floor stays where the rest pose put it.",
     "tolerance_px": 0.5,
     "tolerance_reason": "Joints are written as whole pixels, so a contact solved in floating point can miss its plane by up to half a pixel. The build refuses any larger deviation."
   },
   "deformation": {
     "space": "A mesh's `vertices` are in the part's own pixels, the same space as `pivot` and `joints`. The part's image occupies [0, size[0]] x [0, size[1]], and `uv` is the vertex divided by `size`.",
     "triangles": "Indices into `vertices`, wound v(r,c) -> v(r,c+1) -> v(r+1,c+1) and then v(r,c) -> v(r+1,c+1) -> v(r+1,c). With +y down that is clockwise on screen. No backface culling is implied.",
-    "bones": "`rig.<group>.bones` is the deform skeleton. A bone is a rotation about its `head`, which is always an existing rig joint named `part/joint`, resolved to character space through the attachment tree. Rest is the identity: with every angle at 0 a skinned vertex sits exactly where the rigid rest pose puts it, and the build refuses if it does not.",
+    "bones": "`rig.<group>.bones` is the deform skeleton. A bone is a rotation about its `head`, which is always an existing rig joint named `part/joint`, resolved to character space through the attachment tree. Rest is the identity: with every angle at 0 a skinned vertex sits exactly where the rigid rest pose puts it. On its own that is not evidence \u2014 a rotation of 0 about any point is the identity whatever the head is \u2014 so the build poses one bone at a time and compares the skinned vertices against that bone's head rotation applied directly and blended by the same weights, at 0 degrees and at 30. A wrong head, a chain composed in the wrong order, a rotation taken the wrong way round or a descendant that does not follow its parent fails that comparison.",
     "weights": "One rule covers every weight in this cast: a bone's weight ramps linearly from 0 at the previous bone's head to 1 at its own head, and stays 1 beyond it; the previous bone takes the remainder. `heads` on each mesh records those head positions along the strip, so a reviewer can recompute every weight from two numbers.",
     "skinning": "Linear blend skinning in character space. Solve the rest pose from `attach`, map each mesh vertex into character space with its part's rest transform, then take the weighted sum of the bone transforms applied to that rest position. A bone's transform is its parent's composed with a rotation about its own rest head.",
-    "joints_on_meshes": "A joint on a meshed part is a point on the mesh, not a rigid offset from the pivot. Find the triangle that contains it in rest part space, take its barycentric coordinates there, and apply them to that triangle's deformed vertices. This is how a contact point on a deformed limb is computed, and how a rigid child \u2014 a hand on an arm's `tip` \u2014 finds its anchor: the anchor comes from the deformed mesh, and its rotation is the bone angles blended by the weights interpolated at that same point. At rest the rule reproduces the rigid position exactly, so the ground plane declared in `rig.<group>.ground` is unaffected; under a pose the contact moves with the geometry, and `poses.reference.joints` records where to.",
-    "topology": "Limbs are two-rail strips, 6 to 14 triangles each. The three bipeds have identical body dimensions, so their arms and legs are not merely the same topology but the same vertices, and the build checks that the reference pose deforms them identically.",
-    "seam": "leg_<side>_upper and leg_<side>_lower meet along the knee: the thigh's flat bottom edge and the shin's flat top edge are the same two points in character space, carried by both meshes. A consumer that places the shin from the undeformed joint, or interpolates the two sides differently, opens a visible gap. The build measures the gap under the reference pose and refuses anything but zero."
+    "joints_on_meshes": "A joint on a meshed part is a point on the mesh, not a rigid offset from the pivot. Find the triangle that contains it in rest part space, take its barycentric coordinates there, and apply them to that triangle's deformed vertices. This is how a contact point on a deformed limb is computed, and how a rigid child \u2014 a hand on an arm's `tip` \u2014 finds its anchor: the anchor comes from the deformed mesh, and its rotation is the bone angles blended by the weights interpolated at that same point. At rest the rule reproduces the rigid position exactly, so the ground plane declared in `rig.<group>.ground` is unaffected; under a pose the contact moves with the geometry, and each pose's `joints` records where to.",
+    "topology": "Limbs are two-rail strips, 6 to 14 triangles each. The three bipeds have identical body dimensions, so their arms and legs are not merely the same topology but the same vertices, and the build checks that every recorded pose deforms them identically.",
+    "seam": "leg_<side>_upper and leg_<side>_lower meet along the knee: the thigh's flat bottom edge and the shin's flat top edge are the same two points in character space, carried by both meshes. A consumer that places the shin from the undeformed joint, or interpolates the two sides differently, opens a visible gap. The build measures the gap under every recorded pose and refuses anything but zero."
   },
   "colour": {
     "working_space": "sRGB IEC 61966-2-1, D65 white point",
@@ -41,7 +42,8 @@
     "bit_depth": 8,
     "channels": "RGBA, PNG colour type 6, 8 bits per channel, no palette",
     "boundary": "This cast is a published pack, and production-contracts.md requires alpha association to be fixed at that boundary. It is fixed here as straight. A consumer that premultiplies for compositing does so after reading and must not write premultiplied values back into this pack: an 8-bit premultiply is lossy under low alpha, which is exactly where the shadows and the horizon haze live.",
-    "part_override": "A part record may carry its own `colour` object overriding any field here. No part does; every part matches this header, and the build refuses if the emitted bytes disagree."
+    "verification": "Four of these fields are read back out of the emitted bytes on every build and the build refuses if they disagree: `bit_depth` and `channels` from every PNG header, `embedded_profile` from the chunk list of every PNG, and `alpha` from a pixel carrying a colour channel above its own alpha, which a premultiplied encoding could not hold. `working_space`, `transfer` and `blend_space` are declarations and cannot be checked here: a PNG with no profile carries no byte that records them, which is why this manifest has to state them. They are true of how build_cast.py composited these pixels; nothing in the files themselves could refute a different claim.",
+    "part_override": "A part record may carry its own `colour` object overriding any field here. No part does, so this header describes every part."
   },
   "blend_profile": {
     "default": "normal",
@@ -5083,15 +5085,15 @@
     }
   ],
   "poses": {
-    "note": "Angles are degrees, counter-clockwise on screen, the same convention as `rest_angle`. A bone absent from a pose is at 0. `vertices` are the deformed positions in character space and `joints` are the deformed joints of every meshed part, both to two decimals, so a consumer can check its own evaluation against this one rather than only look at it.",
+    "note": "Angles are degrees, counter-clockwise on screen, the same convention as `rest_angle`. A bone absent from a pose is at 0. `root` moves a group's origin in character space and `root_angle` turns the group about that origin; both are absent from a pose that only bends bones, and neither moves the ground plane. `vertices` are the deformed positions in character space and `joints` are the deformed joints of every meshed part, both to two decimals, so a consumer can check its own evaluation against this one rather than only look at it.",
     "rest": {
       "name": "rest",
-      "note": "Every bone at 0. Deformed vertices equal the rest positions exactly; the build refuses if skinning moves anything.",
+      "note": "Every bone at 0, no root placement. Deformed vertices equal the rest positions exactly; the build refuses if skinning moves anything.",
       "angles": {}
     },
     "reference": {
       "name": "step",
-      "note": "One leg planted, the opposite leg lifted and bent, arms swinging in opposition. Every bone not named is at 0. The bipeds keep their left leg at 0 and mochi keeps its fore left and hind right legs at 0, so those contacts stay on the declared ground plane while the rest of the rig deforms \u2014 which is the point: deformation must not move the floor.",
+      "note": "One leg planted, the opposite leg lifted and bent, arms swinging in opposition. Every bone not named is at 0. The bipeds keep their left leg at 0 and mochi keeps its fore left and hind right legs at 0, so those contacts stay on the declared ground plane while the rest of the rig deforms. The planted chains are at rest here, so this pose shows the floor is not moved by a limb that is not deforming; `plant` is the pose that puts a deforming chain under a planted foot.",
       "angles": {
         "pim": {
           "hip_right": 22.0,
@@ -5127,6 +5129,8 @@
           "tail_end": -28.0
         }
       },
+      "root": {},
+      "root_angle": {},
       "planted": {
         "pim": [
           "leg_left_lower/contact"
@@ -5475,6 +5479,413 @@
         "pim/leg_right_lower/contact": [62.61, 106.94],
         "pim/leg_right_lower/tip": [61.36, 95.01],
         "pim/leg_right_upper/knee": [59.16, 74.12]
+      }
+    },
+    "plant": {
+      "name": "plant",
+      "note": "Weight on the planted leg. Each biped bends the left hip and knee it stands on and drops its root 8.27 px so the left contact lands back on the declared plane; mochi does the same on its fore left leg with a 14.31 px drop. The planted contact is carried by a chain that is deforming, so 'deformation must not move the floor' is measured on a limb that is actually moving. Every group also travels 10 to 18 px in x, the cart tilts 5 degrees and the ball rolls 34 degrees: a ground projected shadow must take that x, hold its y on the plane the body left, and not tilt with the cart, and the light locked highlight must travel with the ball without turning.",
+      "angles": {
+        "pim": {
+          "hip_left": 20.0,
+          "knee_left": 40.0,
+          "hip_right": -30.0,
+          "knee_right": 34.0,
+          "shoulder_left": 24.0,
+          "elbow_left": -20.0,
+          "shoulder_right": -22.0,
+          "elbow_right": 28.0
+        },
+        "bo": {
+          "hip_left": 20.0,
+          "knee_left": 40.0,
+          "hip_right": -30.0,
+          "knee_right": 34.0,
+          "shoulder_left": 24.0,
+          "elbow_left": -20.0,
+          "shoulder_right": -22.0,
+          "elbow_right": 28.0
+        },
+        "nu": {
+          "hip_left": 20.0,
+          "knee_left": 40.0,
+          "hip_right": -30.0,
+          "knee_right": 34.0,
+          "shoulder_left": 24.0,
+          "elbow_left": -20.0,
+          "shoulder_right": -22.0,
+          "elbow_right": 28.0
+        },
+        "mochi": {
+          "shoulder_fore_left": -12.0,
+          "knee_fore_left": -28.0,
+          "shoulder_fore_right": 10.0,
+          "knee_fore_right": -14.0,
+          "hip_hind_left": 18.0,
+          "knee_hind_left": -24.0,
+          "rump": 16.0,
+          "tail_mid": 20.0,
+          "tail_end": 24.0
+        }
+      },
+      "root": {
+        "pim": [10.0, 8.27],
+        "bo": [10.0, 8.27],
+        "nu": [10.0, 8.27],
+        "mochi": [10.0, 14.31],
+        "cart": [18.0, 0.0],
+        "props": [12.0, 0.0]
+      },
+      "root_angle": {
+        "cart": -5.0,
+        "props": 34.0
+      },
+      "planted": {
+        "pim": [
+          "leg_left_lower/contact"
+        ],
+        "bo": [
+          "leg_left_lower/contact"
+        ],
+        "nu": [
+          "leg_left_lower/contact"
+        ],
+        "mochi": [
+          "leg_fore_left/contact"
+        ]
+      },
+      "seams_checked": [
+        "bo/leg_left_upper|leg_left_lower",
+        "bo/leg_right_upper|leg_right_lower",
+        "nu/leg_left_upper|leg_left_lower",
+        "nu/leg_right_upper|leg_right_lower",
+        "pim/leg_left_upper|leg_left_lower",
+        "pim/leg_right_upper|leg_right_lower"
+      ],
+      "vertices": {
+        "bo/arm_left": [
+          [-56.51, -29.02],
+          [-36.71, -26.24],
+          [-56.52, -4.78],
+          [-37.53, 0.5],
+          [-62.49, 16.64],
+          [-44.83, 26.03],
+          [-74.11, 38.49],
+          [-56.45, 47.88],
+          [-85.73, 60.34],
+          [-68.07, 69.73]
+        ],
+        "bo/arm_right": [
+          [56.42, -25.84],
+          [76.11, -29.31],
+          [57.4, 2.01],
+          [75.61, -4.81],
+          [67.2, 27.23],
+          [82.96, 14.91],
+          [82.44, 46.73],
+          [98.2, 34.42],
+          [97.68, 66.23],
+          [113.44, 53.92]
+        ],
+        "bo/leg_left_lower": [
+          [-33.27, 98.42],
+          [-14.51, 79.0],
+          [-25.12, 106.29],
+          [-6.36, 86.87],
+          [-16.96, 114.17],
+          [1.8, 94.75],
+          [-8.81, 122.04],
+          [9.95, 102.62]
+        ],
+        "bo/leg_left_upper": [
+          [-42.29, 41.7],
+          [-15.44, 38.88],
+          [-41.87, 59.36],
+          [-15.66, 55.21],
+          [-42.19, 81.15],
+          [-19.71, 69.37],
+          [-33.27, 98.42],
+          [-14.51, 79.0]
+        ],
+        "bo/leg_right_lower": [
+          [25.71, 91.89],
+          [51.39, 83.55],
+          [29.21, 102.67],
+          [54.89, 94.32],
+          [32.72, 113.45],
+          [58.4, 105.11],
+          [36.22, 124.23],
+          [61.9, 115.89]
+        ],
+        "bo/leg_right_upper": [
+          [39.09, 37.19],
+          [65.04, 44.63],
+          [33.07, 53.52],
+          [59.01, 59.7],
+          [25.0, 72.79],
+          [50.8, 71.71],
+          [25.71, 91.89],
+          [51.39, 83.55]
+        ],
+        "mochi/belly_shade": [
+          [-56.09, 41.09],
+          [-62.32, 70.44],
+          [-22.6, 54.1],
+          [-25.08, 83.24],
+          [10.44, 58.69],
+          [11.96, 87.63],
+          [43.0, 54.22],
+          [48.51, 82.95],
+          [75.12, 41.13],
+          [84.39, 69.66]
+        ],
+        "mochi/leg_fore_left": [
+          [-63.77, 33.65],
+          [-39.34, 42.54],
+          [-67.66, 53.51],
+          [-45.17, 65.28],
+          [-74.62, 67.9],
+          [-57.22, 87.22],
+          [-90.22, 81.95],
+          [-72.83, 101.27],
+          [-105.83, 96.0],
+          [-88.43, 115.33]
+        ],
+        "mochi/leg_fore_right": [
+          [-82.45, 37.77],
+          [-56.46, 36.86],
+          [-80.23, 58.01],
+          [-54.4, 58.85],
+          [-80.7, 76.59],
+          [-55.27, 82.0],
+          [-85.07, 97.13],
+          [-59.64, 102.54],
+          [-89.44, 117.67],
+          [-64.0, 123.08]
+        ],
+        "mochi/leg_hind_left": [
+          [58.62, 44.32],
+          [81.99, 32.93],
+          [69.8, 61.17],
+          [93.89, 52.67],
+          [75.72, 76.83],
+          [101.7, 75.92],
+          [76.45, 97.82],
+          [102.44, 96.91],
+          [77.19, 118.8],
+          [103.17, 117.9]
+        ],
+        "mochi/leg_hind_right": [
+          [74.32, 39.25],
+          [100.06, 35.63],
+          [77.24, 60.04],
+          [102.99, 56.42],
+          [80.16, 80.84],
+          [105.91, 77.22],
+          [83.09, 101.63],
+          [108.83, 98.01],
+          [86.01, 122.43],
+          [111.75, 118.81]
+        ],
+        "mochi/tail": [
+          [109.7, 3.19],
+          [93.12, -7.99],
+          [116.85, -6.6],
+          [99.97, -17.12],
+          [124.63, -18.48],
+          [105.69, -24.38],
+          [129.95, -32.07],
+          [110.41, -33.16],
+          [130.52, -45.76],
+          [110.82, -42.28],
+          [128.49, -57.24],
+          [108.8, -53.77],
+          [126.47, -68.73],
+          [106.77, -65.26]
+        ],
+        "nu/arm_left": [
+          [-56.51, -29.02],
+          [-36.71, -26.24],
+          [-56.52, -4.78],
+          [-37.53, 0.5],
+          [-62.49, 16.64],
+          [-44.83, 26.03],
+          [-74.11, 38.49],
+          [-56.45, 47.88],
+          [-85.73, 60.34],
+          [-68.07, 69.73]
+        ],
+        "nu/arm_right": [
+          [56.42, -25.84],
+          [76.11, -29.31],
+          [57.4, 2.01],
+          [75.61, -4.81],
+          [67.2, 27.23],
+          [82.96, 14.91],
+          [82.44, 46.73],
+          [98.2, 34.42],
+          [97.68, 66.23],
+          [113.44, 53.92]
+        ],
+        "nu/leg_left_lower": [
+          [-33.27, 98.42],
+          [-14.51, 79.0],
+          [-25.12, 106.29],
+          [-6.36, 86.87],
+          [-16.96, 114.17],
+          [1.8, 94.75],
+          [-8.81, 122.04],
+          [9.95, 102.62]
+        ],
+        "nu/leg_left_upper": [
+          [-42.29, 41.7],
+          [-15.44, 38.88],
+          [-41.87, 59.36],
+          [-15.66, 55.21],
+          [-42.19, 81.15],
+          [-19.71, 69.37],
+          [-33.27, 98.42],
+          [-14.51, 79.0]
+        ],
+        "nu/leg_right_lower": [
+          [25.71, 91.89],
+          [51.39, 83.55],
+          [29.21, 102.67],
+          [54.89, 94.32],
+          [32.72, 113.45],
+          [58.4, 105.11],
+          [36.22, 124.23],
+          [61.9, 115.89]
+        ],
+        "nu/leg_right_upper": [
+          [39.09, 37.19],
+          [65.04, 44.63],
+          [33.07, 53.52],
+          [59.01, 59.7],
+          [25.0, 72.79],
+          [50.8, 71.71],
+          [25.71, 91.89],
+          [51.39, 83.55]
+        ],
+        "pim/arm_left": [
+          [-56.51, -29.02],
+          [-36.71, -26.24],
+          [-56.52, -4.78],
+          [-37.53, 0.5],
+          [-62.49, 16.64],
+          [-44.83, 26.03],
+          [-74.11, 38.49],
+          [-56.45, 47.88],
+          [-85.73, 60.34],
+          [-68.07, 69.73]
+        ],
+        "pim/arm_right": [
+          [56.42, -25.84],
+          [76.11, -29.31],
+          [57.4, 2.01],
+          [75.61, -4.81],
+          [67.2, 27.23],
+          [82.96, 14.91],
+          [82.44, 46.73],
+          [98.2, 34.42],
+          [97.68, 66.23],
+          [113.44, 53.92]
+        ],
+        "pim/leg_left_lower": [
+          [-33.27, 98.42],
+          [-14.51, 79.0],
+          [-25.12, 106.29],
+          [-6.36, 86.87],
+          [-16.96, 114.17],
+          [1.8, 94.75],
+          [-8.81, 122.04],
+          [9.95, 102.62]
+        ],
+        "pim/leg_left_upper": [
+          [-42.29, 41.7],
+          [-15.44, 38.88],
+          [-41.87, 59.36],
+          [-15.66, 55.21],
+          [-42.19, 81.15],
+          [-19.71, 69.37],
+          [-33.27, 98.42],
+          [-14.51, 79.0]
+        ],
+        "pim/leg_right_lower": [
+          [25.71, 91.89],
+          [51.39, 83.55],
+          [29.21, 102.67],
+          [54.89, 94.32],
+          [32.72, 113.45],
+          [58.4, 105.11],
+          [36.22, 124.23],
+          [61.9, 115.89]
+        ],
+        "pim/leg_right_upper": [
+          [39.09, 37.19],
+          [65.04, 44.63],
+          [33.07, 53.52],
+          [59.01, 59.7],
+          [25.0, 72.79],
+          [50.8, 71.71],
+          [25.71, 91.89],
+          [51.39, 83.55]
+        ]
+      },
+      "joints": {
+        "bo/arm_left/contact": [-76.43, 64.15],
+        "bo/arm_left/elbow": [-53.54, 20.9],
+        "bo/arm_left/tip": [-72.21, 56.21],
+        "bo/arm_right/contact": [104.94, 59.29],
+        "bo/arm_right/elbow": [74.88, 20.56],
+        "bo/arm_right/tip": [99.4, 52.2],
+        "bo/leg_left_lower/contact": [-0.5, 112.0],
+        "bo/leg_left_lower/tip": [-9.13, 103.66],
+        "bo/leg_left_upper/knee": [-24.24, 89.07],
+        "bo/leg_right_lower/contact": [48.27, 119.26],
+        "bo/leg_right_lower/tip": [44.57, 107.85],
+        "bo/leg_right_upper/knee": [38.08, 87.88],
+        "mochi/belly_shade/fore": [-57.01, 56.52],
+        "mochi/belly_shade/hind": [77.87, 56.17],
+        "mochi/leg_fore_left/contact": [-96.39, 105.0],
+        "mochi/leg_fore_left/knee": [-65.92, 77.56],
+        "mochi/leg_fore_left/tip": [-87.47, 96.97],
+        "mochi/leg_fore_right/contact": [-76.51, 119.4],
+        "mochi/leg_fore_right/knee": [-67.99, 79.29],
+        "mochi/leg_fore_right/tip": [-74.02, 107.66],
+        "mochi/leg_hind_left/contact": [90.14, 117.35],
+        "mochi/leg_hind_left/knee": [88.71, 76.38],
+        "mochi/leg_hind_left/tip": [89.72, 105.36],
+        "mochi/leg_hind_right/contact": [98.74, 119.63],
+        "mochi/leg_hind_right/knee": [93.04, 79.03],
+        "mochi/leg_hind_right/tip": [97.07, 107.75],
+        "mochi/tail/contact": [116.79, -66.01],
+        "mochi/tail/knuckle_1": [116.24, -23.44],
+        "mochi/tail/knuckle_2": [120.64, -43.23],
+        "mochi/tail/tip": [118.35, -57.15],
+        "nu/arm_left/contact": [-76.43, 64.15],
+        "nu/arm_left/elbow": [-53.54, 20.9],
+        "nu/arm_left/tip": [-72.21, 56.21],
+        "nu/arm_right/contact": [104.94, 59.29],
+        "nu/arm_right/elbow": [74.88, 20.56],
+        "nu/arm_right/tip": [99.4, 52.2],
+        "nu/leg_left_lower/contact": [-0.5, 112.0],
+        "nu/leg_left_lower/tip": [-9.13, 103.66],
+        "nu/leg_left_upper/knee": [-24.24, 89.07],
+        "nu/leg_right_lower/contact": [48.27, 119.26],
+        "nu/leg_right_lower/tip": [44.57, 107.85],
+        "nu/leg_right_upper/knee": [38.08, 87.88],
+        "pim/arm_left/contact": [-76.43, 64.15],
+        "pim/arm_left/elbow": [-53.54, 20.9],
+        "pim/arm_left/tip": [-72.21, 56.21],
+        "pim/arm_right/contact": [104.94, 59.29],
+        "pim/arm_right/elbow": [74.88, 20.56],
+        "pim/arm_right/tip": [99.4, 52.2],
+        "pim/leg_left_lower/contact": [-0.5, 112.0],
+        "pim/leg_left_lower/tip": [-9.13, 103.66],
+        "pim/leg_left_upper/knee": [-24.24, 89.07],
+        "pim/leg_right_lower/contact": [48.27, 119.26],
+        "pim/leg_right_lower/tip": [44.57, 107.85],
+        "pim/leg_right_upper/knee": [38.08, 87.88]
       }
     }
   }

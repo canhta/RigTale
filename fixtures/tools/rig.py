@@ -29,6 +29,9 @@ def solve_frames(attach: dict, records: dict) -> dict:
     `attach` is `rig.<character>.attach`; `records` maps layer name to its part
     record. A part whose attachment carries a constraint that drops rotation
     inheritance keeps its own `rest_angle` and nothing of its parent's.
+
+    This is the rest pose. `solve_pose` below is the same tree under a set of
+    bone angles and a root placement.
     """
     solved: dict[str, tuple[float, Point]] = {}
 
@@ -103,13 +106,29 @@ def apply(transform: tuple, p) -> Point:
     return (turned[0] + transform[1], turned[1] + transform[2])
 
 
+def root_transform(root: Point = (0.0, 0.0), root_angle: float = 0.0) -> tuple:
+    """Where a pose puts the whole character: turn about the origin, then move.
+
+    A character's origin is its root part's pivot, so a root angle is a rotation
+    about (0, 0) in character space and `root` is a translation after it. Both
+    are zero in a pose that only bends bones.
+    """
+    return compose((0.0, root[0], root[1]), rot_about((0.0, 0.0), root_angle))
+
+
 def bone_transforms(doc: dict, character: str, angles: dict,
-                    records: dict | None = None, solved: dict | None = None) -> dict:
-    """Bone name to its (angle, tx, ty) for one pose."""
+                    records: dict | None = None, solved: dict | None = None,
+                    root: Point = (0.0, 0.0), root_angle: float = 0.0) -> dict:
+    """Bone name to its (angle, tx, ty) for one pose.
+
+    A bone with no parent carries the root placement, so a root translation or
+    root angle moves the skin as well as the rigid parts.
+    """
     group = doc["rig"][character]
     bones = {b["name"]: b for b in group.get("bones", [])}
     if records is None or solved is None:
         records, solved = frames_of(doc, character)
+    base = root_transform(root, root_angle)
     out: dict[str, tuple] = {}
 
     def resolve(name: str) -> tuple:
@@ -119,8 +138,8 @@ def bone_transforms(doc: dict, character: str, angles: dict,
         layer, joint = bone["head"].split("/")
         head = joint_point(records, solved, layer, joint)
         transform = rot_about(head, float(angles.get(name, 0.0)))
-        if bone["parent"]:
-            transform = compose(resolve(bone["parent"]), transform)
+        transform = compose(resolve(bone["parent"]) if bone["parent"] else base,
+                            transform)
         out[name] = transform
         return transform
 
@@ -200,3 +219,102 @@ def frames_of(doc: dict, character: str) -> tuple[dict, dict]:
     """(records, solved) for one character group."""
     records = records_of(doc, character)
     return records, solve_frames(doc["rig"][character]["attach"], records)
+
+
+def pose_slice(pose: dict, character: str) -> dict:
+    """One character's share of a recorded pose, ready for `solve_pose`."""
+    def part(field, default):
+        return (pose.get(field) or {}).get(character) or default
+
+    return {"angles": part("angles", {}),
+            "root": tuple(part("root", (0.0, 0.0))),
+            "root_angle": float(part("root_angle", 0.0))}
+
+
+def solve_pose(doc: dict, character: str, angles: dict | None = None,
+               root: Point = (0.0, 0.0), root_angle: float = 0.0) -> tuple:
+    """Solve one pose for a whole group: (records, frames, meshes).
+
+    `frames[layer]` is (angle in character space, the layer's pivot in character
+    space, the pose rotation it inherited). `meshes[layer]` is (rest vertices,
+    skinned vertices) for *every* meshed part, whether or not anything hangs off
+    it: a meshed part is drawn from its skinned vertices, so a mesh solved only
+    when some child needs its deformed joints would leave leaf parts rigid.
+
+    A rigid part is placed the way the rest pose places it, except that its
+    anchor comes from the parent's deformed mesh when the parent has one, and it
+    takes the bone angles blended at that anchor. That is what carries a hand on
+    a bending arm and a contact on a bending leg.
+
+    `attach.constraint` restricts what a part inherits. A constraint that drops
+    rotation inheritance takes only the translation axes it names, and one
+    pinned to the character ground plane holds its y on that plane, which is the
+    rest-pose plane: the floor does not move when the character does.
+    """
+    angles = angles or {}
+    group = doc["rig"][character]
+    records, rest_solved = frames_of(doc, character)
+    planes = {entry["part"]: joint_point(records, rest_solved,
+                                         entry["part"], entry["joint"])[1]
+              for entry in group.get("ground", [])}
+    transforms = bone_transforms(doc, character, angles, records, rest_solved,
+                                 root=root, root_angle=root_angle)
+
+    meshes: dict[str, tuple] = {}
+    for layer, record in records.items():
+        if record["mesh"] is None:
+            continue
+        rest = rest_vertices(records, rest_solved, layer)
+        meshes[layer] = (rest, skin(rest, record["mesh"], transforms))
+
+    attach = group["attach"]
+    frames: dict[str, tuple] = {}
+
+    def root_layer(layer: str) -> str:
+        while attach[layer]["parent"] is not None:
+            layer = attach[layer]["parent"]
+        return layer
+
+    def solve(layer: str) -> tuple:
+        if layer in frames:
+            return frames[layer]
+        entry = attach[layer]
+        parent = entry["parent"]
+        rest_angle, rest_pivot = rest_solved[layer]
+        if parent is None:
+            frames[layer] = (rest_angle + root_angle,
+                             (rest_pivot[0] + root[0], rest_pivot[1] + root[1]),
+                             root_angle)
+            return frames[layer]
+        _, p_pos, p_extra = solve(parent)
+        p_rest = rest_solved[parent][1]
+        shift = (p_pos[0] - p_rest[0], p_pos[1] - p_rest[1])
+        record = records[parent]
+        constraint = entry.get("constraint") or {}
+        inherits_rotation = constraint.get("inherit_rotation", True)
+        deformed = meshes.get(parent)
+        if inherits_rotation and deformed is not None:
+            joint = record["joints"][entry["joint"]]
+            where = deform_point(record["mesh"], *deformed, joint)
+            weights = point_weights(record["mesh"], joint)
+            extra = sum(w * transforms[b][0]
+                        for w, b in zip(weights, record["mesh"]["bones"]))
+        else:
+            rest_where = joint_point(records, rest_solved, parent, entry["joint"])
+            if inherits_rotation:
+                where = rotate_point((rest_where[0] + shift[0], rest_where[1] + shift[1]),
+                                     p_pos, p_extra)
+                extra = p_extra
+            else:
+                axes = constraint.get("inherit_translation") or []
+                where = (rest_where[0] + (shift[0] if "x" in axes else 0.0),
+                         rest_where[1] + (shift[1] if "y" in axes else 0.0))
+                extra = 0.0
+                if constraint.get("pin") == "character ground plane":
+                    where = (where[0], planes[root_layer(layer)])
+        frames[layer] = (rest_angle + extra, where, extra)
+        return frames[layer]
+
+    for layer in attach:
+        solve(layer)
+    return records, frames, meshes
