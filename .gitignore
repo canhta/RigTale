@@ -5,3 +5,6 @@
 # and the provenance ledger.
 .sandbox/*
 !.sandbox/README.md
+
+# Python bytecode from fixture tooling.
+__pycache__/

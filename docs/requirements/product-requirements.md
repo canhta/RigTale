@@ -62,7 +62,7 @@ Audio, lyrics, beat, phoneme, viseme, and timing data must be accepted when requ
 
 **New obligation from `RGT-S009` Part A.** Evidence labels from `docs/research/small-studio-workflow.md` section 8 are carried here, because what is specified and what is inferred lead to the same design but not to the same confidence.
 
-`[FACT]` A published distributor specification requires a fully-filled Music & Effects package whose required assets are an M&E track, optional tracks, a dialogue guide and a print master. The M&E body carries "background music exactly as it is represented in the original language mix", and **optional tracks must carry "Vocals from a character singing on-screen"**. `[FACT]` Textless picture is required **for IMF and servicing packages**, covering "any graphic and/or animated text that occurs over picture", with carve-outs for text over pure black or white frames, text that was part of visual-effects composites, and in-story brands.
+`[FACT]` A published distributor specification requires a fully-filled Music & Effects package whose required assets include an M&E track, optional tracks, a dialogue guide and a print master. The M&E body carries "background music exactly as it is represented in the original language mix", and **optional tracks must carry "Vocals from a character singing on-screen"**. `[FACT]` Textless picture is required **for IMF and servicing packages**, covering "any graphic and/or animated text that occurs over picture", with carve-outs for text over pure black or white frames, text that was part of visual-effects composites, and in-story brands.
 
 `[INFERENCE]` That every sung vocal must therefore be deliverable **both** as an optional track **and** as a dialogue stem is read from those requirements taken together, not stated by the specification. The design consequence is the same either way and is the reason this requirement exists.
 
@@ -146,7 +146,7 @@ The qualifying final-render path must therefore either be CPU-only, or demonstra
 
 **`RGT-S014` adds three variables to what `RGT-S013` must measure, and extends it to the compositing stage.**
 
-- **Compiled-in instruction set.** tiny-skia's own README states that portability changes with the SIMD level the binary was compiled for; pixman ships SIMD paths with no numeric-equivalence claim. Instruction set joins thread count and architecture as a determinism variable.
+- **Compiled-in instruction set.** tiny-skia's own README states that portability changes with the SIMD level the binary was compiled for; pixman ships SIMD paths and no per-path numeric-equivalence claim was located. Instruction set joins thread count and architecture as a determinism variable.
 - **8-bit premultiplication precision.** resvg premultiplies raster images into an 8-bit pixmap on load, which is lossy under low alpha — exactly where cutout edge haloing appears, and exactly the region its own golden tests exempt from comparison.
 - **No compositing candidate makes a determinism claim at all.** The determinism class must therefore be established by measurement at the compositing stage, not only at the rasterisation stage.
 
