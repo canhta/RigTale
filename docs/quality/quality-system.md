@@ -84,6 +84,8 @@ Owns creative approvals and final publication judgment. The human rubric uses a 
 
 ## Reference Fixtures
 
+`docs/quality/fixture-risk-matrix.md` maps every material production risk to the fixture assertion that exposes it, and records the three risks no fixture can assert. It is the input to the corpus below, not a summary of it.
+
 The test corpus must include:
 
 - valid and invalid production-contract examples;
