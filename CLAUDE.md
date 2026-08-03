@@ -4,7 +4,7 @@ This is a documentation and research repository. There is no application code ye
 
 ## Writing docs
 
-- **One version of the truth.** Delete superseded text outright. Never strike it through, never keep an old and a new statement side by side, never add a "retained for the record" or "superseded claim" section. Git history is the record.
+- **One version of the truth.** Delete superseded text outright. Never strike it through, never keep an old and a new statement side by side, never add a "retained for the record" or "superseded claim" section. Git history is the record. When enforcing this, grep the phrasing as well as the `~~` markup — the prose form is the common one and searching only for strikethrough misses it.
 - **Short and focused.** Every document states what is true now and stops. Do not restate a point in two places, do not add a paragraph explaining that a change was made when the changed text already says it.
 - **Correct in place.** When a claim turns out to be wrong, rewrite the claim. Keep a correction note only when the reasoning error itself is the finding worth carrying forward, and keep it to a few lines.
 - **No duplication across files.** `TODO.md` tracks status and dependencies. Documents own their content. Do not copy content into `TODO.md` or between documents; link instead.

@@ -116,9 +116,9 @@ The commits are functional, not cosmetic. Verbatim subjects include `fix transfo
 
 The disposition remains `adapt` with a decision gate, but the gate now has a second question: which branch is the specification? Nothing in this review may be cited as evidence of DragonBones' maintenance state until it is re-audited against `origin/6.0.2`.
 
-### The superseded master-branch data, retained for the record
+### Evidence that `master` is the stale branch
 
-From `origin/master` only.
+From `origin/master` only. These figures are why a default clone misleads: they are accurate for `master` and say nothing about the project.
 
 | Period | Commits |
 |---|---|
@@ -133,7 +133,7 @@ Total 416 commits; **zero in the last 12 months, two in the last 36**. Roughly 6
 
 The two 2025 commits are not substantive: one bumps a copyright year, the other changes a `console.info` URL to point at a rebrand. A new maintainer attached a Pixi 8 binding and repointed the website; the README now promotes a different commercial editor over the original tooling.
 
-**Superseded verdict, retained so the error is not silently erased:** "dead, with a 2025 rebranding twitch. The core runtime has had no functional change in over six years. Treat it as a frozen format specification with a reference implementation, not a living dependency." See the correction above. Every clause of that verdict is false of `origin/6.0.2`.
+**The transferable lesson, which is why this section exists at all:** a default clone is not a project. Reading `origin/master` and reporting it as "full git history" produced a verdict that was false in every clause. Branch identity belongs in every maintenance claim this repository makes.
 
 ## Test Strategy — None
 

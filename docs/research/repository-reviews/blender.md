@@ -132,7 +132,7 @@ This is a hypothesis about an adapter shape, not a renderer selection. It must r
 | Does `blender -b file.blend -f N -o out_####.png` produce byte-identical PNGs across repeat runs on one macOS machine for a GP scene? The Halton evidence suggests yes; the project's own TAA note contradicts it. | `SPIKE-R001` | Decisive |
 | Can the full GP layer → View Layer → File Output chain be built and rendered entirely via non-operator RNA, with zero `bpy.ops`? | `SPIKE-R001` | Decisive |
 | Does varying `--threads`, device, or driver version change GP output bytes? | `SPIKE-R001` | |
-| Wall-clock for a 150–210 second multi-character GP scene (roughly 3,600–5,040 frames at 24fps), and per-shot rerender latency | `SPIKE-R001`, `SPIKE-R006` measurements | |
+| Wall-clock for a 150–210 second multi-character GP scene (roughly 3,600–5,040 frames at 24fps), and per-shot rerender latency | `SPIKE-R001` measurements, against `PR-R006` | |
 | Do render failures reliably produce non-zero exit codes, or must RigTale post-verify every output artifact? | `SPIKE-R001` | |
 | Is the `bpy` wheel viable on macOS arm64 despite the development-only annotation? | `SPIKE-I001` | |
 | How much GP3 API churn occurred between 4.x and 5.x? | `SPIKE-A002` | |
