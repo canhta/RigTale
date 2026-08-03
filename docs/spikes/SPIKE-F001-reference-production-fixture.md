@@ -2,7 +2,7 @@
 
 **Tracker:** `RGT-S003`
 
-**Status:** Queued. Do not execute until the v1 documentation baseline is approved and competitive research has identified the production risks the fixture must expose.
+**Status:** Active. Unblocked on 2026-08-03 by the Project Owner's sandbox-asset decision, which closed `RGT-O001`.
 
 ## Question
 
@@ -16,8 +16,21 @@ A convenient demo scene can make weak architectures look successful. The test fi
 
 - The v1 charter and documentation baseline are approved for evidence work.
 - `SPIKE-C001` has identified relevant production patterns and common failure modes.
-- `SPIKE-W001` has established target-user workflow, gate, and value evidence.
+- `SPIKE-W001` has established target-user workflow, gate, and value evidence. **Part B was rejected**, so gate and value evidence rest on desk research and owner judgement; see `docs/requirements/charter.md`, Charter Revision 1.
 - Reference assets may be created, commissioned, or adapted only from sources with compatible, documented licenses.
+
+## Two Asset Tiers
+
+Owner decision, 2026-08-03. This is what closed `RGT-O001` and it governs every asset this spike touches.
+
+| Tier | May be used for | May never be used for |
+|---|---|---|
+| **Sandbox** — downloaded from the Internet under its own licence or terms, held in the ignored `.sandbox/` workspace | Local technical experiments: does a renderer composite headlessly, does an importer preserve layer structure, does a rig deform | Fixtures, approval evidence, decision records, the reference production, anything committed, packaged, published, or released |
+| **Official** — provable redistribution rights, provenance and licence recorded before use | Everything, including all of the above | — |
+
+**Any result that becomes official evidence must be reproduced on official assets.** A sandbox run may tell you a candidate works; it may not be the record that says so. Full policy: `.sandbox/README.md`.
+
+**`.gitignore` changes what Git tracks and nothing else.** Attribution, share-alike, non-commercial, and no-derivatives terms bind regardless of whether a file is ignored.
 
 ## Fixture Structure
 
@@ -88,7 +101,7 @@ Thresholds that cannot be justified before execution remain explicitly evidence-
 1. Derive a risk catalogue from the charter, v1 requirements, quality system, competitive research, and repository reviews.
 2. Map each material risk to at least one isolated fixture assertion.
 3. Design an original production brief and cast sufficient to exercise the required archetypes.
-4. Record provenance and license compatibility before asset work begins.
+4. Record provenance and license compatibility before asset work begins, and decide per asset whether it is originated, commissioned, or adapted from a compatibly licensed source. `RGT-O001` fixed the constraint — official assets must be redistributable — and left the route per asset to this step.
 5. Produce engine-neutral source assets, expected references, semantic descriptions, and invalid cases.
 6. Review the fixture for accidental backend bias and missing full-duration risks.
 7. Version and publish the fixture manifest before orchestration or renderer experiments.
@@ -117,6 +130,7 @@ Thresholds that cannot be justified before execution remain explicitly evidence-
 
 ## Stop Conditions
 
-- Stop if required assets lack provable redistribution rights.
+- Stop if required assets lack provable redistribution rights. A sandbox asset does not satisfy this and never converts into one by being used; it must be replaced.
+- Stop if any fixture manifest, expected-evidence record, or approval artifact references a path under `.sandbox/`.
 - Stop if expected results can be satisfied only through one candidate's private representation.
 - Stop and revise the fixture if a material production risk has no observable assertion.

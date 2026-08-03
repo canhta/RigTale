@@ -31,6 +31,7 @@ This map defines the minimum non-overlapping documentation set required before r
 - `spikes/` defines reproducible experiments and later records their results.
 - `decisions/` is created only when evidence supports an accepted technical choice.
 - `TODO.md` tracks status and dependencies without duplicating document content.
+- `.sandbox/` is an ignored local workspace for Internet-sourced experimental assets. Its contents are never fixtures, approval evidence, or release content, and any result promoted to official evidence must be reproduced on assets with provable redistribution rights. Policy: `.sandbox/README.md`.
 - Stable development workflows may be extracted into agent skills only after the underlying workflow has been implemented and verified.
 
 ## Completion Rule

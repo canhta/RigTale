@@ -12,24 +12,25 @@ An item may be marked `completed` only when its linked exit criteria are satisfi
 
 | ID | Type | Item | Evidence | Status |
 |---|---|---|---|---|
-_No item is active. `RGT-S003` is the next eligible item; see the note below the queue._
+| RGT-S003 | Fixture spike | Define the representative multi-character production fixture | `docs/spikes/SPIKE-F001-reference-production-fixture.md` | `active` since 2026-08-03 |
 
 ## Blocked
 
 | ID | Type | Item | Blocked by | Evidence |
 |---|---|---|---|---|
-| RGT-O001 | Owner decision | Decide the provenance and licence of the reference cast, scenes, props, and music: originate, commission, or adapt | Project Owner decision; no research can resolve it | `docs/spikes/SPIKE-F001-reference-production-fixture.md` |
+_No item is blocked._
 
-**`RGT-O001` is the sole blocker of the entire technical chain.** It gates the approval of `RGT-S003`, and `RGT-S002`, `RGT-S010`, `RGT-S011`, `RGT-S012`, and `RGT-S013` all depend on `RGT-S003`. With `RGT-S014` closed, **no queue item can start until this decision is made.** No research can resolve it; it is an asset provenance and licensing choice.
+## Closed by Owner Decision
 
-## Rejected
+`RGT-S009B` is `rejected`. `RGT-O001` and `RGT-O002` are owner decisions rather than spikes, so they are `resolved` rather than carrying a spike status.
 
 | ID | Result | Reason | Evidence |
 |---|---|---|---|
 | RGT-S009B | Rejected by owner decision, 2026-08-02. Exit criteria not met and will not be met. | Project Owner is the sole decision-maker and implementer and will conduct no interviews or evaluations with external participants. Recorded as `charter.md` Charter Revision 1, because `SPIKE-W001` states that Part B carries a charter obligation and cannot be waived by an evidence-state transition. | `docs/requirements/charter.md` (Charter Revisions), `docs/spikes/SPIKE-W001-production-workflow-and-business-evidence.md` |
 | RGT-O002 | Resolved by recorded deviation, 2026-08-02. Blind-review requirement waived. | A solo project with no external participants cannot supply a reviewer who does not know which workflow produced an output. Quality scoring is owner-performed and non-blind; the Objective 4 rubric result carries that limitation. | `docs/requirements/charter.md` (Charter Revisions), `docs/research/manual-baseline-protocol.md`, `docs/quality/quality-system.md` |
+| RGT-O001 | Resolved by owner decision, 2026-08-03. Two asset tiers established. | Internet-sourced assets may be downloaded and used for local technical experiments in the ignored `.sandbox/` workspace, under their own licence or terms. They are never fixtures, approval evidence, or release content. Official evidence must be reproduced on assets with provable redistribution rights. The originate/commission/adapt route is decided **per asset** inside `RGT-S003` method step 4 rather than as a separate blocking decision, because the binding constraint — redistributability — is now fixed. | `.sandbox/README.md`, `docs/spikes/SPIKE-F001-reference-production-fixture.md` |
 
-The full consequences of both rows are recorded once, in `docs/requirements/charter.md` under Charter Revision 1.
+The consequences of the `RGT-S009B` and `RGT-O002` rows are recorded once, in `docs/requirements/charter.md` under Charter Revision 1. The `RGT-O001` policy is recorded once, in `.sandbox/README.md`.
 
 ## Queue
 
@@ -39,7 +40,6 @@ The queue is topologically ordered: no row depends on a row below it. The `Depen
 
 | ID | Type | Item | Depends on | Evidence |
 |---|---|---|---|---|
-| RGT-S003 | Fixture spike | Define the representative multi-character production fixture | RGT-S001, RGT-S009, RGT-S014, RGT-O001 | `docs/spikes/SPIKE-F001-reference-production-fixture.md` |
 | RGT-S002 | Competitive spikes | Deep-review shortlisted repositories using approved fixture cases | RGT-S001, RGT-S003 | `docs/research/repository-reviews/` |
 | RGT-S010 | Asset spike | Validate layered-asset ingestion and rig publication | RGT-S001, RGT-S003 | `docs/spikes/SPIKE-A002-asset-ingestion-and-rig-authoring.md` |
 | RGT-S011 | Foundation spike | Validate contract tooling, migration, content identity, and local storage | RGT-S001, RGT-S003 | `docs/spikes/SPIKE-CS001-contract-and-local-storage.md` |
@@ -77,17 +77,14 @@ The queue is topologically ordered: no row depends on a row below it. The `Depen
 | RGT-S009 | Workflow Part A complete: labelled workflow map, gate evidence status, manual baseline protocol | `docs/spikes/SPIKE-W001-production-workflow-and-business-evidence.md`, `docs/research/small-studio-workflow.md`, `docs/research/manual-baseline-protocol.md` | closed at `b2da9ad` |
 | RGT-S014 | Ingestion screening complete: PSD/PSB and OpenRaster pass the `PR-A003` write gate, `.kra` fails for want of any published specification. Source artwork is layered raster, but the prior shortlist was screening the right libraries on the wrong axis — tiny-skia is a CPU raster compositor. New requirement `PR-R008` created; 18 propagation rows applied | `docs/research/source-artwork-formats.md` | evidence at `089cf41`, propagation applied on closure |
 
-## Next Eligible Item
+## Notes on the Active Item
 
-`RGT-S003` (`SPIKE-F001`, the reference fixture) **may be drafted but cannot be approved.** The distinction was previously blurred and is now explicit.
+`RGT-S003` (`SPIKE-F001`, the reference fixture) is active. Two constraints govern it.
 
-- **May proceed now.** The brief, cast, diagnostic shots, risk matrix, and acceptance criteria can be specified on the evidence already accepted.
-- **The interview precondition is gone, and what replaced it is weaker.** Fixture priorities are now set from desk research plus owner judgement, so they reflect documented and hypothesised production failures rather than observed ones. Noted here because the fixture is what every later spike measures against.
-- **Cannot be approved without `RGT-O001`.** The fixture requires original or compatibly licensed characters, backgrounds, props, and music; `SPIKE-F001` stop-conditions require halting if assets lack provable redistribution rights. This is now the only remaining blocker.
+- **Fixture priorities rest on desk research plus owner judgement.** `RGT-S009B` was rejected, so they reflect documented and hypothesised production failures rather than observed ones. This matters because the fixture is what every later spike measures against.
+- **Official fixture assets must have provable redistribution rights.** Sandbox assets may bootstrap technical experiments but can never become fixture or approval evidence; `SPIKE-F001` stop-conditions enforce this, and any result promoted to official evidence must be reproduced on official assets. See `.sandbox/README.md`.
 
-An earlier version of this note claimed `RGT-S003` was simply "unblocked" by silently reducing the precondition "workflow, gate, and value evidence" to "workflow evidence." That was wrong.
-
-`RGT-S012` and `RGT-S013` must not run before the fixture is approved. `SPIKE-F001` states the reason: a convenient demo scene can make a weak architecture look successful. Their `Depends on` column previously listed only the completed `RGT-S001`, which contradicted this paragraph in the same file; it now lists `RGT-S003`.
+`RGT-S012` and `RGT-S013` must not run before the fixture is approved. `SPIKE-F001` states the reason: a convenient demo scene can make a weak architecture look successful.
 
 ## Open Contradictions Awaiting an Owner Decision
 

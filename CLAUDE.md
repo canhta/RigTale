@@ -16,6 +16,7 @@ This is a documentation and research repository. There is no application code ye
 - If a fact cannot be verified from a primary source, record it as `not verified`. Never infer, and never assert a superlative from search-index confidence.
 - Label statements about user behaviour: `[FACT]`, `[REPORTED]`, `[HYPOTHESIS]`, `[UNKNOWN]`, `[OWNER-STATED]`. These labels are load-bearing.
 - Screening is read-only. Clone and read source; do not build, install, or execute candidate code.
+- Internet-sourced assets may be downloaded into the ignored `.sandbox/` workspace for local technical experiments, under their own licence or terms. They are never fixtures, approval evidence, or release content, and any result promoted to official evidence must be reproduced on assets with provable redistribution rights. `.gitignore` changes what Git tracks and nothing else; licence obligations are unaffected. Full policy: `.sandbox/README.md`.
 
 ## Governance
 
